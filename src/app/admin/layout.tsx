@@ -15,7 +15,9 @@ export default async function AdminLayout({
   // We'll check dynamically; pages that need auth redirect
   return (
     <SessionProvider session={session}>
-      {children}
+      <div className="min-h-screen bg-gray-50">
+        {children}
+      </div>
     </SessionProvider>
   );
 }

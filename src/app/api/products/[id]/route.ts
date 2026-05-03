@@ -85,7 +85,25 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { id } = await params;
-  await prisma.product.delete({ where: { id } });
-  return NextResponse.json({ success: true });
+  try {
+    const { id } = await params;
+    
+    // Check if product has order items
+    const orderItemsCount = await prisma.orderItem.count({ where: { productId: id } });
+    
+    if (orderItemsCount > 0) {
+      // Soft delete if it has orders
+      await prisma.product.update({
+        where: { id },
+        data: { active: false }
+      });
+      return NextResponse.json({ success: true, message: "Đã ẩn sản phẩm do có đơn hàng liên quan" });
+    } else {
+      await prisma.product.delete({ where: { id } });
+      return NextResponse.json({ success: true });
+    }
+  } catch (error) {
+    console.error("Delete product error:", error);
+    return NextResponse.json({ error: "Lỗi hệ thống" }, { status: 500 });
+  }
 }

@@ -53,7 +53,12 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       ...(depositNote !== undefined && { depositNote }),
     },
     include: {
-      items: { include: { product: true, variant: true } },
+      items: {
+        include: {
+          product: { include: { images: { where: { isPrimary: true }, take: 1 } } },
+          variant: true,
+        },
+      },
     },
   });
 

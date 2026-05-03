@@ -28,7 +28,7 @@ export default function AdminNav() {
   return (
     <>
       {/* Desktop sidebar */}
-      <div className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 lg:bg-gradient-to-b lg:from-purple-900 lg:to-purple-800">
+      <div className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 lg:bg-gradient-to-b lg:from-purple-900 lg:to-purple-800">
         <div className="flex items-center gap-3 p-6 border-b border-purple-700">
           <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
             <Store className="h-6 w-6 text-white" />
