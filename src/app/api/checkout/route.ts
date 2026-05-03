@@ -1,0 +1,82 @@
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { generateOrderCode } from "@/lib/utils";
+import { vnPhoneRegex } from "@/lib/validations";
+
+export async function POST(req: NextRequest) {
+  const body = await req.json();
+  const {
+    customerName,
+    customerPhone,
+    customerEmail,
+    provinceCode,
+    provinceName,
+    districtCode,
+    districtName,
+    wardCode,
+    wardName,
+    detailedAddress,
+    note,
+    paymentMethod,
+    items,
+    totalAmount,
+  } = body;
+
+  if (!customerName || !customerPhone || !provinceName || !districtName || !wardName || !detailedAddress) {
+    return NextResponse.json({ error: "Thiếu thông tin bắt buộc" }, { status: 400 });
+  }
+
+  if (!vnPhoneRegex.test(customerPhone)) {
+    return NextResponse.json({ error: "Số điện thoại không hợp lệ" }, { status: 400 });
+  }
+
+  if (!provinceCode || !districtCode || !wardCode) {
+    return NextResponse.json({ error: "Vui lòng chọn đầy đủ địa chỉ tỉnh/huyện/xã" }, { status: 400 });
+  }
+
+  if (!items || items.length === 0) {
+    return NextResponse.json({ error: "Giỏ hàng trống" }, { status: 400 });
+  }
+
+  for (const item of items) {
+    const product = await prisma.product.findUnique({ where: { id: item.productId } });
+    if (!product || !product.active) {
+      return NextResponse.json({ error: `Sản phẩm không tồn tại hoặc đã ngừng bán` }, { status: 400 });
+    }
+  }
+
+  const code = generateOrderCode();
+
+  const order = await prisma.order.create({
+    data: {
+      code,
+      customerName: customerName.trim(),
+      customerPhone: customerPhone.trim(),
+      customerEmail: customerEmail?.trim() || null,
+      province: provinceName,
+      district: districtName,
+      ward: wardName,
+      detailedAddress: detailedAddress.trim(),
+      note: note?.trim() || null,
+      subtotal: Number(totalAmount),
+      depositAmount: 25000,
+      totalAmount: Number(totalAmount),
+      paymentMethod: paymentMethod || "BANK_TRANSFER",
+      status: "PENDING_DEPOSIT",
+      depositStatus: "PENDING",
+      items: {
+        create: items.map((item: { productId: string; variantId?: string; quantity: number; price: number }) => ({
+          productId: item.productId,
+          variantId: item.variantId || null,
+          quantity: Number(item.quantity),
+          price: Number(item.price),
+        })),
+      },
+    },
+    include: {
+      items: { include: { product: true } },
+    },
+  });
+
+  return NextResponse.json(order, { status: 201 });
+}
