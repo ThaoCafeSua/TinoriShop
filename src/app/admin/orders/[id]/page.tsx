@@ -72,6 +72,9 @@ export default function AdminOrderDetailPage() {
   const [shippingCode, setShippingCode] = useState("");
   const [depositNote, setDepositNote] = useState("");
 
+  const [confirmingDeposit, setConfirmingDeposit] = useState(false);
+  const [confirmingStatus, setConfirmingStatus] = useState<OrderStatus | null>(null);
+
   useEffect(() => {
     fetch(`/api/orders/${id}`)
       .then((res) => res.json())
@@ -96,6 +99,7 @@ export default function AdminOrderDetailPage() {
       setOrder((prev) => prev ? { ...prev, ...updated } : null);
     }
     setUpdating(false);
+    setConfirmingDeposit(false);
   };
 
   const updateStatus = async (status: OrderStatus) => {
@@ -110,6 +114,7 @@ export default function AdminOrderDetailPage() {
       setOrder((prev) => prev ? { ...prev, ...updated } : null);
     }
     setUpdating(false);
+    setConfirmingStatus(null);
   };
 
   const saveShippingCode = async () => {
@@ -125,7 +130,7 @@ export default function AdminOrderDetailPage() {
   if (loading) {
     return (
       <div className="lg:pl-64 flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-pink-600" />
       </div>
     );
   }
@@ -178,14 +183,13 @@ export default function AdminOrderDetailPage() {
                   <div key={item.id} className="flex gap-4 p-4">
                     <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
                       {item.product.images[0] ? (
-                        <Image
+                        <img
                           src={item.product.images[0].url}
                           alt={item.product.name}
-                          fill
-                          className="object-cover"
+                          className="w-full h-full object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full bg-purple-100 flex items-center justify-center text-2xl">📦</div>
+                        <div className="w-full h-full bg-pink-100 flex items-center justify-center text-2xl">📦</div>
                       )}
                     </div>
                     <div className="flex-1">
@@ -235,14 +239,21 @@ export default function AdminOrderDetailPage() {
                     placeholder="Ghi chú xác nhận cọc (tùy chọn)..."
                     className="w-full text-sm border rounded-lg p-2 mb-3 resize-none h-16"
                   />
-                  <Button
-                    onClick={confirmDeposit}
-                    disabled={updating}
-                    className="bg-green-600 hover:bg-green-700"
-                  >
-                    {updating ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
-                    Xác nhận đã nhận cọc
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => confirmingDeposit ? confirmDeposit() : setConfirmingDeposit(true)}
+                      disabled={updating}
+                      className={confirmingDeposit ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700"}
+                    >
+                      {updating ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
+                      {confirmingDeposit ? "Bấm lần nữa để xác nhận" : "Xác nhận đã nhận cọc"}
+                    </Button>
+                    {confirmingDeposit && (
+                      <Button onClick={() => setConfirmingDeposit(false)} variant="outline" disabled={updating}>
+                        Hủy
+                      </Button>
+                    )}
+                  </div>
                 </div>
               ) : (
                 <div className="p-3 bg-green-50 border border-green-200 rounded-xl mb-4">
@@ -270,7 +281,7 @@ export default function AdminOrderDetailPage() {
                     value={shippingCode}
                     onChange={(e) => setShippingCode(e.target.value)}
                     placeholder="Nhập mã vận đơn..."
-                    className="flex-1 text-sm border-2 border-gray-200 rounded-xl px-3 py-2 focus:border-purple-400 focus:outline-none"
+                    className="flex-1 text-sm border-2 border-gray-200 rounded-xl px-3 py-2 focus:border-pink-400 focus:outline-none"
                   />
                   <Button onClick={saveShippingCode} disabled={updating} variant="outline" size="sm">
                     Lưu
@@ -284,21 +295,28 @@ export default function AdminOrderDetailPage() {
                 <div className="flex flex-wrap gap-2">
                   {statusFlow.map(({ status, label, icon, requiresDeposit }) => {
                     const disabled = (requiresDeposit && order.depositStatus !== "PAID") || updating || order.status === status;
+                    const isConfirming = confirmingStatus === status;
+                    
                     return (
                       <Button
                         key={status}
-                        onClick={() => updateStatus(status)}
+                        onClick={() => isConfirming ? updateStatus(status) : setConfirmingStatus(status)}
                         disabled={disabled}
-                        variant={order.status === status ? "default" : "outline"}
+                        variant={order.status === status ? "default" : (isConfirming ? "destructive" : "outline")}
                         size="sm"
-                        className={status === "CANCELLED" ? "border-red-300 text-red-600 hover:bg-red-50" : ""}
+                        className={status === "CANCELLED" && !isConfirming ? "border-red-300 text-red-600 hover:bg-red-50" : ""}
                         title={requiresDeposit && order.depositStatus !== "PAID" ? "Cần xác nhận cọc trước" : ""}
                       >
                         {icon}
-                        {label}
+                        {isConfirming ? "Xác nhận đổi?" : label}
                       </Button>
                     );
                   })}
+                  {confirmingStatus && (
+                    <Button variant="ghost" size="sm" onClick={() => setConfirmingStatus(null)}>
+                      Hủy thao tác
+                    </Button>
+                  )}
                 </div>
                 {order.depositStatus !== "PAID" && (
                   <p className="text-xs text-yellow-600 mt-2">
@@ -343,12 +361,12 @@ export default function AdminOrderDetailPage() {
               <h2 className="font-bold text-gray-900 mb-3">Thông tin khách</h2>
               <div className="space-y-2 text-sm">
                 <div className="flex items-center gap-2 text-gray-600">
-                  <User className="h-4 w-4 flex-shrink-0 text-purple-400" />
+                  <User className="h-4 w-4 flex-shrink-0 text-pink-400" />
                   <span className="font-semibold text-gray-800">{order.customerName}</span>
                 </div>
                 <div className="flex items-center gap-2 text-gray-600">
                   <Phone className="h-4 w-4 flex-shrink-0 text-green-400" />
-                  <a href={`tel:${order.customerPhone}`} className="hover:text-purple-600">
+                  <a href={`tel:${order.customerPhone}`} className="hover:text-pink-600">
                     {order.customerPhone}
                   </a>
                 </div>
@@ -379,8 +397,8 @@ export default function AdminOrderDetailPage() {
                 <CreditCard className="h-4 w-4 text-blue-400" />
                 <span>{PAYMENT_METHOD_MAP[order.paymentMethod] || order.paymentMethod}</span>
               </div>
-              <div className="mt-2 p-3 bg-purple-50 rounded-xl">
-                <p className="text-xs text-purple-600 font-medium">Tiền cọc: 25.000đ</p>
+              <div className="mt-2 p-3 bg-pink-50 rounded-xl">
+                <p className="text-xs text-pink-600 font-medium">Tiền cọc: 25.000đ</p>
                 <p className="text-xs text-gray-500 mt-1">
                   Nội dung: COC {order.code}
                 </p>

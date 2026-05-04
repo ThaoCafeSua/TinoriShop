@@ -27,8 +27,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" className={`${beVietnamPro.variable}`}>
-      <body className="min-h-screen bg-gray-50 font-[family-name:var(--font-be-vietnam)] antialiased">
+    <html lang="vi" className={`${beVietnamPro.variable}`} suppressHydrationWarning>
+      <body className="min-h-screen bg-white font-[family-name:var(--font-be-vietnam)] antialiased">
         {children}
         <Toaster />
       </body>

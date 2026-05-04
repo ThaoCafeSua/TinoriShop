@@ -41,7 +41,7 @@ export function slugify(text: string): string {
 export const ORDER_STATUS_MAP: Record<string, { label: string; color: string }> = {
   PENDING_DEPOSIT: { label: "Chờ cọc", color: "bg-yellow-100 text-yellow-800" },
   DEPOSIT_CONFIRMED: { label: "Đã cọc", color: "bg-blue-100 text-blue-800" },
-  PROCESSING: { label: "Đang xử lý", color: "bg-purple-100 text-purple-800" },
+  PROCESSING: { label: "Đang xử lý", color: "bg-pink-100 text-pink-800" },
   SHIPPING: { label: "Đang giao", color: "bg-orange-100 text-orange-800" },
   DELIVERED: { label: "Đã giao", color: "bg-green-100 text-green-800" },
   CANCELLED: { label: "Đã hủy", color: "bg-red-100 text-red-800" },

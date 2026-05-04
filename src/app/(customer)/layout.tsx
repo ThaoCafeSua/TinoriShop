@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import CartSync from "@/components/CartSync";
 
 export default function CustomerLayout({
   children,
@@ -8,6 +9,7 @@ export default function CustomerLayout({
 }) {
   return (
     <>
+      <CartSync />
       <Navbar />
       <main className="min-h-screen">{children}</main>
       <Footer />

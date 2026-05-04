@@ -74,9 +74,9 @@ export default async function DashboardPage() {
       title: "Tổng đơn hàng",
       value: stats.totalOrders,
       icon: ShoppingBag,
-      color: "from-purple-500 to-purple-700",
-      bg: "bg-purple-50",
-      text: "text-purple-600",
+      color: "from-pink-500 to-pink-700",
+      bg: "bg-pink-50",
+      text: "text-pink-600",
     },
     {
       title: "Chờ xác nhận cọc",
@@ -124,7 +124,7 @@ export default async function DashboardPage() {
   const statusMap: Record<string, { label: string; color: string }> = {
     PENDING_DEPOSIT: { label: "Chờ cọc", color: "bg-yellow-100 text-yellow-800" },
     DEPOSIT_CONFIRMED: { label: "Đã cọc", color: "bg-blue-100 text-blue-800" },
-    PROCESSING: { label: "Đang xử lý", color: "bg-purple-100 text-purple-800" },
+    PROCESSING: { label: "Đang xử lý", color: "bg-pink-100 text-pink-800" },
     SHIPPING: { label: "Đang giao", color: "bg-orange-100 text-orange-800" },
     DELIVERED: { label: "Đã giao", color: "bg-green-100 text-green-800" },
     CANCELLED: { label: "Đã hủy", color: "bg-red-100 text-red-800" },
@@ -170,7 +170,7 @@ export default async function DashboardPage() {
             <h2 className="text-lg font-black text-gray-900">Đơn hàng gần đây</h2>
             <Link
               href="/admin/orders"
-              className="text-sm font-medium text-purple-600 hover:text-purple-700"
+              className="text-sm font-medium text-pink-600 hover:text-pink-700"
             >
               Xem tất cả
             </Link>
@@ -197,7 +197,7 @@ export default async function DashboardPage() {
                       <td className="px-4 py-3">
                         <Link
                           href={`/admin/orders/${order.id}`}
-                          className="font-mono text-purple-600 hover:text-purple-700 font-semibold text-xs"
+                          className="font-mono text-pink-600 hover:text-pink-700 font-semibold text-xs"
                         >
                           {order.code}
                         </Link>

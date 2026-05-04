@@ -66,7 +66,7 @@ function OrderSuccessContent() {
   if (loading) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
-        <div className="animate-spin h-12 w-12 border-4 border-purple-500 border-t-transparent rounded-full mx-auto" />
+        <div className="animate-spin h-12 w-12 border-4 border-pink-500 border-t-transparent rounded-full mx-auto" />
         <p className="mt-4 text-gray-500">Đang tải thông tin đơn hàng...</p>
       </div>
     );
@@ -82,21 +82,21 @@ function OrderSuccessContent() {
         <p className="text-gray-500">Cảm ơn bạn đã tin tưởng Tinori. Vui lòng hoàn tất đặt cọc để xác nhận đơn hàng.</p>
       </div>
 
-      <div className="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-2xl p-5 mb-6">
+      <div className="bg-gradient-to-r from-rose-50 to-pink-50 border-2 border-pink-200 rounded-2xl p-5 mb-6">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-purple-600 font-medium mb-1">Mã đơn hàng</p>
-            <p className="text-2xl font-black text-purple-800">{code}</p>
+            <p className="text-sm text-pink-600 font-medium mb-1">Mã đơn hàng</p>
+            <p className="text-2xl font-black text-pink-800">{code}</p>
           </div>
           <button
             onClick={() => copyCode(code || "")}
-            className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-xl text-sm font-medium hover:bg-purple-700"
+            className="flex items-center gap-2 px-4 py-2 bg-pink-600 text-white rounded-xl text-sm font-medium hover:bg-pink-700"
           >
             <Copy className="h-4 w-4" />
             Sao chép
           </button>
         </div>
-        <p className="text-xs text-purple-500 mt-2 flex items-center gap-1">
+        <p className="text-xs text-pink-500 mt-2 flex items-center gap-1">
           <Clock className="h-3 w-3" />
           Lưu mã này để tra cứu đơn hàng
         </p>
@@ -159,7 +159,7 @@ function OrderSuccessContent() {
         <h2 className="text-lg font-black text-gray-900 mb-4">Các bước tiếp theo</h2>
         <div className="space-y-4">
           {[
-            { step: "1", title: "Chuyển khoản đặt cọc", desc: `Chuyển 25.000đ với nội dung COC ${code}`, color: "bg-purple-100 text-purple-700" },
+            { step: "1", title: "Chuyển khoản đặt cọc", desc: `Chuyển 25.000đ với nội dung COC ${code}`, color: "bg-pink-100 text-pink-700" },
             { step: "2", title: "Admin xác nhận cọc", desc: "Trong vòng 1-2 giờ làm việc", color: "bg-blue-100 text-blue-700" },
             { step: "3", title: "Đóng gói và giao hàng", desc: "SPX Express giao hàng 2-5 ngày", color: "bg-green-100 text-green-700" },
           ].map((s) => (
@@ -212,12 +212,12 @@ function OrderSuccessContent() {
         </div>
       )}
 
-      <div className="bg-purple-50 rounded-2xl p-6 mb-6">
-        <h2 className="text-lg font-bold text-purple-900 mb-2 flex items-center gap-2">
+      <div className="bg-pink-50 rounded-2xl p-6 mb-6">
+        <h2 className="text-lg font-bold text-pink-900 mb-2 flex items-center gap-2">
           <MessageCircle className="h-5 w-5" />
           Cần hỗ trợ?
         </h2>
-        <p className="text-sm text-purple-700 mb-4">
+        <p className="text-sm text-pink-700 mb-4">
           Nhắn tin trực tiếp cho Tinori qua Facebook để được hỗ trợ nhanh nhất
         </p>
         <a href="https://www.facebook.com/tinori.official" target="_blank" rel="noopener noreferrer">
@@ -244,7 +244,7 @@ export default function OrderSuccessPage() {
   return (
     <Suspense fallback={
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
-        <div className="animate-spin h-12 w-12 border-4 border-purple-500 border-t-transparent rounded-full mx-auto" />
+        <div className="animate-spin h-12 w-12 border-4 border-pink-500 border-t-transparent rounded-full mx-auto" />
         <p className="mt-4 text-gray-500">Đang tải...</p>
       </div>
     }>

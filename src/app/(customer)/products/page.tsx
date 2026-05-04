@@ -34,6 +34,7 @@ async function getProducts(searchParams: SearchParams) {
       include: {
         images: { where: { isPrimary: true }, take: 1 },
         category: true,
+        _count: { select: { variants: true } },
       },
       orderBy,
       take: 48,
@@ -57,10 +58,7 @@ export default async function ProductsPage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
-  const [products, categories] = await Promise.all([
-    getProducts(params),
-    getCategories(),
-  ]);
+  const products = await getProducts(params);
 
   const activeCategory = params.category;
 
@@ -71,9 +69,6 @@ export default async function ProductsPage({
         <h1 className="text-2xl font-black text-gray-900">
           {params.q
             ? `Kết quả tìm kiếm: "${params.q}"`
-            : params.category
-            ? categories.find((c) => c.slug === params.category)?.name ||
-              "Sản phẩm"
             : params.featured
             ? "Sản phẩm nổi bật"
             : "Tất cả sản phẩm"}
@@ -84,43 +79,7 @@ export default async function ProductsPage({
       </div>
 
       <div className="flex gap-6">
-        {/* Sidebar */}
-        <aside className="hidden lg:block w-52 flex-shrink-0">
-          <div className="bg-white rounded-2xl p-4 shadow-sm sticky top-20">
-            <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <Filter className="h-4 w-4" />
-              Danh mục
-            </h3>
-            <ul className="space-y-1">
-              <li>
-                <Link
-                  href="/products"
-                  className={`block px-3 py-2 rounded-lg text-sm transition-colors ${
-                    !activeCategory
-                      ? "bg-purple-100 text-purple-700 font-semibold"
-                      : "text-gray-600 hover:bg-gray-50"
-                  }`}
-                >
-                  Tất cả sản phẩm
-                </Link>
-              </li>
-              {categories.map((cat) => (
-                <li key={cat.id}>
-                  <Link
-                    href={`/products?category=${cat.slug}`}
-                    className={`block px-3 py-2 rounded-lg text-sm transition-colors ${
-                      activeCategory === cat.slug
-                        ? "bg-purple-100 text-purple-700 font-semibold"
-                        : "text-gray-600 hover:bg-gray-50"
-                    }`}
-                  >
-                    {cat.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </aside>
+
 
         <div className="flex-1">
           {/* Sort & Filter bar */}
@@ -138,16 +97,14 @@ export default async function ProductsPage({
                 <Link
                   key={opt.value}
                   href={{
-                    pathname: "/products",
                     query: {
-                      ...(activeCategory && { category: activeCategory }),
                       ...(params.q && { q: params.q }),
                       ...(opt.value && { sort: opt.value }),
                     },
                   }}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                     (params.sort || "") === opt.value
-                      ? "bg-purple-600 text-white"
+                      ? "bg-pink-500 text-white"
                       : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}
                 >
@@ -157,34 +114,7 @@ export default async function ProductsPage({
             </div>
           </div>
 
-          {/* Mobile categories */}
-          {categories.length > 0 && (
-            <div className="lg:hidden flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
-              <Link
-                href="/products"
-                className={`flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition-colors ${
-                  !activeCategory
-                    ? "bg-purple-600 text-white"
-                    : "bg-white text-gray-600 shadow-sm"
-                }`}
-              >
-                Tất cả
-              </Link>
-              {categories.map((cat) => (
-                <Link
-                  key={cat.id}
-                  href={`/products?category=${cat.slug}`}
-                  className={`flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition-colors ${
-                    activeCategory === cat.slug
-                      ? "bg-purple-600 text-white"
-                      : "bg-white text-gray-600 shadow-sm"
-                  }`}
-                >
-                  {cat.name}
-                </Link>
-              ))}
-            </div>
-          )}
+
 
           {products.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-2xl">
@@ -196,7 +126,7 @@ export default async function ProductsPage({
                 Thử tìm kiếm với từ khóa khác hoặc xem tất cả sản phẩm
               </p>
               <Link href="/products">
-                <button className="mt-4 px-6 py-2 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700">
+                <button className="mt-4 px-6 py-2 bg-pink-500 text-white rounded-xl font-medium hover:bg-pink-600">
                   Xem tất cả
                 </button>
               </Link>
@@ -212,7 +142,7 @@ export default async function ProductsPage({
                   salePrice={product.salePrice}
                   image={product.images[0]?.url}
                   slug={product.slug}
-                  category={product.category?.name}
+                  hasVariants={product._count?.variants > 0}
                 />
               ))}
             </div>

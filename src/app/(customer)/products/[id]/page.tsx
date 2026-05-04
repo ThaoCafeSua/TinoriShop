@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ShoppingCart,
   ChevronLeft,
@@ -29,6 +30,9 @@ interface ProductVariant {
   type: string;
   stock: number;
   price?: number;
+  salePrice?: number | null;
+  active?: boolean;
+  image?: string | null;
 }
 
 interface Product {
@@ -40,7 +44,7 @@ interface Product {
   stock: number;
   images: { id: string; url: string; isPrimary: boolean }[];
   variants: ProductVariant[];
-  category?: { name: string; slug: string };
+  variants: ProductVariant[];
 }
 
 export default function ProductDetailPage() {
@@ -51,7 +55,8 @@ export default function ProductDetailPage() {
   const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({});
   const [quantity, setQuantity] = useState(1);
   const [addedToCart, setAddedToCart] = useState(false);
-  const { addItem } = useCart();
+  const { addItem, clearCart } = useCart();
+  const router = useRouter();
 
   useEffect(() => {
     fetch(`/api/products/${id}`)
@@ -96,36 +101,63 @@ export default function ProductDetailPage() {
     product.salePrice && product.salePrice < product.price
       ? product.salePrice
       : product.price;
-  const hasDiscount = product.salePrice && product.salePrice < product.price;
-  const discountPercent = hasDiscount
-    ? Math.round(((product.price - product.salePrice!) / product.price) * 100)
-    : 0;
+  const baseHasDiscount = product.salePrice && product.salePrice < product.price;
 
-  // Group variants by type
-  const variantGroups: Record<string, ProductVariant[]> = {};
-  product.variants.forEach((v) => {
-    if (!variantGroups[v.type]) variantGroups[v.type] = [];
-    variantGroups[v.type].push(v);
-  });
+  // Extract attributes from combination variants
+  const attributeNames = product.variants[0]?.type?.split(' - ') || [];
+  const attributeGroups = attributeNames.map((name, index) => {
+    const values = Array.from(new Set(product.variants.map(v => v.value.split(' - ')[index]).filter(Boolean)));
+    return { name, values };
+  }).filter(g => g.name);
+
+  // Find matched variant based on selection
+  const selectedValuesString = attributeNames.map(name => selectedVariants[name] || "").join(' - ');
+  const matchedVariant = product.variants.find(v => v.value === selectedValuesString);
+
+  const currentDisplayPrice = matchedVariant?.salePrice || matchedVariant?.price || displayPrice;
+  const currentOriginalPrice = matchedVariant?.price || product.price;
+  const hasDiscount = matchedVariant 
+    ? (matchedVariant.salePrice && matchedVariant.salePrice < matchedVariant.price!)
+    : baseHasDiscount;
+  const discountPercent = hasDiscount
+    ? Math.round(((currentOriginalPrice - currentDisplayPrice) / currentOriginalPrice) * 100)
+    : 0;
+  
+  const currentStock = matchedVariant ? matchedVariant.stock : product.stock;
+  const displayImage = matchedVariant?.image || product.images[selectedImage]?.url;
 
   const handleAddToCart = () => {
-    // Get selected variant
-    const variantTypes = Object.keys(variantGroups);
-    const selectedVariant =
-      variantTypes.length > 0
-        ? product.variants.find((v) => selectedVariants[v.type] === v.id)
-        : undefined;
+    if (attributeNames.length > 0) {
+      const missingVariant = attributeNames.find((name) => !selectedVariants[name]);
+      if (missingVariant) {
+        toast({
+          title: "Vui lòng chọn thuộc tính",
+          description: `Bạn chưa chọn ${missingVariant}`,
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
+    if (currentStock <= 0) {
+      toast({
+        title: "Hết hàng",
+        description: "Sản phẩm này đã hết hàng",
+        variant: "destructive",
+      });
+      return;
+    }
 
     const cartItem = {
-      id: `${product.id}-${selectedVariant?.id || "default"}-${Date.now()}`,
+      id: `${product.id}-${matchedVariant?.id || "default"}-${Date.now()}`,
       productId: product.id,
       name: product.name,
-      price: selectedVariant?.price || displayPrice,
-      image: product.images[0]?.url || "",
+      price: currentDisplayPrice,
+      image: displayImage || product.images[0]?.url || "",
       quantity,
-      variantId: selectedVariant?.id,
-      variantName: selectedVariant?.name,
-      variantValue: selectedVariant?.value,
+      variantId: matchedVariant?.id,
+      variantName: attributeNames.join(" - ") || undefined,
+      variantValue: matchedVariant?.value || undefined,
     };
 
     addItem(cartItem);
@@ -137,29 +169,58 @@ export default function ProductDetailPage() {
     });
     setTimeout(() => setAddedToCart(false), 2000);
   };
+  
+  const handleBuyNow = () => {
+    if (attributeNames.length > 0) {
+      const missingVariant = attributeNames.find((name) => !selectedVariants[name]);
+      if (missingVariant) {
+        toast({
+          title: "Vui lòng chọn thuộc tính",
+          description: `Bạn chưa chọn ${missingVariant}`,
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
+    if (currentStock <= 0) {
+      toast({
+        title: "Hết hàng",
+        description: "Sản phẩm này đã hết hàng",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const cartItem = {
+      id: `${product.id}-${matchedVariant?.id || "default"}-${Date.now()}`,
+      productId: product.id,
+      name: product.name,
+      price: currentDisplayPrice,
+      image: displayImage || product.images[0]?.url || "",
+      quantity,
+      variantId: matchedVariant?.id,
+      variantName: attributeNames.join(" - ") || undefined,
+      variantValue: matchedVariant?.value || undefined,
+    };
+
+    clearCart(); // Ensure only this product is checked out
+    addItem(cartItem);
+    router.push("/checkout");
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-        <Link href="/" className="hover:text-purple-600">
+        <Link href="/" className="hover:text-pink-600">
           Trang chủ
         </Link>
         <span>/</span>
-        <Link href="/products" className="hover:text-purple-600">
+        <Link href="/products" className="hover:text-pink-600">
           Sản phẩm
         </Link>
-        {product.category && (
-          <>
-            <span>/</span>
-            <Link
-              href={`/products?category=${product.category.slug}`}
-              className="hover:text-purple-600"
-            >
-              {product.category.name}
-            </Link>
-          </>
-        )}
+
         <span>/</span>
         <span className="text-gray-700 font-medium line-clamp-1">{product.name}</span>
       </div>
@@ -176,7 +237,7 @@ export default function ProductDetailPage() {
                 className="object-cover"
               />
             ) : (
-              <div className="flex items-center justify-center h-full bg-gradient-to-br from-purple-50 to-pink-50 text-gray-400">
+              <div className="flex items-center justify-center h-full bg-gradient-to-br from-rose-50 to-pink-50 text-gray-400">
                 <ShoppingCart className="h-20 w-20 opacity-20" />
               </div>
             )}
@@ -194,7 +255,7 @@ export default function ProductDetailPage() {
                   onClick={() => setSelectedImage(i)}
                   className={`relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 border-2 transition-colors ${
                     selectedImage === i
-                      ? "border-purple-500"
+                      ? "border-pink-500"
                       : "border-transparent"
                   }`}
                 >
@@ -207,19 +268,17 @@ export default function ProductDetailPage() {
 
         {/* Product info */}
         <div>
-          {product.category && (
-            <Badge className="mb-2">{product.category.name}</Badge>
-          )}
+
           <h1 className="text-2xl font-black text-gray-900 mb-3">{product.name}</h1>
 
           <div className="flex items-center gap-3 mb-4">
             <span className="text-3xl font-black text-pink-600">
-              {formatPrice(displayPrice)}
+              {formatPrice(currentDisplayPrice)}
             </span>
             {hasDiscount && (
               <>
                 <span className="text-lg text-gray-400 line-through">
-                  {formatPrice(product.price)}
+                  {formatPrice(currentOriginalPrice)}
                 </span>
                 <span className="bg-red-100 text-red-600 text-sm font-bold px-2 py-1 rounded-lg">
                   -{discountPercent}%
@@ -240,27 +299,28 @@ export default function ProductDetailPage() {
           </div>
 
           {/* Variants */}
-          {Object.entries(variantGroups).map(([type, variants]) => (
-            <div key={type} className="mb-4">
-              <p className="text-sm font-bold text-gray-700 mb-2">{type}:</p>
+          {attributeGroups.map((group) => (
+            <div key={group.name} className="mb-4">
+              <p className="text-sm font-bold text-gray-700 mb-2">{group.name}:</p>
               <div className="flex flex-wrap gap-2">
-                {variants.map((v) => (
-                  <button
-                    key={v.id}
-                    onClick={() =>
-                      setSelectedVariants((prev) => ({ ...prev, [type]: v.id }))
-                    }
-                    className={`px-4 py-2 rounded-xl border-2 text-sm font-medium transition-all ${
-                      selectedVariants[type] === v.id
-                        ? "border-purple-500 bg-purple-50 text-purple-700"
-                        : "border-gray-200 text-gray-600 hover:border-purple-300"
-                    } ${v.stock === 0 ? "opacity-40 cursor-not-allowed" : ""}`}
-                    disabled={v.stock === 0}
-                  >
-                    {v.value}
-                    {v.stock === 0 && " (Hết)"}
-                  </button>
-                ))}
+                {group.values.map((value) => {
+                  const isSelected = selectedVariants[group.name] === value;
+                  return (
+                    <button
+                      key={value}
+                      onClick={() =>
+                        setSelectedVariants((prev) => ({ ...prev, [group.name]: value }))
+                      }
+                      className={`px-4 py-2 rounded-xl border-2 text-sm font-medium transition-all ${
+                        isSelected
+                          ? "border-pink-500 bg-pink-50 text-pink-700"
+                          : "border-gray-200 text-gray-600 hover:border-pink-300"
+                      }`}
+                    >
+                      {value}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           ))}
@@ -323,11 +383,15 @@ export default function ProductDetailPage() {
                 </>
               )}
             </Button>
-            <Link href="/checkout" className="flex-1">
-              <Button size="lg" variant="outline" className="w-full">
-                Mua ngay
-              </Button>
-            </Link>
+            <Button
+              onClick={handleBuyNow}
+              className="flex-1"
+              size="lg"
+              variant="outline"
+              disabled={product.stock === 0}
+            >
+              Mua ngay
+            </Button>
           </div>
 
           {/* Features */}
@@ -343,7 +407,7 @@ export default function ProductDetailPage() {
                   key={i}
                   className="flex flex-col items-center gap-1 p-3 bg-gray-50 rounded-xl"
                 >
-                  <Icon className="h-5 w-5 text-purple-600" />
+                  <Icon className="h-5 w-5 text-pink-600" />
                   <span className="text-xs text-gray-600 text-center">{f.text}</span>
                 </div>
               );

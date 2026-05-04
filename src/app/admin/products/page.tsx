@@ -8,13 +8,13 @@ import { Plus, Edit, Trash2, Package } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import DeleteProductButton from "./DeleteProductButton";
+import ProductStatusToggle from "./ProductStatusToggle";
 import Image from "next/image";
 
 async function getProducts() {
   return prisma.product.findMany({
     include: {
       images: { where: { isPrimary: true }, take: 1 },
-      category: true,
       _count: { select: { orderItems: true } },
     },
     orderBy: { createdAt: "desc" },
@@ -50,9 +50,7 @@ export default async function AdminProductsPage() {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="text-left px-4 py-3 font-semibold text-gray-600">Sản phẩm</th>
-                  <th className="text-left px-4 py-3 font-semibold text-gray-600 hidden md:table-cell">
-                    Danh mục
-                  </th>
+
                   <th className="text-right px-4 py-3 font-semibold text-gray-600">Giá</th>
                   <th className="text-center px-4 py-3 font-semibold text-gray-600 hidden sm:table-cell">
                     Kho
@@ -70,14 +68,13 @@ export default async function AdminProductsPage() {
                       <div className="flex items-center gap-3">
                         <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
                           {product.images[0]?.url ? (
-                            <Image
+                            <img
                               src={product.images[0].url}
                               alt={product.name}
-                              fill
-                              className="object-cover"
+                              className="w-full h-full object-cover"
                             />
                           ) : (
-                            <div className="w-full h-full bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
+                            <div className="w-full h-full bg-gradient-to-br from-rose-100 to-pink-100 flex items-center justify-center">
                               <Package className="h-5 w-5 text-gray-400" />
                             </div>
                           )}
@@ -88,11 +85,7 @@ export default async function AdminProductsPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3 hidden md:table-cell">
-                      <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-medium">
-                        {product.category?.name || "Chưa phân loại"}
-                      </span>
-                    </td>
+
                     <td className="px-4 py-3 text-right">
                       <div>
                         <p className="font-bold text-pink-600">
@@ -119,15 +112,7 @@ export default async function AdminProductsPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-center">
-                      {product.active ? (
-                        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
-                          Đang bán
-                        </span>
-                      ) : (
-                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full font-medium">
-                          Ẩn
-                        </span>
-                      )}
+                      <ProductStatusToggle id={product.id} initialStatus={product.active} />
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-center gap-2">
@@ -143,7 +128,7 @@ export default async function AdminProductsPage() {
                 ))}
                 {products.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="px-4 py-16 text-center">
+                    <td colSpan={5} className="px-4 py-16 text-center">
                       <Package className="h-12 w-12 text-gray-300 mx-auto mb-3" />
                       <p className="text-gray-400 font-medium">Chưa có sản phẩm nào</p>
                       <Link href="/admin/products/new" className="inline-block mt-3">

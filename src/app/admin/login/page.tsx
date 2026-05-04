@@ -41,7 +41,7 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-purple-800 to-pink-800 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-800 via-pink-800 to-rose-700 px-4">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
@@ -49,7 +49,7 @@ export default function AdminLoginPage() {
             <Store className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-2xl font-black text-white">Tinori Admin</h1>
-          <p className="text-purple-300 text-sm mt-1">Đăng nhập để quản lý cửa hàng</p>
+          <p className="text-pink-300 text-sm mt-1">Đăng nhập để quản lý cửa hàng</p>
         </div>
 
         {/* Form */}
@@ -119,7 +119,7 @@ export default function AdminLoginPage() {
           </p>
         </div>
 
-        <p className="text-center text-purple-300 text-xs mt-6">
+        <p className="text-center text-pink-300 text-xs mt-6">
           <a href="/" className="hover:text-white">← Quay về cửa hàng</a>
         </p>
       </div>

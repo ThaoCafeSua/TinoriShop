@@ -17,11 +17,26 @@ export default function DeleteProductButton({ id, name }: DeleteProductButtonPro
   const handleDelete = async () => {
     try {
       const res = await fetch(`/api/products/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Xóa thất bại");
-      toast({ title: "Đã xóa sản phẩm", variant: "success" });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || "Xóa thất bại");
+      
+      if (data.message) {
+        toast({ 
+          title: "Thông báo", 
+          description: data.message, 
+          variant: "default" 
+        });
+      } else {
+        toast({ title: "Đã xóa sản phẩm", variant: "success" });
+      }
       router.refresh();
-    } catch {
-      toast({ title: "Lỗi khi xóa sản phẩm", variant: "destructive" });
+    } catch (error: any) {
+      toast({ 
+        title: "Lỗi khi xóa sản phẩm", 
+        description: error.message,
+        variant: "destructive" 
+      });
     }
     setConfirming(false);
   };

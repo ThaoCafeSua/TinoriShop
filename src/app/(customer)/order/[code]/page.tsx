@@ -68,7 +68,7 @@ export default function OrderTrackingPage() {
   if (loading) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
-        <div className="animate-spin h-12 w-12 border-4 border-purple-500 border-t-transparent rounded-full mx-auto" />
+        <div className="animate-spin h-12 w-12 border-4 border-pink-500 border-t-transparent rounded-full mx-auto" />
         <p className="mt-4 text-gray-500">Đang tra cứu đơn hàng...</p>
       </div>
     );
@@ -96,7 +96,7 @@ export default function OrderTrackingPage() {
         <div>
           <h1 className="text-xl font-black text-gray-900">Theo dõi đơn hàng</h1>
           <div className="flex items-center gap-2 mt-1">
-            <span className="font-bold text-purple-700">{order.code}</span>
+            <span className="font-bold text-pink-700">{order.code}</span>
             <button
               onClick={() => {
                 navigator.clipboard.writeText(order.code);
@@ -118,7 +118,7 @@ export default function OrderTrackingPage() {
             {/* Progress line */}
             <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-gray-200">
               <div
-                className="bg-gradient-to-b from-purple-500 to-pink-500 w-full transition-all duration-500"
+                className="bg-gradient-to-b from-pink-500 to-rose-500 w-full transition-all duration-500"
                 style={{
                   height: `${
                     currentStepIndex === 0
@@ -139,9 +139,9 @@ export default function OrderTrackingPage() {
                     <div
                       className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 z-10 transition-all ${
                         isCompleted
-                          ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md"
+                          ? "bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-md"
                           : "bg-white border-2 border-gray-200 text-gray-300"
-                      } ${isCurrent ? "ring-4 ring-purple-100 scale-110" : ""}`}
+                      } ${isCurrent ? "ring-4 ring-pink-100 scale-110" : ""}`}
                     >
                       <Icon className="h-4 w-4" />
                     </div>
@@ -154,7 +154,7 @@ export default function OrderTrackingPage() {
                         {step.label}
                       </p>
                       {isCurrent && (
-                        <p className="text-xs text-purple-500">Trạng thái hiện tại</p>
+                        <p className="text-xs text-pink-500">Trạng thái hiện tại</p>
                       )}
                     </div>
                   </div>
@@ -227,7 +227,7 @@ export default function OrderTrackingPage() {
           {order.shippingCode && (
             <div className="flex justify-between">
               <span className="text-gray-500">Mã vận chuyển:</span>
-              <span className="font-semibold text-purple-600">{order.shippingCode}</span>
+              <span className="font-semibold text-pink-600">{order.shippingCode}</span>
             </div>
           )}
         </div>

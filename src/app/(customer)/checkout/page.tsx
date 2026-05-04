@@ -200,7 +200,7 @@ export default function CheckoutPage() {
                 <textarea
                   {...register("note")}
                   placeholder="Ghi chú cho người bán (ví dụ: giao hàng giờ hành chính)..."
-                  className="flex min-h-[80px] w-full rounded-xl border-2 border-gray-200 bg-white px-4 py-2 text-sm transition-colors placeholder:text-gray-400 focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-100"
+                  className="flex min-h-[80px] w-full rounded-xl border-2 border-gray-200 bg-white px-4 py-2 text-sm transition-colors placeholder:text-gray-400 focus:border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-100"
                 />
               </div>
             </div>
@@ -214,12 +214,12 @@ export default function CheckoutPage() {
                 Cần đặt cọc <strong className="text-pink-600">25.000đ</strong> để xác nhận đơn hàng
               </p>
               <div className="space-y-3">
-                <label className="flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-colors has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50">
+                <label className="flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-colors has-[:checked]:border-pink-500 has-[:checked]:bg-pink-50">
                   <input
                     type="radio"
                     {...register("paymentMethod")}
                     value="BANK_TRANSFER"
-                    className="accent-purple-600"
+                    className="accent-pink-600"
                   />
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
@@ -232,12 +232,12 @@ export default function CheckoutPage() {
                   </div>
                 </label>
 
-                <label className="flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-colors has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50">
+                <label className="flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-colors has-[:checked]:border-pink-500 has-[:checked]:bg-pink-50">
                   <input
                     type="radio"
                     {...register("paymentMethod")}
                     value="MOMO"
-                    className="accent-purple-600"
+                    className="accent-pink-600"
                   />
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-pink-100 rounded-xl flex items-center justify-center">
@@ -272,7 +272,7 @@ export default function CheckoutPage() {
                           className="object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full bg-purple-100" />
+                        <div className="w-full h-full bg-pink-100" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">

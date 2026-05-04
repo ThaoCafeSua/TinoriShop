@@ -56,13 +56,13 @@ export default function CartPage() {
                 {item.image ? (
                   <Image src={item.image} alt={item.name} fill className="object-cover" />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-purple-100 to-pink-100" />
+                  <div className="w-full h-full bg-gradient-to-br from-rose-100 to-pink-100" />
                 )}
               </div>
               <div className="flex-1 min-w-0">
                 <Link
                   href={`/products/${item.productId}`}
-                  className="text-sm font-bold text-gray-800 hover:text-purple-600 line-clamp-2"
+                  className="text-sm font-bold text-gray-800 hover:text-pink-600 line-clamp-2"
                 >
                   {item.name}
                 </Link>

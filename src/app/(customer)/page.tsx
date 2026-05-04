@@ -18,7 +18,7 @@ async function getFeaturedProducts() {
       where: { featured: true, active: true },
       include: {
         images: { where: { isPrimary: true }, take: 1 },
-        category: true,
+        _count: { select: { variants: true } },
       },
       take: 8,
       orderBy: { createdAt: "desc" },
@@ -28,13 +28,7 @@ async function getFeaturedProducts() {
   }
 }
 
-async function getCategories() {
-  try {
-    return await prisma.category.findMany({ take: 6 });
-  } catch {
-    return [];
-  }
-}
+
 
 async function getLatestProducts() {
   try {
@@ -42,7 +36,7 @@ async function getLatestProducts() {
       where: { active: true },
       include: {
         images: { where: { isPrimary: true }, take: 1 },
-        category: true,
+        _count: { select: { variants: true } },
       },
       take: 8,
       orderBy: { createdAt: "desc" },
@@ -53,42 +47,42 @@ async function getLatestProducts() {
 }
 
 export default async function HomePage() {
-  const [featuredProducts, categories, latestProducts] = await Promise.all([
+  const [featuredProducts, latestProducts] = await Promise.all([
     getFeaturedProducts(),
-    getCategories(),
     getLatestProducts(),
   ]);
 
   return (
     <div>
       {/* Hero Banner */}
-      <section className="relative bg-gradient-to-br from-purple-700 via-purple-600 to-pink-500 text-white overflow-hidden">
+      <section className="relative bg-white text-gray-900 border-b border-gray-100 overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 left-10 w-72 h-72 bg-white rounded-full blur-3xl"></div>
           <div className="absolute bottom-10 right-10 w-96 h-96 bg-pink-300 rounded-full blur-3xl"></div>
         </div>
         <div className="relative max-w-7xl mx-auto px-4 py-20 flex flex-col items-center text-center">
-          <div className="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-2 text-sm font-medium mb-6">
-            <Star className="h-4 w-4 text-yellow-300 fill-yellow-300" />
+          {/* <div className="inline-flex items-center gap-2 bg-white/30 rounded-full px-4 py-2 text-sm font-medium mb-6">
+            <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
             Shop thời trang uy tín #1
-          </div>
+          </div> */}
           <h1 className="text-4xl md:text-6xl font-black mb-6 leading-tight">
-            Thời Trang &<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-pink-200">
+            TINORI<br />
+            {/* <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-rose-500">
               Phụ Kiện
-            </span>
-            <br />
-            <span className="text-3xl md:text-5xl">Chất Lượng Cao</span>
+            </span> */}
+            {/* <br /> */}
+            {/* <span className="text-3xl md:text-5xl">TINORI</span> */}
           </h1>
-          <p className="text-lg text-white/80 mb-8 max-w-md">
-            Khám phá hàng ngàn sản phẩm thời trang trending, giá tốt, giao hàng
-            nhanh toàn quốc
+          <p className="text-lg text-gray-600 mb-8 max-w-md">
+            Cảm ơn cậu đã ghé thăm — nơi những điều xinh đẹp được nâng niu.
+            Mỗi sản phẩm là một tâm huyết nhỏ xinh mình gửi gắm.
+            Chúc cậu tìm được món quà dành riêng cho mình nhé ✨
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/products">
               <Button
                 size="lg"
-                className="bg-white text-purple-700 hover:bg-pink-50 shadow-xl"
+                className="bg-pink-600 text-white hover:bg-pink-700 shadow-lg shadow-pink-100"
               >
                 Mua sắm ngay
                 <ArrowRight className="h-5 w-5" />
@@ -102,7 +96,7 @@ export default async function HomePage() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-white text-white hover:bg-white/20 bg-transparent"
+                className="border-gray-200 text-gray-700 hover:bg-gray-50 bg-white"
               >
                 <FacebookIcon className="h-5 w-5" />
                 Theo dõi Facebook
@@ -121,8 +115,8 @@ export default async function HomePage() {
                 icon: Truck,
                 title: "Giao hàng toàn quốc",
                 desc: "Nhanh chóng, an toàn",
-                color: "text-purple-600",
-                bg: "bg-purple-50",
+                color: "text-pink-600",
+                bg: "bg-pink-50",
               },
               {
                 icon: Shield,
@@ -165,39 +159,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Categories */}
-      {categories.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 py-12">
-          <h2 className="text-2xl font-black text-gray-900 mb-6">
-            Danh mục sản phẩm
-          </h2>
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
-            {categories.map((cat) => (
-              <Link
-                key={cat.id}
-                href={`/products?category=${cat.slug}`}
-                className="flex flex-col items-center gap-2 p-4 bg-white rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all text-center group"
-              >
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-pink-100 rounded-xl flex items-center justify-center group-hover:from-purple-200 group-hover:to-pink-200 transition-colors">
-                  <span className="text-2xl">👗</span>
-                </div>
-                <span className="text-xs font-semibold text-gray-700 line-clamp-1">
-                  {cat.name}
-                </span>
-              </Link>
-            ))}
-            <Link
-              href="/products"
-              className="flex flex-col items-center gap-2 p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all text-center group"
-            >
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-200 to-pink-200 rounded-xl flex items-center justify-center">
-                <ArrowRight className="h-6 w-6 text-purple-600" />
-              </div>
-              <span className="text-xs font-semibold text-purple-600">Xem tất cả</span>
-            </Link>
-          </div>
-        </section>
-      )}
+
 
       {/* Featured Products */}
       {featuredProducts.length > 0 && (
@@ -223,7 +185,7 @@ export default async function HomePage() {
                 salePrice={product.salePrice}
                 image={product.images[0]?.url}
                 slug={product.slug}
-                category={product.category?.name}
+                hasVariants={product._count?.variants > 0}
               />
             ))}
           </div>
@@ -255,6 +217,7 @@ export default async function HomePage() {
                 image={product.images[0]?.url}
                 slug={product.slug}
                 category={product.category?.name}
+                hasVariants={product._count?.variants > 0}
               />
             ))}
           </div>
@@ -282,7 +245,7 @@ export default async function HomePage() {
       </section>
 
       {/* CTA Banner */}
-      <section className="bg-gradient-to-r from-pink-500 to-purple-600 text-white py-12 my-8">
+      <section className="bg-gradient-to-r from-pink-400 to-rose-400 text-white py-12 my-8">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-black mb-4">
             Theo dõi Tinori trên Facebook
@@ -295,7 +258,7 @@ export default async function HomePage() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Button className="bg-white text-purple-700 hover:bg-pink-50" size="lg">
+            <Button className="bg-white text-pink-700 hover:bg-pink-50" size="lg">
               <FacebookIcon className="h-5 w-5" />
               Theo dõi ngay
             </Button>

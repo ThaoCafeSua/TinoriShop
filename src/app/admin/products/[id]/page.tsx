@@ -16,20 +16,17 @@ export default async function EditProductPage({
   if (!session) redirect("/admin/login");
 
   const { id } = await params;
-  const [product, categories] = await Promise.all([
-    prisma.product.findUnique({
-      where: { id },
-      include: { images: true, variants: true },
-    }),
-    prisma.category.findMany(),
-  ]);
+  const product = await prisma.product.findUnique({
+    where: { id },
+    include: { images: true, variants: true },
+  });
 
   if (!product) notFound();
 
   return (
     <div className="lg:pl-64">
       <AdminNav />
-      <div className="p-4 sm:p-6 lg:p-8 pt-16 lg:pt-8 max-w-3xl">
+      <div className="p-4 sm:p-6 lg:p-8 pt-16 lg:pt-8">
         <Link
           href="/admin/products"
           className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-4"
@@ -38,7 +35,7 @@ export default async function EditProductPage({
           Quay lại danh sách
         </Link>
         <h1 className="text-2xl font-black text-gray-900 mb-6">Chỉnh sửa sản phẩm</h1>
-        <ProductForm categories={categories} product={product} />
+        <ProductForm product={product} />
       </div>
     </div>
   );

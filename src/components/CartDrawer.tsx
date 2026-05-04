@@ -18,7 +18,7 @@ export default function CartDrawer() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="relative p-2 text-white hover:text-pink-200 transition-colors"
+        className="relative p-2 text-pink-700 hover:text-pink-500 transition-colors"
       >
         <ShoppingCart className="h-6 w-6" />
         {totalItems > 0 && (
@@ -42,14 +42,14 @@ export default function CartDrawer() {
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-purple-600 to-pink-500">
+        <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-rose-300 to-pink-400">
           <h2 className="text-lg font-bold text-white flex items-center gap-2">
             <ShoppingCart className="h-5 w-5" />
             Giỏ hàng ({totalItems})
           </h2>
           <button
             onClick={() => setIsOpen(false)}
-            className="p-1 text-white hover:text-pink-200"
+            className="p-1 text-white hover:text-pink-100"
           >
             <X className="h-6 w-6" />
           </button>
@@ -75,7 +75,7 @@ export default function CartDrawer() {
                     {item.image ? (
                       <Image src={item.image} alt={item.name} fill className="object-cover" />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-purple-100 to-pink-100" />
+                      <div className="w-full h-full bg-gradient-to-br from-rose-100 to-pink-100" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">

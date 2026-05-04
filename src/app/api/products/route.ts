@@ -72,12 +72,15 @@ export async function POST(req: NextRequest) {
         : undefined,
       variants: variants?.length
         ? {
-            create: variants.map((v: { name: string; value: string; type: string; stock?: number; price?: number }) => ({
+            create: variants.map((v: any) => ({
               name: v.name,
               value: v.value,
               type: v.type,
               stock: v.stock || 0,
               price: v.price || null,
+              salePrice: v.salePrice || null,
+              active: v.active !== false,
+              image: v.image || null,
             })),
           }
         : undefined,

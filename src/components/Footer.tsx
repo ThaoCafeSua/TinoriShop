@@ -11,7 +11,7 @@ function FacebookIcon({ className }: { className?: string }) {
 
 export default function Footer() {
   return (
-    <footer className="bg-gradient-to-b from-purple-900 to-gray-900 text-white mt-16">
+    <footer className="bg-gradient-to-b from-rose-300 to-rose-400 text-white mt-16">
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand */}
@@ -22,7 +22,7 @@ export default function Footer() {
               </div>
               <span className="text-2xl font-black">TINORI</span>
             </div>
-            <p className="text-purple-300 text-sm leading-relaxed">
+            <p className="text-rose-100 text-sm leading-relaxed">
               Shop thời trang & phụ kiện online. Hàng chất lượng, giá hợp lý,
               giao hàng nhanh toàn quốc.
             </p>
@@ -49,7 +49,7 @@ export default function Footer() {
           {/* Links */}
           <div>
             <h3 className="font-bold text-lg mb-4">Liên kết</h3>
-            <ul className="space-y-2 text-sm text-purple-300">
+            <ul className="space-y-2 text-sm text-rose-100">
               <li>
                 <Link href="/" className="hover:text-white transition-colors">
                   Trang chủ
@@ -81,9 +81,9 @@ export default function Footer() {
           {/* Contact */}
           <div>
             <h3 className="font-bold text-lg mb-4">Liên hệ</h3>
-            <ul className="space-y-3 text-sm text-purple-300">
+            <ul className="space-y-3 text-sm text-rose-100">
               <li className="flex items-center gap-2">
-                <FacebookIcon className="h-4 w-4 text-blue-400 flex-shrink-0" />
+                <FacebookIcon className="h-4 w-4 text-blue-300 flex-shrink-0" />
                 <a
                   href="https://www.facebook.com/tinori.official"
                   target="_blank"
@@ -94,23 +94,23 @@ export default function Footer() {
                 </a>
               </li>
               <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-green-400 flex-shrink-0" />
+                <Phone className="h-4 w-4 text-green-300 flex-shrink-0" />
                 <span>Liên hệ qua Facebook</span>
               </li>
               <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-pink-400 flex-shrink-0" />
+                <Mail className="h-4 w-4 text-pink-200 flex-shrink-0" />
                 <span>Inbox fanpage để được hỗ trợ</span>
               </li>
             </ul>
             <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-xl">
-              <p className="text-xs text-yellow-300 font-medium">
+              <p className="text-xs text-yellow-200 font-medium">
                 💡 Cần đặt cọc 25.000đ để xác nhận đơn hàng
               </p>
             </div>
           </div>
         </div>
 
-        <div className="border-t border-white/10 mt-8 pt-6 text-center text-sm text-purple-400">
+        <div className="border-t border-white/20 mt-8 pt-6 text-center text-sm text-rose-100">
           <p>© 2024 Tinori. Mọi quyền được bảo lưu.</p>
         </div>
       </div>

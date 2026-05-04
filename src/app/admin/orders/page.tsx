@@ -61,7 +61,7 @@ export default async function AdminOrdersPage({
               href={tab.status ? `/admin/orders?status=${tab.status}` : "/admin/orders"}
               className={`flex-shrink-0 px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
                 (params.status || "") === tab.status
-                  ? "bg-purple-600 text-white"
+                  ? "bg-pink-600 text-white"
                   : "bg-white text-gray-600 hover:bg-gray-50 shadow-sm"
               }`}
             >
@@ -100,7 +100,7 @@ export default async function AdminOrdersPage({
                   return (
                     <tr key={order.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3">
-                        <span className="font-mono text-xs font-bold text-purple-600">
+                        <span className="font-mono text-xs font-bold text-pink-600">
                           {order.code}
                         </span>
                       </td>

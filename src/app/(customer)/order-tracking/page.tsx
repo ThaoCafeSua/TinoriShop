@@ -50,8 +50,8 @@ export default function OrderTrackingPage() {
   return (
     <div className="max-w-lg mx-auto px-4 py-16">
       <div className="text-center mb-8">
-        <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Package className="h-10 w-10 text-purple-600" />
+        <div className="w-20 h-20 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Package className="h-10 w-10 text-pink-600" />
         </div>
         <h1 className="text-2xl font-black text-gray-900 mb-2">Tra cứu đơn hàng</h1>
         <p className="text-gray-500">
