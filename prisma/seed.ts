@@ -1,8 +1,20 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaLibSql } from "@prisma/adapter-libsql";
+import { createClient } from "@libsql/client";
 import bcrypt from "bcryptjs";
 
-const prisma = new PrismaClient();
+const url = process.env.DATABASE_URL || "file:./dev.db";
+const isLibsql = url.startsWith("libsql://") || url.startsWith("wss://") || url.startsWith("https://");
+
+let prisma: PrismaClient;
+
+if (isLibsql) {
+  const libsql = createClient({ url, authToken: process.env.DATABASE_AUTH_TOKEN });
+  const adapter = new PrismaLibSql(libsql);
+  prisma = new PrismaClient({ adapter } as any);
+} else {
+  prisma = new PrismaClient();
+}
 
 async function main() {
   console.log("🌱 Seeding database...");
