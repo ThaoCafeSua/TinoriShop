@@ -13,7 +13,7 @@ let prismaClient: PrismaClient;
 
 if (isLibsql) {
   const libsql = createClient({ url, authToken: process.env.DATABASE_AUTH_TOKEN });
-  const adapter = new PrismaLibSql(libsql);
+  const adapter = new PrismaLibSql(libsql as any);
   prismaClient = new PrismaClient({ adapter } as any);
 } else {
   prismaClient = new PrismaClient({
