@@ -1,4 +1,5 @@
 "use client";
+// Trigger redeploy to apply new environment variables
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
