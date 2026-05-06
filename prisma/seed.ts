@@ -22,22 +22,22 @@ async function main() {
   const adminEmail = process.env.ADMIN_EMAIL || "admin@tinori.vn";
   const adminPassword = process.env.ADMIN_PASSWORD || "tinori@2024";
 
-  // Create admin user
-  const existingAdmin = await prisma.user.findUnique({ where: { email: adminEmail } });
-  if (!existingAdmin) {
-    const hashedPassword = await bcrypt.hash(adminPassword, 10);
-    await prisma.user.create({
-      data: {
-        email: adminEmail,
-        password: hashedPassword,
-        name: "Thanh Thảo Admin",
-        role: "admin",
-      },
-    });
-    console.log(`✅ Admin created: ${adminEmail}`);
-  } else {
-    console.log("ℹ️ Admin already exists");
-  }
+  // Create or update admin user
+  const hashedPassword = await bcrypt.hash(adminPassword, 10);
+  await prisma.user.upsert({
+    where: { email: adminEmail },
+    update: {
+      password: hashedPassword,
+      name: "Thanh Thảo Admin",
+    },
+    create: {
+      email: adminEmail,
+      password: hashedPassword,
+      name: "Thanh Thảo Admin",
+      role: "admin",
+    },
+  });
+  console.log(`✅ Admin updated/created: ${adminEmail}`);
 
   // Create categories
   const categories = [
