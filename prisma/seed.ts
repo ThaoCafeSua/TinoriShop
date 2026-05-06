@@ -2,25 +2,27 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaLibSql } from "@prisma/adapter-libsql";
 import bcrypt from "bcryptjs";
 
-const libsql = new PrismaLibSql({ url: process.env.DATABASE_URL || "file:./dev.db" });
-const prisma = new PrismaClient({ adapter: libsql } as ConstructorParameters<typeof PrismaClient>[0]);
+const prisma = new PrismaClient();
 
 async function main() {
   console.log("🌱 Seeding database...");
 
+  const adminEmail = process.env.ADMIN_EMAIL || "admin@tinori.vn";
+  const adminPassword = process.env.ADMIN_PASSWORD || "tinori@2024";
+
   // Create admin user
-  const existingAdmin = await prisma.user.findUnique({ where: { email: "admin@tinori.vn" } });
+  const existingAdmin = await prisma.user.findUnique({ where: { email: adminEmail } });
   if (!existingAdmin) {
-    const hashedPassword = await bcrypt.hash("tinori@2024", 10);
+    const hashedPassword = await bcrypt.hash(adminPassword, 10);
     await prisma.user.create({
       data: {
-        email: "admin@tinori.vn",
+        email: adminEmail,
         password: hashedPassword,
-        name: "Admin Tinori",
+        name: "Thanh Thảo Admin",
         role: "admin",
       },
     });
-    console.log("✅ Admin created: admin@tinori.vn / tinori@2024");
+    console.log(`✅ Admin created: ${adminEmail}`);
   } else {
     console.log("ℹ️ Admin already exists");
   }
@@ -110,8 +112,8 @@ async function main() {
   }
   console.log("✅ Sample products created");
   console.log("\n🎉 Seed complete!");
-  console.log("📧 Admin: admin@tinori.vn");
-  console.log("🔑 Password: tinori@2024");
+  console.log(`📧 Admin Email: ${adminEmail}`);
+  console.log("🔑 Password: (Sử dụng mật khẩu trong .env)");
 }
 
 main()
