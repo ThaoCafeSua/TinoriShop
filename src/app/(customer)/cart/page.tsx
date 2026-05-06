@@ -62,7 +62,7 @@ export default function CartPage() {
             >
               <div className="relative w-24 h-24 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
                 {item.image ? (
-                  <Image src={item.image} alt={item.name} fill className="object-cover" />
+                  <Image src={item.image} alt={item.name} fill sizes="96px" className="object-cover" />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-rose-100 to-pink-100" />
                 )}

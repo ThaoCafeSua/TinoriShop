@@ -17,7 +17,22 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   });
 
   if (!product) return NextResponse.json({ error: "Không tìm thấy sản phẩm" }, { status: 404 });
-  return NextResponse.json(product);
+
+  // Get related products (same category, or just newest active ones)
+  const relatedProducts = await prisma.product.findMany({
+    where: {
+      active: true,
+      id: { not: product.id },
+      ...(product.categoryId ? { categoryId: product.categoryId } : {})
+    },
+    include: {
+      images: { orderBy: { order: "asc" } }
+    },
+    take: 4,
+    orderBy: { createdAt: "desc" }
+  });
+
+  return NextResponse.json({ ...product, relatedProducts });
 }
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

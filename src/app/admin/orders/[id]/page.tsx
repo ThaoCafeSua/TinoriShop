@@ -270,15 +270,6 @@ export default function AdminOrderDetailPage() {
                     </p>
                   </div>
                   
-                  {order.depositImage && (
-                    <div className="mb-4">
-                      <p className="text-xs font-semibold text-gray-700 mb-2">📸 Ảnh chuyển khoản của khách:</p>
-                      <a href={order.depositImage} target="_blank" rel="noreferrer" className="block w-32 h-auto rounded border hover:opacity-90 transition-opacity">
-                        <img src={order.depositImage} alt="Biên lai" className="w-full h-auto rounded" />
-                      </a>
-                    </div>
-                  )}
-
                   <textarea
                     value={depositNote}
                     onChange={(e) => setDepositNote(e.target.value)}
@@ -319,14 +310,6 @@ export default function AdminOrderDetailPage() {
                       </p>
                     )}
                   </div>
-                  {order.depositImage && (
-                    <div className="shrink-0">
-                      <p className="text-[10px] uppercase font-bold text-green-600 mb-1">Ảnh CK</p>
-                      <a href={order.depositImage} target="_blank" rel="noreferrer">
-                        <img src={order.depositImage} alt="Biên lai" className="w-16 h-16 object-cover rounded border border-green-200" />
-                      </a>
-                    </div>
-                  )}
                 </div>
               )}
 

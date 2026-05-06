@@ -127,3 +127,13 @@ model OrderItem {
 
   @@map("order_items")
 }
+
+model PageVisit {
+  id        String   @id @default(cuid())
+  path      String
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@map("page_visits")
+}

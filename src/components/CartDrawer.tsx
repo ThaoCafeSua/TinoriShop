@@ -80,7 +80,7 @@ export default function CartDrawer() {
                 <div key={item.id} className="flex gap-3 p-3 bg-gray-50 rounded-xl">
                   <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
                     {item.image ? (
-                      <Image src={item.image} alt={item.name} fill className="object-cover" />
+                      <Image src={item.image} alt={item.name} fill sizes="64px" className="object-cover" />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-rose-100 to-pink-100" />
                     )}

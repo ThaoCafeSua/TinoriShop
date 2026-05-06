@@ -198,6 +198,7 @@ export default function ProductCard({
                 src={matchedVariant?.image || image}
                 alt={name}
                 fill
+                sizes="(max-width: 768px) 100vw, 33vw"
                 className="object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
               />
             ) : (

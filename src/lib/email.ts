@@ -181,3 +181,33 @@ export async function sendOrderConfirmationEmail(
   });
   console.log("[EMAIL] Order confirmation sent to", to, "for order", orderCode);
 }
+
+// Email 5: Thông báo cho Admin có đơn mới
+export async function sendNewOrderAdminEmail(orderCode: string, customerName: string, totalAmount: number) {
+  const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_USER;
+  if (!adminEmail) {
+    console.log("[EMAIL] ADMIN_EMAIL not configured, skipping admin notification");
+    return;
+  }
+
+  const html = wrapEmailHtml(`
+    <p>🌟 <strong>Chủ shop ơi, có đơn hàng mới nè!</strong></p>
+    <div class="highlight">
+      <p>Mã đơn: <strong>#${orderCode}</strong></p>
+      <p>Khách hàng: <strong>${customerName}</strong></p>
+      <p>Tổng tiền: <strong>${new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(totalAmount)}</strong></p>
+    </div>
+    <p style="text-align:center;margin-top:12px;">
+      <a href="${process.env.NEXTAUTH_URL}/admin/orders" class="btn" style="color:white;">🚀 Xem đơn ngay</a>
+    </p>
+  `);
+
+  await transporter.sendMail({
+    from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
+    to: adminEmail,
+    subject: `🔔 CÓ ĐƠN HÀNG MỚI! #${orderCode}`,
+    html,
+  });
+  console.log("[EMAIL] Admin notified for order", orderCode);
+}
+

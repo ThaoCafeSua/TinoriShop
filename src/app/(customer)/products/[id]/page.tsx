@@ -22,6 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/hooks/useCart";
 import { formatPrice } from "@/lib/utils";
 import { toast } from "@/hooks/useToast";
+import ProductCard from "@/components/ProductCard";
 
 interface ProductVariant {
   id: string;
@@ -44,6 +45,16 @@ interface Product {
   stock: number;
   images: { id: string; url: string; isPrimary: boolean }[];
   variants: ProductVariant[];
+  slug: string;
+  relatedProducts?: {
+    id: string;
+    name: string;
+    price: number;
+    salePrice?: number | null;
+    slug: string;
+    images: { url: string; isPrimary: boolean }[];
+    variants?: any[];
+  }[];
 }
 
 export default function ProductDetailPage() {
@@ -264,7 +275,7 @@ export default function ProductDetailPage() {
                       : "border-transparent"
                   }`}
                 >
-                  <Image src={img.url} alt="" fill className="object-cover" />
+                  <Image src={img.url} alt="" fill sizes="80px" className="object-cover" />
                 </button>
               ))}
             </div>
@@ -431,11 +442,33 @@ export default function ProductDetailPage() {
         </div>
       )}
 
+      {/* Suggested Products */}
+      {product.relatedProducts && product.relatedProducts.length > 0 && (
+        <div className="mt-16">
+          <h2 className="text-2xl font-black text-gray-900 mb-6 text-center">Gợi ý cho bạn</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {product.relatedProducts.map((p) => (
+              <ProductCard
+                key={p.id}
+                id={p.id}
+                name={p.name}
+                price={p.price}
+                salePrice={p.salePrice}
+                slug={p.slug}
+                image={p.images[0]?.url}
+                hasVariants={p.variants && p.variants.length > 0}
+                variants={p.variants}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Back button */}
-      <div className="mt-8">
+      <div className="mt-12 text-center">
         <Link href="/products">
-          <Button variant="outline">
-            <ChevronLeft className="h-4 w-4" />
+          <Button variant="outline" className="rounded-full px-8 border-pink-200 text-pink-600 hover:bg-pink-50 hover:text-pink-700">
+            <ChevronLeft className="h-4 w-4 mr-2" />
             Quay lại danh sách
           </Button>
         </Link>

@@ -37,10 +37,10 @@ interface Order {
 }
 
 const BANK_INFO = {
-  bankId: "MB",
-  bankName: "MB Bank",
-  accountNo: "1234567890",
-  accountName: "TINORI SHOP",
+  bankId: "ICB",
+  bankName: "VietinBank",
+  accountNo: "100877579446",
+  accountName: "TRAN THI THANH THAO",
   amount: 25000,
 };
 
@@ -50,9 +50,6 @@ function OrderSuccessContent() {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   
-  const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
   const fetchOrder = () => {
     if (!code) { setLoading(false); return; }
     fetch(`/api/orders/by-code/${code}`)
@@ -68,48 +65,6 @@ function OrderSuccessContent() {
   const copyCode = (text: string) => {
     navigator.clipboard.writeText(text);
     toast({ title: "Đã sao chép!" });
-  };
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !order) return;
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast({ title: "Ảnh quá lớn (tối đa 5MB)", variant: "destructive" });
-      return;
-    }
-
-    setUploading(true);
-    try {
-      // 1. Upload ảnh
-      const formData = new FormData();
-      formData.append("file", file);
-      const uploadRes = await fetch("/api/upload-public", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!uploadRes.ok) throw new Error("Lỗi tải ảnh lên");
-      const { url } = await uploadRes.json();
-
-      // 2. Cập nhật đơn hàng
-      const updateRes = await fetch(`/api/orders/${order.id}/upload-deposit`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ depositImage: url }),
-      });
-
-      if (!updateRes.ok) throw new Error("Lỗi cập nhật đơn hàng");
-
-      toast({ title: "Đã gửi ảnh thành công! Chờ shop xác nhận nhé." });
-      fetchOrder(); // Reload
-    } catch (err) {
-      console.error(err);
-      toast({ title: "Có lỗi xảy ra, vui lòng thử lại", variant: "destructive" });
-    } finally {
-      setUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    }
   };
 
   if (loading) {
@@ -247,26 +202,6 @@ function OrderSuccessContent() {
               </div>
             </div>
           )}
-
-          <div className="border-t border-gray-100 pt-5 mt-2">
-            <h3 className="font-bold text-gray-800 mb-2">Đã chuyển khoản xong?</h3>
-            <p className="text-sm text-gray-500 mb-3">Tải lên ảnh chụp màn hình chuyển khoản để shop xác nhận đơn hàng cho bạn nhé!</p>
-            <input 
-              type="file" 
-              accept="image/*" 
-              className="hidden" 
-              ref={fileInputRef}
-              onChange={handleFileUpload}
-            />
-            <Button 
-              className="w-full bg-green-600 hover:bg-green-700 text-white" 
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
-            >
-              {uploading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Upload className="h-4 w-4 mr-2" />}
-              {uploading ? "Đang tải lên..." : "Tải lên ảnh chuyển khoản"}
-            </Button>
-          </div>
         </div>
       )}
 
@@ -276,8 +211,8 @@ function OrderSuccessContent() {
           <div className="space-y-4">
             {[
               { step: "1", title: "Chuyển khoản đặt cọc", desc: `Chuyển 25.000đ với nội dung COC ${code}`, color: "bg-pink-100 text-pink-700" },
-              { step: "2", title: "Admin xác nhận cọc", desc: "Trong vòng 1-2 giờ làm việc", color: "bg-blue-100 text-blue-700" },
-              { step: "3", title: "Đóng gói và giao hàng", desc: "SPX Express giao hàng 2-5 ngày", color: "bg-green-100 text-green-700" },
+              { step: "2", title: "Admin xác nhận cọc", desc: "Shop sẽ tự động kiểm tra và xác nhận đơn", color: "bg-blue-100 text-blue-700" },
+              { step: "3", title: "Đóng gói và giao hàng", desc: "Thời gian giao hàng 2-5 ngày", color: "bg-green-100 text-green-700" },
             ].map((s) => (
               <div key={s.step} className="flex gap-3">
                 <div className={`w-8 h-8 rounded-full ${s.color} flex items-center justify-center font-bold text-sm flex-shrink-0`}>

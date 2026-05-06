@@ -13,7 +13,7 @@ import {
   X,
   Tag,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -25,6 +25,25 @@ const navItems = [
 export default function AdminNav() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
+
+  useEffect(() => {
+    const fetchCount = async () => {
+      try {
+        const res = await fetch("/api/admin/pending-count");
+        if (res.ok) {
+          const data = await res.json();
+          setPendingCount(data.count || 0);
+        }
+      } catch (err) {
+        // ignore
+      }
+    };
+    
+    fetchCount();
+    const interval = setInterval(fetchCount, 30000); // 30s
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <>
@@ -56,6 +75,11 @@ export default function AdminNav() {
               >
                 <Icon className="h-5 w-5" />
                 {item.label}
+                {item.href === "/admin/orders" && pendingCount > 0 && (
+                  <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">
+                    {pendingCount}
+                  </span>
+                )}
               </Link>
             );
           })}
@@ -84,9 +108,19 @@ export default function AdminNav() {
           <Store className="h-6 w-6" />
           <span className="font-bold">Tinori Admin</span>
         </div>
-        <button onClick={() => setMobileOpen(!mobileOpen)} className="p-2">
-          {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
+        <div className="flex items-center gap-3">
+          {pendingCount > 0 && (
+            <Link href="/admin/orders" className="relative p-1">
+              <ShoppingBag className="h-5 w-5" />
+              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white animate-pulse">
+                {pendingCount}
+              </span>
+            </Link>
+          )}
+          <button onClick={() => setMobileOpen(!mobileOpen)} className="p-2">
+            {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu */}
@@ -115,6 +149,11 @@ export default function AdminNav() {
                 >
                   <Icon className="h-5 w-5" />
                   {item.label}
+                  {item.href === "/admin/orders" && pendingCount > 0 && (
+                    <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                      {pendingCount}
+                    </span>
+                  )}
                 </Link>
               );
             })}

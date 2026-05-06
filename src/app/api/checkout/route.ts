@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateOrderCode, calculateShippingFee } from "@/lib/utils";
 import { vnPhoneRegex } from "@/lib/validations";
-import { sendOrderConfirmationEmail } from "@/lib/email";
+import { sendOrderConfirmationEmail, sendNewOrderAdminEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
+  try {
+    const body = await req.json();
   const {
     customerName,
     customerPhone,
@@ -85,10 +86,17 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  // Gửi email xác nhận đơn hàng
+  // Gửi email xác nhận đơn hàng cho khách
   if (customerEmail) {
     sendOrderConfirmationEmail(customerEmail.trim(), code, customerName.trim()).catch(console.error);
   }
 
-  return NextResponse.json(order, { status: 201 });
+  // Thông báo cho Admin
+  sendNewOrderAdminEmail(code, customerName.trim(), finalTotal).catch(console.error);
+
+    return NextResponse.json(order, { status: 201 });
+  } catch (error: any) {
+    console.error("Checkout API error:", error);
+    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+  }
 }

@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import AddressForm from "@/components/AddressForm";
 import { useCart } from "@/hooks/useCart";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, calculateShippingFee } from "@/lib/utils";
 import { checkoutSchema, CheckoutFormData } from "@/lib/validations";
 import { toast } from "@/hooks/useToast";
 
@@ -278,6 +278,7 @@ export default function CheckoutPage() {
                           src={item.image}
                           alt={item.name}
                           fill
+                          sizes="48px"
                           className="object-cover"
                         />
                       ) : (
@@ -305,13 +306,17 @@ export default function CheckoutPage() {
                   <span className="text-gray-600">Tạm tính</span>
                   <span className="font-semibold">{formatPrice(totalPrice)}</span>
                 </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Phí vận chuyển</span>
+                  <span className="font-semibold">{calculateShippingFee(totalPrice) === 0 ? "Miễn phí" : formatPrice(calculateShippingFee(totalPrice))}</span>
+                </div>
                 <div className="flex justify-between text-sm text-amber-700">
                   <span className="font-semibold">Tiền cọc</span>
                   <span className="font-bold">25.000đ</span>
                 </div>
                 <div className="flex justify-between font-black text-lg border-t pt-2">
                   <span>Tổng</span>
-                  <span className="text-pink-600">{formatPrice(totalPrice)}</span>
+                  <span className="text-pink-600">{formatPrice(totalPrice + calculateShippingFee(totalPrice))}</span>
                 </div>
               </div>
 

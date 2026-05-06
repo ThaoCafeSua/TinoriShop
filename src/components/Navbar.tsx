@@ -29,6 +29,12 @@ export default function Navbar() {
             <Link href="/products" className="transition-colors hover:opacity-70" style={{ color: '#d53c83' }}>
               Sản phẩm
             </Link>
+            <Link href="/track-order" className="transition-colors hover:opacity-70" style={{ color: '#d53c83' }}>
+              Tra cứu đơn
+            </Link>
+            <Link href="/blogs/huong-dan-dat-hang" className="transition-colors hover:opacity-70" style={{ color: '#d53c83' }}>
+              Hướng dẫn
+            </Link>
 
             <a
               href="https://www.facebook.com/tinori.official"
@@ -95,7 +101,8 @@ export default function Navbar() {
             {[
               { href: "/", label: "Trang chủ" },
               { href: "/products", label: "Sản phẩm" },
-
+              { href: "/track-order", label: "Tra cứu đơn" },
+              { href: "/blogs/huong-dan-dat-hang", label: "Hướng dẫn đặt hàng" },
             ].map((item) => (
               <Link
                 key={item.href}

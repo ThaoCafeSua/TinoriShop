@@ -4,15 +4,24 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import AdminNav from "@/components/AdminNav";
 import Link from "next/link";
-import { Plus, Edit, Trash2, Package } from "lucide-react";
+import { Plus, Edit, Package, Search } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import DeleteProductButton from "./DeleteProductButton";
 import ProductStatusToggle from "./ProductStatusToggle";
-import Image from "next/image";
 
-async function getProducts() {
+interface SearchParams {
+  search?: string;
+}
+
+async function getProducts(search?: string) {
   return prisma.product.findMany({
+    where: search ? {
+      OR: [
+        { name: { contains: search } },
+        { slug: { contains: search } },
+      ]
+    } : undefined,
     include: {
       images: { where: { isPrimary: true }, take: 1 },
       _count: { select: { orderItems: true } },
@@ -21,17 +30,22 @@ async function getProducts() {
   });
 }
 
-export default async function AdminProductsPage() {
+export default async function AdminProductsPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/admin/login");
 
-  const products = await getProducts();
+  const params = await searchParams;
+  const products = await getProducts(params.search);
 
   return (
     <div className="lg:pl-64">
       <AdminNav />
       <div className="p-4 sm:p-6 lg:p-8 pt-16 lg:pt-8">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
           <div>
             <h1 className="text-2xl font-black text-gray-900">Sản phẩm</h1>
             <p className="text-gray-500 text-sm">{products.length} sản phẩm</p>
@@ -44,13 +58,27 @@ export default async function AdminProductsPage() {
           </Link>
         </div>
 
+        {/* Search Filter */}
+        <div className="bg-white p-4 rounded-2xl shadow-sm mb-6">
+          <form className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <input
+              type="text"
+              name="search"
+              defaultValue={params.search}
+              placeholder="Tìm tên sản phẩm..."
+              className="w-full pl-10 pr-4 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-500"
+            />
+            <button type="submit" className="hidden">Tìm</button>
+          </form>
+        </div>
+
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="text-left px-4 py-3 font-semibold text-gray-600">Sản phẩm</th>
-
                   <th className="text-right px-4 py-3 font-semibold text-gray-600">Giá</th>
                   <th className="text-center px-4 py-3 font-semibold text-gray-600 hidden sm:table-cell">
                     Kho
@@ -130,13 +158,7 @@ export default async function AdminProductsPage() {
                   <tr>
                     <td colSpan={5} className="px-4 py-16 text-center">
                       <Package className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                      <p className="text-gray-400 font-medium">Chưa có sản phẩm nào</p>
-                      <Link href="/admin/products/new" className="inline-block mt-3">
-                        <Button size="sm">
-                          <Plus className="h-4 w-4" />
-                          Thêm sản phẩm đầu tiên
-                        </Button>
-                      </Link>
+                      <p className="text-gray-400 font-medium">Không tìm thấy sản phẩm nào</p>
                     </td>
                   </tr>
                 )}
