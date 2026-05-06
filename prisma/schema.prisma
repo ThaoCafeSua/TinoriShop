@@ -5,6 +5,7 @@ generator client {
 
 datasource db {
   provider  = "sqlite"
+  url       = env("DATABASE_URL")
 }
 
 model User {
@@ -93,14 +94,19 @@ model Order {
   detailedAddress String
   note            String?
   subtotal        Float
+  shippingFee     Float       @default(0)
   depositAmount   Float       @default(25000)
   totalAmount     Float
   status          String      @default("PENDING_DEPOSIT")
   depositStatus   String      @default("PENDING")
   depositPaidAt   DateTime?
   depositNote     String?
+  depositImage    String?
   paymentMethod   String      @default("BANK_TRANSFER")
   shippingCode    String?
+  shippingLink    String?
+  reminderSentAt  DateTime?
+  cancelledAt     DateTime?
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
   items           OrderItem[]

@@ -34,12 +34,12 @@ export default async function AdminOrdersPage({
 
   const tabs = [
     { status: "", label: "Tất cả" },
-    { status: "PENDING_DEPOSIT", label: "Chờ cọc" },
-    { status: "DEPOSIT_CONFIRMED", label: "Đã cọc" },
-    { status: "PROCESSING", label: "Đang xử lý" },
-    { status: "SHIPPING", label: "Đang giao" },
-    { status: "DELIVERED", label: "Đã giao" },
-    { status: "CANCELLED", label: "Đã hủy" },
+    { status: "PENDING_DEPOSIT", label: "⏳ Chờ cọc" },
+    { status: "PENDING_CONFIRM", label: "📸 Chờ xác nhận" },
+    { status: "CONFIRMED", label: "✅ Đã xác nhận" },
+    { status: "SHIPPING", label: "🚚 Đang giao" },
+    { status: "COMPLETED", label: "🎉 Hoàn tất" },
+    { status: "CANCELLED", label: "❌ Đã hủy" },
   ];
 
   return (

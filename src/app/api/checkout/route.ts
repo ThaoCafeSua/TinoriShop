@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { generateOrderCode } from "@/lib/utils";
+import { generateOrderCode, calculateShippingFee } from "@/lib/utils";
 import { vnPhoneRegex } from "@/lib/validations";
+import { sendOrderConfirmationEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -46,6 +47,11 @@ export async function POST(req: NextRequest) {
   }
 
   const code = generateOrderCode();
+  const subtotal = Number(totalAmount);
+  
+  // Tính phí vận chuyển - mặc định ngoại thành (30k), miễn phí từ 250k
+  const shippingFee = calculateShippingFee(subtotal, false);
+  const finalTotal = subtotal + shippingFee;
 
   const order = await prisma.order.create({
     data: {
@@ -58,9 +64,10 @@ export async function POST(req: NextRequest) {
       ward: wardName,
       detailedAddress: detailedAddress.trim(),
       note: note?.trim() || null,
-      subtotal: Number(totalAmount),
+      subtotal,
+      shippingFee,
       depositAmount: 25000,
-      totalAmount: Number(totalAmount),
+      totalAmount: finalTotal,
       paymentMethod: paymentMethod || "BANK_TRANSFER",
       status: "PENDING_DEPOSIT",
       depositStatus: "PENDING",
@@ -77,6 +84,11 @@ export async function POST(req: NextRequest) {
       items: { include: { product: true } },
     },
   });
+
+  // Gửi email xác nhận đơn hàng
+  if (customerEmail) {
+    sendOrderConfirmationEmail(customerEmail.trim(), code, customerName.trim()).catch(console.error);
+  }
 
   return NextResponse.json(order, { status: 201 });
 }

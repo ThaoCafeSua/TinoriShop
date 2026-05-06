@@ -40,10 +40,10 @@ export function slugify(text: string): string {
 
 export const ORDER_STATUS_MAP: Record<string, { label: string; color: string }> = {
   PENDING_DEPOSIT: { label: "Chờ cọc", color: "bg-yellow-100 text-yellow-800" },
-  DEPOSIT_CONFIRMED: { label: "Đã cọc", color: "bg-blue-100 text-blue-800" },
-  PROCESSING: { label: "Đang xử lý", color: "bg-pink-100 text-pink-800" },
+  PENDING_CONFIRM: { label: "Chờ xác nhận", color: "bg-amber-100 text-amber-800" },
+  CONFIRMED: { label: "Đã xác nhận", color: "bg-blue-100 text-blue-800" },
   SHIPPING: { label: "Đang giao", color: "bg-orange-100 text-orange-800" },
-  DELIVERED: { label: "Đã giao", color: "bg-green-100 text-green-800" },
+  COMPLETED: { label: "Hoàn tất", color: "bg-green-100 text-green-800" },
   CANCELLED: { label: "Đã hủy", color: "bg-red-100 text-red-800" },
 };
 
@@ -51,3 +51,9 @@ export const PAYMENT_METHOD_MAP: Record<string, string> = {
   BANK_TRANSFER: "Chuyển khoản ngân hàng",
   MOMO: "Ví MoMo",
 };
+
+// Tính phí vận chuyển
+export function calculateShippingFee(subtotal: number, isInnerCity: boolean = false): number {
+  if (subtotal >= 250000) return 0; // Miễn phí ship từ 250k
+  return isInnerCity ? 20000 : 30000;
+}

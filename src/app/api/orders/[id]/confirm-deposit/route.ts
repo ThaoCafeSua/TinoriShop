@@ -24,7 +24,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       depositStatus: "PAID",
       depositPaidAt: new Date(),
       depositNote: note || null,
-      status: "DEPOSIT_CONFIRMED",
+      status: "CONFIRMED",
     },
   });
 

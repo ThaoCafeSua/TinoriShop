@@ -20,9 +20,10 @@ import {
   User,
   Mail,
   CreditCard,
+  Image as ImageIcon,
 } from "lucide-react";
 
-type OrderStatus = "PENDING_DEPOSIT" | "DEPOSIT_CONFIRMED" | "PROCESSING" | "SHIPPING" | "DELIVERED" | "CANCELLED";
+type OrderStatus = "PENDING_DEPOSIT" | "PENDING_CONFIRM" | "CONFIRMED" | "SHIPPING" | "COMPLETED" | "CANCELLED";
 
 interface OrderItem {
   id: string;
@@ -51,14 +52,17 @@ interface Order {
   detailedAddress: string;
   note?: string | null;
   subtotal: number;
+  shippingFee: number;
   depositAmount: number;
   totalAmount: number;
   status: OrderStatus;
   depositStatus: string;
   depositPaidAt?: string | null;
   depositNote?: string | null;
+  depositImage?: string | null;
   paymentMethod: string;
   shippingCode?: string | null;
+  shippingLink?: string | null;
   createdAt: string;
   items: OrderItem[];
 }
@@ -70,6 +74,7 @@ export default function AdminOrderDetailPage() {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [shippingCode, setShippingCode] = useState("");
+  const [shippingLink, setShippingLink] = useState("");
   const [depositNote, setDepositNote] = useState("");
 
   const [confirmingDeposit, setConfirmingDeposit] = useState(false);
@@ -81,6 +86,7 @@ export default function AdminOrderDetailPage() {
       .then((data) => {
         setOrder(data);
         setShippingCode(data.shippingCode || "");
+        setShippingLink(data.shippingLink || "");
         setDepositNote(data.depositNote || "");
         setLoading(false);
       })
@@ -103,27 +109,43 @@ export default function AdminOrderDetailPage() {
   };
 
   const updateStatus = async (status: OrderStatus) => {
+    if (status === "SHIPPING" && !shippingCode) {
+      alert("Vui lòng nhập mã vận đơn trước khi chuyển sang Đang giao");
+      setConfirmingStatus(null);
+      return;
+    }
     setUpdating(true);
     const res = await fetch(`/api/orders/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status, shippingCode: shippingCode || undefined }),
+      body: JSON.stringify({ 
+        status, 
+        shippingCode: shippingCode || undefined,
+        shippingLink: shippingLink || undefined,
+      }),
     });
     if (res.ok) {
       const updated = await res.json();
       setOrder((prev) => prev ? { ...prev, ...updated } : null);
+    } else {
+      const err = await res.json();
+      alert(err.error || "Có lỗi xảy ra");
     }
     setUpdating(false);
     setConfirmingStatus(null);
   };
 
-  const saveShippingCode = async () => {
+  const saveShippingInfo = async () => {
     setUpdating(true);
-    await fetch(`/api/orders/${id}`, {
+    const res = await fetch(`/api/orders/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ shippingCode }),
+      body: JSON.stringify({ shippingCode, shippingLink }),
     });
+    if (res.ok) {
+      const updated = await res.json();
+      setOrder((prev) => prev ? { ...prev, ...updated } : null);
+    }
     setUpdating(false);
   };
 
@@ -145,9 +167,9 @@ export default function AdminOrderDetailPage() {
   }
 
   const statusFlow: { status: OrderStatus; label: string; icon: React.ReactNode; requiresDeposit?: boolean }[] = [
-    { status: "PROCESSING", label: "Xử lý đơn", icon: <Package className="h-4 w-4" />, requiresDeposit: true },
-    { status: "SHIPPING", label: "Đang giao", icon: <Truck className="h-4 w-4" /> },
-    { status: "DELIVERED", label: "Đã giao", icon: <CheckCircle className="h-4 w-4" /> },
+    { status: "CONFIRMED", label: "Đã xác nhận", icon: <CheckCircle className="h-4 w-4" /> },
+    { status: "SHIPPING", label: "Đang giao", icon: <Truck className="h-4 w-4" />, requiresDeposit: true },
+    { status: "COMPLETED", label: "Hoàn tất", icon: <Package className="h-4 w-4" />, requiresDeposit: true },
     { status: "CANCELLED", label: "Hủy đơn", icon: <XCircle className="h-4 w-4" /> },
   ];
 
@@ -176,7 +198,7 @@ export default function AdminOrderDetailPage() {
             {/* Order items */}
             <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
               <div className="p-5 border-b">
-                <h2 className="font-bold text-gray-900">Sản phẩm đặt hàng</h2>
+                <h2 className="font-bold text-gray-900">Chi tiết sản phẩm</h2>
               </div>
               <div className="divide-y">
                 {order.items.map((item) => (
@@ -208,14 +230,26 @@ export default function AdminOrderDetailPage() {
                   </div>
                 ))}
               </div>
-              <div className="p-4 bg-gray-50 space-y-1">
-                <div className="flex justify-between text-sm text-gray-600">
-                  <span>Tạm tính</span>
+              <div className="p-4 bg-gray-50 space-y-2 text-sm">
+                <div className="flex justify-between text-gray-600">
+                  <span>Tổng sản phẩm</span>
                   <span>{formatPrice(order.subtotal)}</span>
                 </div>
-                <div className="flex justify-between text-sm font-bold text-lg">
+                <div className="flex justify-between text-gray-600">
+                  <span>Phí vận chuyển</span>
+                  <span>{order.shippingFee === 0 ? "Miễn phí" : formatPrice(order.shippingFee)}</span>
+                </div>
+                <div className="flex justify-between font-bold text-lg pt-2 border-t mt-2">
                   <span>Tổng cộng</span>
                   <span className="text-pink-600">{formatPrice(order.totalAmount)}</span>
+                </div>
+                <div className="flex justify-between text-gray-600 text-xs">
+                  <span>Đã đặt cọc</span>
+                  <span className="text-green-600">-{formatPrice(order.depositAmount)}</span>
+                </div>
+                <div className="flex justify-between text-gray-800 font-semibold pt-1">
+                  <span>Còn lại thu COD</span>
+                  <span>{formatPrice(order.totalAmount - order.depositAmount)}</span>
                 </div>
               </div>
             </div>
@@ -226,18 +260,30 @@ export default function AdminOrderDetailPage() {
 
               {/* Deposit confirmation */}
               {order.depositStatus !== "PAID" ? (
-                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-xl mb-4">
-                  <p className="font-semibold text-yellow-800 mb-3">
-                    ⏳ Chờ xác nhận cọc 25.000đ
-                  </p>
-                  <p className="text-xs text-yellow-700 mb-3">
-                    PT: {PAYMENT_METHOD_MAP[order.paymentMethod] || order.paymentMethod}
-                  </p>
+                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-xl mb-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="font-semibold text-yellow-800">
+                      ⏳ Chờ xác nhận cọc {formatPrice(order.depositAmount)}
+                    </p>
+                    <p className="text-xs font-medium text-yellow-700 bg-yellow-100 px-2 py-1 rounded-md">
+                      {PAYMENT_METHOD_MAP[order.paymentMethod] || order.paymentMethod}
+                    </p>
+                  </div>
+                  
+                  {order.depositImage && (
+                    <div className="mb-4">
+                      <p className="text-xs font-semibold text-gray-700 mb-2">📸 Ảnh chuyển khoản của khách:</p>
+                      <a href={order.depositImage} target="_blank" rel="noreferrer" className="block w-32 h-auto rounded border hover:opacity-90 transition-opacity">
+                        <img src={order.depositImage} alt="Biên lai" className="w-full h-auto rounded" />
+                      </a>
+                    </div>
+                  )}
+
                   <textarea
                     value={depositNote}
                     onChange={(e) => setDepositNote(e.target.value)}
                     placeholder="Ghi chú xác nhận cọc (tùy chọn)..."
-                    className="w-full text-sm border rounded-lg p-2 mb-3 resize-none h-16"
+                    className="w-full text-sm border border-yellow-300 bg-white rounded-lg p-3 mb-3 resize-none h-16 focus:outline-none focus:ring-1 focus:ring-yellow-500"
                   />
                   <div className="flex gap-2">
                     <Button
@@ -249,44 +295,73 @@ export default function AdminOrderDetailPage() {
                       {confirmingDeposit ? "Bấm lần nữa để xác nhận" : "Xác nhận đã nhận cọc"}
                     </Button>
                     {confirmingDeposit && (
-                      <Button onClick={() => setConfirmingDeposit(false)} variant="outline" disabled={updating}>
+                      <Button onClick={() => setConfirmingDeposit(false)} variant="outline" disabled={updating} className="border-gray-300">
                         Hủy
                       </Button>
                     )}
                   </div>
                 </div>
               ) : (
-                <div className="p-3 bg-green-50 border border-green-200 rounded-xl mb-4">
-                  <p className="text-green-700 font-semibold text-sm">
-                    ✓ Đã xác nhận cọc
+                <div className="p-4 bg-green-50 border border-green-200 rounded-xl mb-6 flex flex-col sm:flex-row gap-4 justify-between items-start">
+                  <div>
+                    <p className="text-green-700 font-semibold flex items-center gap-1.5">
+                      <CheckCircle className="h-4 w-4" /> Đã xác nhận cọc {formatPrice(order.depositAmount)}
+                    </p>
                     {order.depositPaidAt && (
-                      <span className="font-normal text-xs ml-1">
-                        ({new Date(order.depositPaidAt).toLocaleString("vi-VN")})
-                      </span>
+                      <p className="text-xs text-green-600 mt-1.5">
+                        Xác nhận lúc: {new Date(order.depositPaidAt).toLocaleString("vi-VN")}
+                      </p>
                     )}
-                  </p>
-                  {order.depositNote && (
-                    <p className="text-xs text-green-600 mt-1">{order.depositNote}</p>
+                    {order.depositNote && (
+                      <p className="text-sm text-gray-700 mt-2 p-2 bg-white rounded border border-green-100">
+                        <span className="font-semibold text-xs text-gray-500 block mb-0.5">Ghi chú:</span>
+                        {order.depositNote}
+                      </p>
+                    )}
+                  </div>
+                  {order.depositImage && (
+                    <div className="shrink-0">
+                      <p className="text-[10px] uppercase font-bold text-green-600 mb-1">Ảnh CK</p>
+                      <a href={order.depositImage} target="_blank" rel="noreferrer">
+                        <img src={order.depositImage} alt="Biên lai" className="w-16 h-16 object-cover rounded border border-green-200" />
+                      </a>
+                    </div>
                   )}
                 </div>
               )}
 
-              {/* Shipping code */}
-              <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                  Mã vận đơn SPX
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    value={shippingCode}
-                    onChange={(e) => setShippingCode(e.target.value)}
-                    placeholder="Nhập mã vận đơn..."
-                    className="flex-1 text-sm border-2 border-gray-200 rounded-xl px-3 py-2 focus:border-pink-400 focus:outline-none"
-                  />
-                  <Button onClick={saveShippingCode} disabled={updating} variant="outline" size="sm">
-                    Lưu
+              {/* Shipping info */}
+              <div className="mb-6 bg-gray-50 p-4 rounded-xl border">
+                <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                  <Truck className="h-4 w-4 text-orange-500" />
+                  Thông tin Vận chuyển (SPX)
+                </h3>
+                <div className="grid sm:grid-cols-2 gap-3 mb-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 mb-1">Mã vận đơn <span className="text-red-500">*</span></label>
+                    <input
+                      value={shippingCode}
+                      onChange={(e) => setShippingCode(e.target.value)}
+                      placeholder="VD: SPX123456789"
+                      className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 mb-1">Link Tracking (Tùy chọn)</label>
+                    <input
+                      value={shippingLink}
+                      onChange={(e) => setShippingLink(e.target.value)}
+                      placeholder="https://spx.vn/..."
+                      className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 outline-none"
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-end">
+                  <Button onClick={saveShippingInfo} disabled={updating || (!shippingCode && !shippingLink)} variant="secondary" size="sm">
+                    Lưu thông tin vận chuyển
                   </Button>
                 </div>
+                <p className="text-xs text-gray-400 mt-2 italic">* Cần nhập mã vận đơn trước khi chuyển trạng thái sang "Đang giao". Khi chuyển sang "Đang giao", hệ thống sẽ tự động gửi email cho khách.</p>
               </div>
 
               {/* Status buttons */}
@@ -308,7 +383,7 @@ export default function AdminOrderDetailPage() {
                         title={requiresDeposit && order.depositStatus !== "PAID" ? "Cần xác nhận cọc trước" : ""}
                       >
                         {icon}
-                        {isConfirming ? "Xác nhận đổi?" : label}
+                        {isConfirming ? "Xác nhận?" : label}
                       </Button>
                     );
                   })}
@@ -318,11 +393,6 @@ export default function AdminOrderDetailPage() {
                     </Button>
                   )}
                 </div>
-                {order.depositStatus !== "PAID" && (
-                  <p className="text-xs text-yellow-600 mt-2">
-                    * Cần xác nhận cọc trước khi chuyển sang &quot;Đang xử lý&quot;
-                  </p>
-                )}
               </div>
             </div>
           </div>
@@ -331,13 +401,13 @@ export default function AdminOrderDetailPage() {
           <div className="space-y-4">
             {/* Status */}
             <div className="bg-white rounded-2xl shadow-sm p-5">
-              <h2 className="font-bold text-gray-900 mb-3">Trạng thái</h2>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Đơn hàng</span>
+              <h2 className="font-bold text-gray-900 mb-3">Tổng quan</h2>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between border-b pb-2">
+                  <span className="text-sm text-gray-500">Trạng thái</span>
                   <OrderStatusBadge status={order.status} />
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between border-b pb-2">
                   <span className="text-sm text-gray-500">Tiền cọc</span>
                   <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
                     order.depositStatus === "PAID"
@@ -348,9 +418,14 @@ export default function AdminOrderDetailPage() {
                   </span>
                 </div>
                 {order.shippingCode && (
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col gap-1 border-b pb-2">
                     <span className="text-sm text-gray-500">Mã vận đơn</span>
-                    <span className="font-mono text-xs font-bold text-orange-600">{order.shippingCode}</span>
+                    <span className="font-mono text-sm font-bold text-pink-600 bg-pink-50 p-2 rounded text-center">{order.shippingCode}</span>
+                    {order.shippingLink && (
+                      <a href={order.shippingLink} target="_blank" rel="noreferrer" className="text-xs text-blue-500 hover:underline text-center">
+                        🔗 Mở link tracking
+                      </a>
+                    )}
                   </div>
                 )}
               </div>
@@ -358,33 +433,41 @@ export default function AdminOrderDetailPage() {
 
             {/* Customer info */}
             <div className="bg-white rounded-2xl shadow-sm p-5">
-              <h2 className="font-bold text-gray-900 mb-3">Thông tin khách</h2>
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center gap-2 text-gray-600">
-                  <User className="h-4 w-4 flex-shrink-0 text-pink-400" />
-                  <span className="font-semibold text-gray-800">{order.customerName}</span>
+              <h2 className="font-bold text-gray-900 mb-3">Thông tin nhận hàng</h2>
+              <div className="space-y-3 text-sm">
+                <div className="flex items-center gap-3 text-gray-700">
+                  <div className="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center shrink-0">
+                    <User className="h-4 w-4 text-pink-600" />
+                  </div>
+                  <span className="font-semibold">{order.customerName}</span>
                 </div>
-                <div className="flex items-center gap-2 text-gray-600">
-                  <Phone className="h-4 w-4 flex-shrink-0 text-green-400" />
-                  <a href={`tel:${order.customerPhone}`} className="hover:text-pink-600">
+                <div className="flex items-center gap-3 text-gray-700">
+                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                    <Phone className="h-4 w-4 text-green-600" />
+                  </div>
+                  <a href={`tel:${order.customerPhone}`} className="hover:text-pink-600 font-medium">
                     {order.customerPhone}
                   </a>
                 </div>
                 {order.customerEmail && (
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <Mail className="h-4 w-4 flex-shrink-0 text-blue-400" />
+                  <div className="flex items-center gap-3 text-gray-700">
+                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                      <Mail className="h-4 w-4 text-blue-600" />
+                    </div>
                     <span>{order.customerEmail}</span>
                   </div>
                 )}
-                <div className="flex items-start gap-2 text-gray-600">
-                  <MapPin className="h-4 w-4 flex-shrink-0 text-red-400 mt-0.5" />
-                  <span>
-                    {order.detailedAddress}, {order.ward}, {order.district}, {order.province}
+                <div className="flex items-start gap-3 text-gray-700 bg-gray-50 p-3 rounded-xl border">
+                  <MapPin className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
+                  <span className="leading-snug">
+                    {order.detailedAddress}<br/>
+                    {order.ward}, {order.district}, {order.province}
                   </span>
                 </div>
                 {order.note && (
-                  <div className="p-2 bg-gray-50 rounded-lg text-xs text-gray-600">
-                    <span className="font-semibold">Ghi chú:</span> {order.note}
+                  <div className="p-3 bg-amber-50 border border-amber-100 rounded-xl text-sm text-amber-900">
+                    <span className="font-bold block mb-1">📝 Ghi chú của khách:</span>
+                    {order.note}
                   </div>
                 )}
               </div>
@@ -392,16 +475,10 @@ export default function AdminOrderDetailPage() {
 
             {/* Payment */}
             <div className="bg-white rounded-2xl shadow-sm p-5">
-              <h2 className="font-bold text-gray-900 mb-3">Thanh toán</h2>
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <CreditCard className="h-4 w-4 text-blue-400" />
+              <h2 className="font-bold text-gray-900 mb-3">Cọc qua</h2>
+              <div className="flex items-center gap-2 text-sm text-gray-700 font-medium border p-3 rounded-xl">
+                <CreditCard className="h-5 w-5 text-indigo-500" />
                 <span>{PAYMENT_METHOD_MAP[order.paymentMethod] || order.paymentMethod}</span>
-              </div>
-              <div className="mt-2 p-3 bg-pink-50 rounded-xl">
-                <p className="text-xs text-pink-600 font-medium">Tiền cọc: 25.000đ</p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Nội dung: COC {order.code}
-                </p>
               </div>
             </div>
           </div>
