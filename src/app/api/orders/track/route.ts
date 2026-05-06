@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    let orders;
+    let orders: any[] = [];
 
     if (type === "CODE") {
       const order = await prisma.order.findUnique({
