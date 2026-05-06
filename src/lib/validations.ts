@@ -7,7 +7,7 @@ export const checkoutSchema = z.object({
   customerPhone: z
     .string()
     .regex(vnPhoneRegex, "Số điện thoại không hợp lệ (phải là số Việt Nam)"),
-  customerEmail: z.string().email("Email không hợp lệ").optional().or(z.literal("")),
+  customerEmail: z.string().min(1, "Vui lòng nhập email").email("Email không hợp lệ"),
   provinceCode: z.string().min(1, "Vui lòng chọn tỉnh/thành phố"),
   provinceName: z.string().min(1, "Vui lòng chọn tỉnh/thành phố"),
   districtCode: z.string().min(1, "Vui lòng chọn quận/huyện"),

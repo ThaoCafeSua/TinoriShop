@@ -159,7 +159,7 @@ export default function CheckoutPage() {
                   )}
                 </div>
                 <div className="sm:col-span-2">
-                  <Label className="mb-1.5 block">Email (tùy chọn)</Label>
+                  <Label className="mb-1.5 block">Email <span className="text-red-500">*</span></Label>
                   <Input
                     {...register("customerEmail")}
                     placeholder="email@example.com"
