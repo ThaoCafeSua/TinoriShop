@@ -10,16 +10,17 @@ const beVietnamPro = Be_Vietnam_Pro({
 });
 
 export const metadata: Metadata = {
-  title: "Tinori - Shop Thời Trang & Phụ Kiện",
-  description:
-    "Shop thời trang và phụ kiện online Tinori. Hàng chất lượng, giá hợp lý, giao hàng nhanh toàn quốc.",
+  title: "TINORI",
+  description: "Tinori - Nơi những điều xinh đẹp được nâng niu.",
   keywords: "thời trang, phụ kiện, shop online, tinori",
   openGraph: {
-    title: "Tinori - Shop Thời Trang & Phụ Kiện",
-    description: "Shop thời trang và phụ kiện online",
+    title: "TINORI",
+    description: "Tinori - Nơi những điều xinh đẹp được nâng niu.",
     type: "website",
   },
 };
+
+import FloatingWidgets from "@/components/FloatingWidgets";
 
 export default function RootLayout({
   children,
@@ -29,9 +30,15 @@ export default function RootLayout({
   return (
     <html lang="vi" className={`${beVietnamPro.variable}`} suppressHydrationWarning>
       <body className="min-h-screen bg-white font-[family-name:var(--font-be-vietnam)] antialiased">
+        <FloatingWidgets />
         {children}
         <Toaster />
       </body>
     </html>
   );
 }
+
+
+
+
+

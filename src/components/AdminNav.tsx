@@ -29,14 +29,14 @@ export default function AdminNav() {
   return (
     <>
       {/* Desktop sidebar */}
-      <div className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 lg:bg-gradient-to-b lg:from-rose-800 lg:to-pink-800">
-        <div className="flex items-center gap-3 p-6 border-b border-pink-700">
-          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-            <Store className="h-6 w-6 text-white" />
+      <div className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 lg:inset-y-0 lg:bg-[#f2d5e0] border-r border-[#d53c83]/10">
+        <div className="flex items-center gap-3 p-6 border-b border-[#d53c83]/10">
+          <div className="w-10 h-10 rounded-xl bg-[#d53c83]/10 flex items-center justify-center">
+            <Store className="h-6 w-6 text-[#d53c83]" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-white">Tinori Admin</h1>
-            <p className="text-xs text-pink-300">Quản lý cửa hàng</p>
+            <h1 className="text-lg font-bold text-[#d53c83]">Tinori Admin</h1>
+            <p className="text-xs text-[#d53c83]/70">Quản lý cửa hàng</p>
           </div>
         </div>
         <nav className="flex-1 p-4 space-y-1">
@@ -50,8 +50,8 @@ export default function AdminNav() {
                 className={cn(
                   "flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-sm font-medium",
                   isActive
-                    ? "bg-white/20 text-white shadow-sm"
-                    : "text-pink-200 hover:bg-white/10 hover:text-white"
+                    ? "bg-[#d53c83] text-white shadow-md shadow-[#d53c83]/20"
+                    : "text-[#d53c83]/80 hover:bg-[#d53c83]/10 hover:text-[#d53c83]"
                 )}
               >
                 <Icon className="h-5 w-5" />
@@ -63,14 +63,14 @@ export default function AdminNav() {
         <div className="p-4">
           <Link
             href="/"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-pink-200 hover:bg-white/10 hover:text-white transition-all text-sm font-medium mb-2"
+            className="flex items-center gap-3 px-4 py-3 rounded-xl text-[#d53c83]/80 hover:bg-[#d53c83]/10 hover:text-[#d53c83] transition-all text-sm font-medium mb-2"
           >
             <Store className="h-5 w-5" />
             Xem cửa hàng
           </Link>
           <button
             onClick={() => signOut({ callbackUrl: "/admin/login" })}
-            className="flex w-full items-center gap-3 px-4 py-3 rounded-xl text-pink-200 hover:bg-red-500/20 hover:text-red-300 transition-all text-sm font-medium"
+            className="flex w-full items-center gap-3 px-4 py-3 rounded-xl text-[#d53c83]/80 hover:bg-red-500/10 hover:text-red-600 transition-all text-sm font-medium"
           >
             <LogOut className="h-5 w-5" />
             Đăng xuất
@@ -79,7 +79,7 @@ export default function AdminNav() {
       </div>
 
       {/* Mobile header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-30 bg-rose-800 text-white flex items-center justify-between px-4 h-14">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-30 bg-[#f2d5e0] text-[#d53c83] flex items-center justify-between px-4 h-14 shadow-sm border-b border-[#d53c83]/10">
         <div className="flex items-center gap-2">
           <Store className="h-6 w-6" />
           <span className="font-bold">Tinori Admin</span>
@@ -96,7 +96,8 @@ export default function AdminNav() {
             className="lg:hidden fixed inset-0 bg-black/50 z-30 pt-14"
             onClick={() => setMobileOpen(false)}
           />
-          <div className="lg:hidden fixed top-14 left-0 right-0 bg-rose-800 z-40 p-4 space-y-1">
+          <div className="lg:hidden fixed top-14 left-0 right-0 bg-[#f2d5e0] z-40 p-4 shadow-xl border-t border-[#d53c83]/10">
+            <div className="space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname.startsWith(item.href);
@@ -108,8 +109,8 @@ export default function AdminNav() {
                   className={cn(
                     "flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-sm font-medium",
                     isActive
-                      ? "bg-white/20 text-white"
-                      : "text-pink-200 hover:bg-white/10 hover:text-white"
+                      ? "bg-[#d53c83] text-white"
+                      : "text-[#d53c83]/80 hover:bg-[#d53c83]/10 hover:text-[#d53c83]"
                   )}
                 >
                   <Icon className="h-5 w-5" />
@@ -119,11 +120,12 @@ export default function AdminNav() {
             })}
             <button
               onClick={() => signOut({ callbackUrl: "/admin/login" })}
-              className="flex w-full items-center gap-3 px-4 py-3 rounded-xl text-pink-200 hover:bg-red-500/20 hover:text-red-300 transition-all text-sm font-medium"
+              className="flex w-full items-center gap-3 px-4 py-3 rounded-xl text-[#d53c83]/80 hover:bg-red-500/10 hover:text-red-600 transition-all text-sm font-medium"
             >
               <LogOut className="h-5 w-5" />
               Đăng xuất
             </button>
+            </div>
           </div>
         </>
       )}

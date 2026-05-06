@@ -44,7 +44,6 @@ interface Product {
   stock: number;
   images: { id: string; url: string; isPrimary: boolean }[];
   variants: ProductVariant[];
-  variants: ProductVariant[];
 }
 
 export default function ProductDetailPage() {
@@ -105,14 +104,20 @@ export default function ProductDetailPage() {
 
   // Extract attributes from combination variants
   const attributeNames = product.variants[0]?.type?.split(' - ') || [];
-  const attributeGroups = attributeNames.map((name, index) => {
-    const values = Array.from(new Set(product.variants.map(v => v.value.split(' - ')[index]).filter(Boolean)));
+  const attributeGroups = attributeNames.map((name: string, index: number) => {
+    const values = Array.from(new Set(product.variants.map(v => {
+      const parts = v.value.split(' - ');
+      if (index === attributeNames.length - 1 && parts.length > attributeNames.length) {
+        return parts.slice(index).join(' - ');
+      }
+      return parts[index];
+    }).filter(Boolean)));
     return { name, values };
-  }).filter(g => g.name);
+  }).filter((g: { name: string; values: string[] }) => g.name);
 
   // Find matched variant based on selection
-  const selectedValuesString = attributeNames.map(name => selectedVariants[name] || "").join(' - ');
-  const matchedVariant = product.variants.find(v => v.value === selectedValuesString);
+  const selectedValuesString = attributeNames.map((name: string) => selectedVariants[name] || "").join(' - ');
+  const matchedVariant = product.variants.find((v: ProductVariant) => v.value === selectedValuesString);
 
   const currentDisplayPrice = matchedVariant?.salePrice || matchedVariant?.price || displayPrice;
   const currentOriginalPrice = matchedVariant?.price || product.price;
@@ -128,7 +133,7 @@ export default function ProductDetailPage() {
 
   const handleAddToCart = () => {
     if (attributeNames.length > 0) {
-      const missingVariant = attributeNames.find((name) => !selectedVariants[name]);
+      const missingVariant = attributeNames.find((name: string) => !selectedVariants[name]);
       if (missingVariant) {
         toast({
           title: "Vui lòng chọn thuộc tính",
@@ -172,7 +177,7 @@ export default function ProductDetailPage() {
   
   const handleBuyNow = () => {
     if (attributeNames.length > 0) {
-      const missingVariant = attributeNames.find((name) => !selectedVariants[name]);
+      const missingVariant = attributeNames.find((name: string) => !selectedVariants[name]);
       if (missingVariant) {
         toast({
           title: "Vui lòng chọn thuộc tính",
@@ -299,11 +304,11 @@ export default function ProductDetailPage() {
           </div>
 
           {/* Variants */}
-          {attributeGroups.map((group) => (
+          {attributeGroups.map((group: { name: string; values: string[] }) => (
             <div key={group.name} className="mb-4">
               <p className="text-sm font-bold text-gray-700 mb-2">{group.name}:</p>
               <div className="flex flex-wrap gap-2">
-                {group.values.map((value) => {
+                {group.values.map((value: string) => {
                   const isSelected = selectedVariants[group.name] === value;
                   return (
                     <button
@@ -385,10 +390,10 @@ export default function ProductDetailPage() {
             </Button>
             <Button
               onClick={handleBuyNow}
-              className="flex-1"
+              className="flex-1 font-bold shadow-lg"
               size="lg"
-              variant="outline"
               disabled={product.stock === 0}
+              style={{ backgroundColor: '#d53c83', color: '#ffffff' }}
             >
               Mua ngay
             </Button>

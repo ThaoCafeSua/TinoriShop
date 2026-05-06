@@ -10,33 +10,32 @@ export default function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-30 bg-gradient-to-r from-rose-200 via-pink-200 to-rose-200 shadow-md">
+    <header className="sticky top-0 z-30 bg-white border-b border-gray-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-14">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 text-pink-700">
-            <div className="w-9 h-9 bg-pink-500/20 rounded-xl flex items-center justify-center">
-              <Store className="h-5 w-5" />
+          <Link href="/" className="flex items-center gap-2" style={{ color: '#9a7182' }}>
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#f2d5e0' }}>
+              <Store className="h-5 w-5" style={{ color: '#9a7182' }} />
             </div>
-            <span className="text-xl font-black tracking-tight">TINORI</span>
+            <span className="text-xl font-black tracking-tight" style={{ fontFamily: '"Sugo Display", sans-serif' }}>TINORI</span>
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-pink-800/80">
-            <Link href="/" className="hover:text-pink-600 transition-colors">
+          <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+            <Link href="/" className="transition-colors hover:opacity-70" style={{ color: '#d53c83' }}>
               Trang chủ
             </Link>
-            <Link href="/products" className="hover:text-pink-600 transition-colors">
+            <Link href="/products" className="transition-colors hover:opacity-70" style={{ color: '#d53c83' }}>
               Sản phẩm
             </Link>
-            <Link href="/order-tracking" className="hover:text-pink-600 transition-colors">
-              Tra đơn hàng
-            </Link>
+
             <a
               href="https://www.facebook.com/tinori.official"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-pink-600 transition-colors"
+              className="transition-colors hover:opacity-70"
+              style={{ color: '#d53c83' }}
             >
               Facebook
             </a>
@@ -46,13 +45,15 @@ export default function Navbar() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setSearchOpen(!searchOpen)}
-              className="p-2 text-pink-700 hover:text-pink-500 transition-colors"
+              className="p-2 transition-colors hover:opacity-70"
+              style={{ color: '#d53c83' }}
             >
               <Search className="h-6 w-6" />
             </button>
             <CartDrawer />
             <button
-              className="md:hidden p-2 text-pink-700"
+              className="md:hidden p-2"
+              style={{ color: '#d53c83' }}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -71,12 +72,14 @@ export default function Navbar() {
                 name="q"
                 type="text"
                 placeholder="Tìm kiếm sản phẩm..."
-                className="flex-1 h-10 rounded-xl px-4 text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-pink-300"
+                className="flex-1 h-10 rounded-xl px-4 text-sm text-gray-800 bg-gray-50 border border-gray-100 focus:outline-none focus:ring-2"
+
                 autoFocus
               />
               <button
                 type="submit"
-                className="h-10 px-4 bg-pink-500 text-white rounded-xl hover:bg-pink-600 font-medium text-sm"
+                className="h-10 px-4 rounded-xl font-bold text-sm transition-opacity hover:opacity-90"
+                style={{ backgroundColor: '#f2d5e0', color: '#d53c83' }}
               >
                 Tìm
               </button>
@@ -87,17 +90,18 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-rose-300 px-4 pb-4">
-          <nav className="flex flex-col gap-2 text-sm font-medium">
+        <div className="md:hidden bg-white border-t border-gray-50 px-4 pb-4">
+          <nav className="flex flex-col gap-2 text-sm font-medium pt-2">
             {[
               { href: "/", label: "Trang chủ" },
               { href: "/products", label: "Sản phẩm" },
-              { href: "/order-tracking", label: "Tra đơn hàng" },
+
             ].map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="px-3 py-2 text-pink-800/90 hover:text-pink-700 hover:bg-white/30 rounded-lg transition-colors"
+                className="px-3 py-2 rounded-lg transition-colors hover:bg-gray-50"
+                style={{ color: '#9a7182' }}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {item.label}
@@ -107,7 +111,8 @@ export default function Navbar() {
               href="https://www.facebook.com/tinori.official"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3 py-2 text-pink-800/90 hover:text-pink-700 hover:bg-white/30 rounded-lg transition-colors"
+              className="px-3 py-2 rounded-lg transition-colors hover:bg-gray-50"
+              style={{ color: '#9a7182' }}
             >
               Facebook
             </a>

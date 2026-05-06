@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle, Copy, ExternalLink, MessageCircle, Clock } from "lucide-react";
+import { CheckCircle, Copy, ExternalLink, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/utils";
 import { toast } from "@/hooks/useToast";
@@ -96,10 +96,7 @@ function OrderSuccessContent() {
             Sao chép
           </button>
         </div>
-        <p className="text-xs text-pink-500 mt-2 flex items-center gap-1">
-          <Clock className="h-3 w-3" />
-          Lưu mã này để tra cứu đơn hàng
-        </p>
+
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
@@ -232,9 +229,7 @@ function OrderSuccessContent() {
         <Link href="/products" className="flex-1">
           <Button variant="outline" className="w-full">Tiếp tục mua sắm</Button>
         </Link>
-        <Link href={`/order/${code}`} className="flex-1">
-          <Button variant="secondary" className="w-full">Theo dõi đơn hàng</Button>
-        </Link>
+
       </div>
     </div>
   );

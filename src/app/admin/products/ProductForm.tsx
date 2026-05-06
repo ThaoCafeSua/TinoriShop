@@ -289,8 +289,7 @@ export default function ProductForm({ product }: ProductFormProps) {
         title: isEdit ? "Đã cập nhật sản phẩm" : "Đã thêm sản phẩm",
         variant: "success",
       });
-      router.push("/admin/products");
-      router.refresh();
+      window.location.href = "/admin/products";
     } catch (err) {
       toast({
         title: "Lỗi",
@@ -443,7 +442,7 @@ export default function ProductForm({ product }: ProductFormProps) {
                   onClick={addAttributeGroup} 
                   variant="outline" 
                   size="sm"
-                  className="text-pink-600 border-pink-200 hover:bg-pink-50"
+                  className="text-[#d53c83] border-[#d53c83]/20 hover:bg-[#d53c83]/5"
                 >
                   <Plus className="h-4 w-4 mr-1" />
                   Thêm nhóm phân loại {attributeGroups.length + 1}
@@ -488,7 +487,7 @@ export default function ProductForm({ product }: ProductFormProps) {
                 <Button 
                   type="button" 
                   onClick={generateVariants} 
-                  className="w-full bg-pink-600 hover:bg-pink-700 text-white shadow-lg shadow-pink-200 py-6 text-base font-bold"
+                  className="w-full bg-[#d53c83] hover:opacity-90 text-white shadow-lg shadow-[#d53c83]/20 py-6 text-base font-bold border-none"
                 >
                   Cập nhật danh sách phân loại chi tiết
                 </Button>
@@ -634,22 +633,25 @@ export default function ProductForm({ product }: ProductFormProps) {
         </div>
       </div>
 
-      {/* Submit */}
-      <div className="flex gap-3">
-        <Button type="submit" className="flex-1" disabled={isSubmitting}>
+      {/* Sticky Bottom Actions */}
+      <div className="sticky bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-md border-t border-gray-100 flex gap-4 z-40 -mx-6 -mb-6 mt-8">
+        <Button 
+          type="submit" 
+          className="flex-1 bg-[#d53c83] hover:opacity-90 text-white h-12 text-lg font-bold rounded-xl shadow-lg shadow-[#d53c83]/20 border-none" 
+          disabled={isSubmitting}
+        >
           {isSubmitting ? (
-            <>
+            <div className="flex items-center justify-center gap-2">
               <Loader2 className="h-5 w-5 animate-spin" />
               Đang lưu...
-            </>
-          ) : (
-            isEdit ? "Cập nhật sản phẩm" : "Thêm sản phẩm"
-          )}
+            </div>
+          ) : "Hoàn tất"}
         </Button>
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.push("/admin/products")}
+          onClick={() => window.location.href = "/admin/products"}
+          className="h-12 px-8 rounded-xl border-2 bg-white"
         >
           Hủy
         </Button>

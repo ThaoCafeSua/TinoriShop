@@ -35,6 +35,9 @@ async function getProducts(searchParams: SearchParams) {
         images: { where: { isPrimary: true }, take: 1 },
         category: true,
         _count: { select: { variants: true } },
+        variants: {
+          where: { active: true },
+        },
       },
       orderBy,
       take: 48,
@@ -143,6 +146,7 @@ export default async function ProductsPage({
                   image={product.images[0]?.url}
                   slug={product.slug}
                   hasVariants={product._count?.variants > 0}
+                  variants={product.variants}
                 />
               ))}
             </div>
