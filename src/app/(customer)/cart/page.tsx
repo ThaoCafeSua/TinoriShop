@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useCart } from "@/hooks/useCart";
@@ -9,17 +10,24 @@ import { Trash2, Plus, Minus, ShoppingCart, ArrowRight } from "lucide-react";
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, getTotalPrice, clearCart } = useCart();
-  const totalPrice = getTotalPrice();
+  const [mounted, setMounted] = useState(false);
 
-  if (items.length === 0) {
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const totalPrice = getTotalPrice();
+  const displayItems = mounted ? items : [];
+
+  if (!mounted || displayItems.length === 0) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
         <ShoppingCart className="h-24 w-24 mx-auto text-gray-300 mb-6" />
         <h2 className="text-2xl font-black text-gray-700 mb-3">
-          Giỏ hàng trống
+          {mounted ? "Giỏ hàng trống" : "Đang tải giỏ hàng..."}
         </h2>
         <p className="text-gray-500 mb-8">
-          Hãy thêm sản phẩm vào giỏ hàng để tiến hành mua sắm
+          {mounted ? "Hãy thêm sản phẩm vào giỏ hàng để tiến hành mua sắm" : "Vui lòng đợi trong giây lát"}
         </p>
         <Link href="/products">
           <Button size="lg">
@@ -34,7 +42,7 @@ export default function CartPage() {
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-black text-gray-900">Giỏ hàng ({items.length} sản phẩm)</h1>
+        <h1 className="text-2xl font-black text-gray-900">Giỏ hàng ({displayItems.length} sản phẩm)</h1>
         <button
           onClick={clearCart}
           className="text-sm text-red-400 hover:text-red-600 flex items-center gap-1"
@@ -45,9 +53,9 @@ export default function CartPage() {
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* Cart items */}
+        {/* Cart displayItems */}
         <div className="lg:col-span-2 space-y-3">
-          {items.map((item) => (
+          {displayItems.map((item) => (
             <div
               key={item.id}
               className="flex gap-4 bg-white rounded-2xl p-4 shadow-sm"
@@ -112,7 +120,7 @@ export default function CartPage() {
             <div className="space-y-3 mb-4">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">
-                  Tạm tính ({items.reduce((acc, i) => acc + i.quantity, 0)} sản phẩm)
+                  Tạm tính ({displayItems.reduce((acc, i) => acc + i.quantity, 0)} sản phẩm)
                 </span>
                 <span className="font-semibold">{formatPrice(totalPrice)}</span>
               </div>

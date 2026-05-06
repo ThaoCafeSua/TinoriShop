@@ -1,7 +1,7 @@
 "use client";
 
 import { ShoppingCart, X, Plus, Minus, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useCart } from "@/hooks/useCart";
@@ -11,8 +11,15 @@ import { Button } from "@/components/ui/button";
 export default function CartDrawer() {
   const [isOpen, setIsOpen] = useState(false);
   const { items, removeItem, updateQuantity, getTotalItems, getTotalPrice } = useCart();
-  const totalItems = getTotalItems();
-  const totalPrice = getTotalPrice();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const totalItems = mounted ? getTotalItems() : 0;
+  const totalPrice = mounted ? getTotalPrice() : 0;
+  const displayItems = mounted ? items : [];
 
   return (
     <>
@@ -21,7 +28,7 @@ export default function CartDrawer() {
         className="relative p-2 text-pink-700 hover:text-pink-500 transition-colors"
       >
         <ShoppingCart className="h-6 w-6" />
-        {totalItems > 0 && (
+        {mounted && totalItems > 0 && (
           <span className="absolute -top-1 -right-1 bg-pink-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
             {totalItems > 99 ? "99+" : totalItems}
           </span>
@@ -56,7 +63,7 @@ export default function CartDrawer() {
         </div>
 
         <div className="flex-1 overflow-y-auto p-4">
-          {items.length === 0 ? (
+          {displayItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-gray-400">
               <ShoppingCart className="h-16 w-16 mb-4 opacity-30" />
               <p className="text-lg font-medium">Giỏ hàng trống</p>
@@ -69,7 +76,7 @@ export default function CartDrawer() {
             </div>
           ) : (
             <div className="space-y-3">
-              {items.map((item) => (
+              {displayItems.map((item) => (
                 <div key={item.id} className="flex gap-3 p-3 bg-gray-50 rounded-xl">
                   <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
                     {item.image ? (
@@ -116,7 +123,7 @@ export default function CartDrawer() {
           )}
         </div>
 
-        {items.length > 0 && (
+        {displayItems.length > 0 && (
           <div className="border-t p-4 bg-white">
             <div className="flex items-center justify-between mb-3">
               <span className="font-semibold text-gray-700">Tổng cộng:</span>

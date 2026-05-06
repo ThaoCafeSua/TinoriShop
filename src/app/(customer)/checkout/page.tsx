@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,7 +19,14 @@ import { toast } from "@/hooks/useToast";
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, getTotalPrice, clearCart } = useCart();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const totalPrice = getTotalPrice();
+  const displayItems = mounted ? items : [];
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [addressData, setAddressData] = useState({
     provinceCode: "",
@@ -53,7 +60,7 @@ export default function CheckoutPage() {
   };
 
   const onSubmit = async (data: CheckoutFormData) => {
-    if (items.length === 0) {
+    if (displayItems.length === 0) {
       toast({ title: "Giỏ hàng trống", variant: "destructive" });
       return;
     }
@@ -65,7 +72,7 @@ export default function CheckoutPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...data,
-          items: items.map((item) => ({
+          items: displayItems.map((item) => ({
             productId: item.productId,
             variantId: item.variantId,
             quantity: item.quantity,
@@ -94,11 +101,13 @@ export default function CheckoutPage() {
     }
   };
 
-  if (items.length === 0) {
+  if (!mounted || displayItems.length === 0) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
         <ShoppingCart className="h-24 w-24 mx-auto text-gray-300 mb-6" />
-        <h2 className="text-2xl font-black text-gray-700 mb-3">Giỏ hàng trống</h2>
+        <h2 className="text-2xl font-black text-gray-700 mb-3">
+          {mounted ? "Giỏ hàng trống" : "Đang tải..."}
+        </h2>
         <Link href="/products">
           <Button size="lg">Tiếp tục mua sắm</Button>
         </Link>
@@ -261,7 +270,7 @@ export default function CheckoutPage() {
               </h2>
 
               <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
-                {items.map((item) => (
+                {displayItems.map((item) => (
                   <div key={item.id} className="flex gap-3">
                     <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                       {item.image ? (
