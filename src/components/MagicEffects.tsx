@@ -58,6 +58,7 @@ const MagicEffects = () => {
               width: `${40 + (i % 3) * 20}px`,
               height: `${40 + (i % 3) * 20}px`,
               opacity: 0.6,
+              mixBlendMode: "multiply",
             }}
           >
             <Image
