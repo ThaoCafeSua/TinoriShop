@@ -35,23 +35,18 @@ export default function AdminBannersPage() {
 
   useEffect(() => { fetchBanners(); }, []);
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleAddBannerURL = async () => {
+    const imageUrl = prompt("Vui lòng dán link ảnh banner vào đây (Ví dụ: https://...):");
+    if (!imageUrl) return;
+    
     setUploading(true);
     try {
-      const form = new FormData();
-      form.append("file", file);
-      const res = await fetch("/api/upload-public", { method: "POST", body: form });
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
-
       const link = prompt("Nhập link khi bấm vào banner (tùy chọn, để trống nếu không cần):");
 
       await fetch("/api/banners", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image: data.url, link: link || null, order: banners.length }),
+        body: JSON.stringify({ image: imageUrl, link: link || null, order: banners.length }),
       });
       toast({ title: "Đã thêm banner" });
       fetchBanners();
@@ -59,7 +54,6 @@ export default function AdminBannersPage() {
       toast({ title: "Lỗi", description: err.message, variant: "destructive" });
     } finally {
       setUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
@@ -89,8 +83,7 @@ export default function AdminBannersPage() {
             <p className="text-sm text-gray-500">Ảnh vòng quay hiển thị trên trang chủ</p>
           </div>
           <div>
-            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleUpload} />
-            <Button onClick={() => fileInputRef.current?.click()} disabled={uploading} className="bg-pink-600 hover:bg-pink-700">
+            <Button onClick={handleAddBannerURL} disabled={uploading} className="bg-pink-600 hover:bg-pink-700">
               {uploading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
               Thêm banner
             </Button>

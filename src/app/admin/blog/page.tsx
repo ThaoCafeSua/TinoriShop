@@ -64,21 +64,10 @@ export default function AdminBlogPage() {
     setShowForm(true);
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploadingImg(true);
-    try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch("/api/upload-public", { method: "POST", body: fd });
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
-      setForm(f => ({ ...f, image: data.url }));
-    } catch (err: any) {
-      toast({ title: "Lỗi upload ảnh", description: err.message, variant: "destructive" });
-    } finally {
-      setUploadingImg(false);
+  const handleImageUpload = () => {
+    const url = prompt("Vui lòng dán link ảnh vào đây (Ví dụ: https://...):");
+    if (url) {
+      setForm(f => ({ ...f, image: url }));
     }
   };
 
@@ -168,10 +157,9 @@ export default function AdminBlogPage() {
                       </div>
                     )}
                     <div>
-                      <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-                      <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={uploadingImg}>
-                        {uploadingImg ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <ImageIcon className="h-4 w-4 mr-2" />}
-                        {form.image ? "Đổi ảnh" : "Tải ảnh lên"}
+                      <Button type="button" variant="outline" size="sm" onClick={handleImageUpload}>
+                        <ImageIcon className="h-4 w-4 mr-2" />
+                        {form.image ? "Đổi link ảnh" : "Nhập link ảnh"}
                       </Button>
                       <p className="text-xs text-gray-400 mt-1">Khuyến nghị: 1200×630px</p>
                     </div>

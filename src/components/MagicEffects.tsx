@@ -72,7 +72,7 @@ const MagicEffects = () => {
               left: icon.left,
               width: icon.size,
               height: icon.size,
-              backgroundImage: 'url("/brand/floating-icons.png")',
+              backgroundImage: 'url("/brand/floating-icons-transparent.png")',
               backgroundSize: 'contain',
               backgroundRepeat: 'no-repeat',
               animationDelay: icon.delay,
