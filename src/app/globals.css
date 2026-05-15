@@ -23,28 +23,28 @@ body {
 }
 
 /* Custom scrollbar */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #f9a8d4 #fefefe;
+:root {
+  scrollbar-color: #d53c83 #fdf2f8;
+  scrollbar-width: auto;
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #fefefe;
+  background: #fdf2f8;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #f9a8d4;
+  background-color: #d53c83;
   border-radius: 10px;
-  border: 2px solid #fefefe;
+  border: 2px solid #fdf2f8;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #d53c83;
+  background-color: #9a7182;
 }
 
 /* Line clamp utilities */
