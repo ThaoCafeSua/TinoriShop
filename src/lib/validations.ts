@@ -22,14 +22,22 @@ export const checkoutSchema = z.object({
 export type CheckoutFormData = z.infer<typeof checkoutSchema>;
 
 export const productSchema = z.object({
-  name: z.string().min(2, "Tên sản phẩm phải có ít nhất 2 ký tự"),
+  name: z.string().trim().min(2, "Tên sản phẩm phải có ít nhất 2 ký tự"),
   description: z.string().optional(),
-  price: z.number().min(0, "Giá không được âm"),
+  price: z.number().min(1, "Giá phải lớn hơn 0"),
   salePrice: z.number().min(0, "Giá sale không được âm").optional().nullable(),
   stock: z.number().int().min(0, "Tồn kho không được âm"),
   categoryId: z.string().optional().nullable(),
   featured: z.boolean().optional(),
   active: z.boolean().optional(),
+}).refine((data) => {
+  if (data.salePrice !== null && data.salePrice !== undefined && data.salePrice >= data.price) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Giá khuyến mãi phải nhỏ hơn giá gốc",
+  path: ["salePrice"],
 });
 
 export type ProductFormData = z.infer<typeof productSchema>;

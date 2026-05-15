@@ -67,8 +67,20 @@ export default function AdminBlogPage() {
 
 
   const handleSave = async () => {
-    if (!form.title.trim() || !form.content.trim()) {
-      toast({ title: "Vui lòng nhập tiêu đề và nội dung", variant: "destructive" });
+    const title = form.title.trim();
+    const content = form.content.trim();
+    const videoUrl = form.videoUrl?.trim();
+
+    if (!title) {
+      toast({ title: "Vui lòng nhập tiêu đề", variant: "destructive" });
+      return;
+    }
+    if (!content) {
+      toast({ title: "Vui lòng nhập nội dung bài viết", variant: "destructive" });
+      return;
+    }
+    if (videoUrl && !videoUrl.startsWith("http")) {
+      toast({ title: "Link video không hợp lệ", variant: "destructive" });
       return;
     }
     setSaving(true);

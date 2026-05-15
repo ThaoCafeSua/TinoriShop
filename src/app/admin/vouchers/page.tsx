@@ -85,10 +85,50 @@ export default function AdminVouchersPage() {
   };
 
   const handleSave = async () => {
-    if (!form.code.trim() || !form.discountValue) {
-      toast({ title: "Vui lòng nhập mã và giá trị giảm", variant: "destructive" });
+    // ── FRONTEND VALIDATION ──
+    const code = form.code.trim();
+    const discountValue = Number(form.discountValue);
+    const minOrderValue = Number(form.minOrderValue || 0);
+    const maxDiscount = form.maxDiscount ? Number(form.maxDiscount) : null;
+    const usageLimit = Number(form.usageLimit || 0);
+    const startDate = new Date(form.startDate);
+    const endDate = form.endDate ? new Date(form.endDate) : null;
+
+    if (!code) {
+      toast({ title: "Vui lòng nhập mã voucher", variant: "destructive" });
       return;
     }
+
+    if (!form.discountValue || discountValue <= 0) {
+      toast({ title: "Giá trị giảm phải lớn hơn 0", variant: "destructive" });
+      return;
+    }
+
+    if (form.discountType === "PERCENT" && discountValue > 100) {
+      toast({ title: "Giảm giá theo % không thể vượt quá 100%", variant: "destructive" });
+      return;
+    }
+
+    if (form.discountType === "PERCENT" && !maxDiscount) {
+      toast({ title: "Vui lòng nhập giá trị giảm tối đa cho loại giảm giá %", variant: "destructive" });
+      return;
+    }
+
+    if (minOrderValue < 0) {
+      toast({ title: "Giá trị đơn tối thiểu không được âm", variant: "destructive" });
+      return;
+    }
+
+    if (usageLimit < 0) {
+      toast({ title: "Số lượt dùng không được âm", variant: "destructive" });
+      return;
+    }
+
+    if (endDate && endDate < startDate) {
+      toast({ title: "Ngày kết thúc phải sau ngày bắt đầu", variant: "destructive" });
+      return;
+    }
+
     setSaving(true);
     try {
       const url = editingId ? `/api/vouchers/${editingId}` : "/api/vouchers";
@@ -98,10 +138,11 @@ export default function AdminVouchersPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
-          discountValue: Number(form.discountValue),
-          minOrderValue: Number(form.minOrderValue || 0),
-          maxDiscount: form.maxDiscount ? Number(form.maxDiscount) : null,
-          usageLimit: Number(form.usageLimit || 100),
+          code,
+          discountValue,
+          minOrderValue,
+          maxDiscount,
+          usageLimit,
           endDate: form.endDate || null,
         }),
       });

@@ -39,8 +39,16 @@ export default function AdminBannersPage() {
   useEffect(() => { fetchBanners(); }, []);
 
   const handleSaveBanner = async () => {
-    if (!form.image.trim()) {
-      toast({ title: "Vui lòng nhập link ảnh", variant: "destructive" });
+    const image = form.image.trim();
+    const link = form.link.trim();
+
+    if (!image) {
+      toast({ title: "Vui lòng nhập link ảnh hoặc tải ảnh lên", variant: "destructive" });
+      return;
+    }
+
+    if (link && !link.startsWith("http") && !link.startsWith("/")) {
+      toast({ title: "Link liên kết không hợp lệ (phải bắt đầu bằng http hoặc /)", variant: "destructive" });
       return;
     }
     

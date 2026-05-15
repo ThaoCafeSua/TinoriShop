@@ -35,8 +35,16 @@ export default function AdminPopupPage() {
   }, []);
 
   const handleSave = async () => {
-    if (form.active && !form.image) {
-      toast({ title: "Vui lòng nhập link ảnh để hiển thị popup", variant: "destructive" });
+    const image = form.image.trim();
+    const link = form.link.trim();
+
+    if (!image) {
+      toast({ title: "Vui lòng nhập link ảnh hoặc tải ảnh lên", variant: "destructive" });
+      return;
+    }
+
+    if (link && !link.startsWith("http") && !link.startsWith("/")) {
+      toast({ title: "Link liên kết không hợp lệ", variant: "destructive" });
       return;
     }
 

@@ -32,6 +32,17 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   if (startDate !== undefined) updateData.startDate = new Date(startDate);
   if (endDate !== undefined) updateData.endDate = endDate ? new Date(endDate) : null;
 
+  // Validation
+  if (updateData.discountValue !== undefined && updateData.discountValue <= 0) {
+    return NextResponse.json({ error: "Giá trị giảm phải > 0" }, { status: 400 });
+  }
+  if (updateData.discountType === "PERCENT" && updateData.discountValue > 100) {
+    return NextResponse.json({ error: "Giảm % không quá 100" }, { status: 400 });
+  }
+  if (updateData.endDate && updateData.startDate && new Date(updateData.endDate) < new Date(updateData.startDate)) {
+    return NextResponse.json({ error: "Ngày kết thúc phải sau ngày bắt đầu" }, { status: 400 });
+  }
+
   const voucher = await prisma.voucher.update({ where: { id }, data: updateData });
   return NextResponse.json(voucher);
 }
