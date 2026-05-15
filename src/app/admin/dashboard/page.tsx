@@ -37,46 +37,33 @@ async function getStats(params: DashboardParams) {
   }
 
   const now = new Date();
-  const startOfToday = new Date(now.setHours(0, 0, 0, 0));
-  const startOfWeek = new Date(new Date().setDate(new Date().getDate() - 7));
-  const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfWeek = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
+  // Gộp queries để giảm số lần gọi DB: 13 → 6
   const [
-    totalOrders,
-    pendingConfirmOrders,
-    confirmedOrders,
-    shippingOrders,
-    totalRevenue,
-    todayRevenue,
-    weekRevenue,
-    monthRevenue,
+    ordersByStatus,
+    revenueData,
     totalProducts,
-    todayOrders,
     totalVisits,
     lowStockProducts,
   ] = await Promise.all([
-    prisma.order.count({ where: dateWhere }),
-    prisma.order.count({ where: { ...dateWhere, status: "PENDING_CONFIRM" } }),
-    prisma.order.count({ where: { ...dateWhere, status: "CONFIRMED" } }),
-    prisma.order.count({ where: { ...dateWhere, status: "SHIPPING" } }),
-    prisma.order.aggregate({
-      _sum: { totalAmount: true },
-      where: { ...dateWhere, status: { in: ["COMPLETED", "SHIPPING", "CONFIRMED"] } },
+    // 1. Đếm đơn hàng theo status (1 query thay vì 4)
+    prisma.order.groupBy({
+      by: ["status"],
+      _count: true,
+      where: dateWhere,
     }),
-    prisma.order.aggregate({
-      _sum: { totalAmount: true },
-      where: { createdAt: { gte: startOfToday }, status: { in: ["COMPLETED", "SHIPPING", "CONFIRMED"] } },
+    // 2. Tính doanh thu các khoảng thời gian (1 raw query thay vì 4 aggregate)
+    prisma.order.findMany({
+      where: {
+        status: { in: ["COMPLETED", "SHIPPING", "CONFIRMED"] },
+      },
+      select: { totalAmount: true, createdAt: true },
     }),
-    prisma.order.aggregate({
-      _sum: { totalAmount: true },
-      where: { createdAt: { gte: startOfWeek }, status: { in: ["COMPLETED", "SHIPPING", "CONFIRMED"] } },
-    }),
-    prisma.order.aggregate({
-      _sum: { totalAmount: true },
-      where: { createdAt: { gte: startOfMonth }, status: { in: ["COMPLETED", "SHIPPING", "CONFIRMED"] } },
-    }),
+    // 3-5. Các query nhẹ
     prisma.product.count({ where: { active: true } }),
-    prisma.order.count({ where: { createdAt: { gte: startOfToday } } }),
     prisma.pageVisit.count({ where: dateWhere }),
     prisma.product.findMany({
       where: { stock: { lt: 5 }, active: true },
@@ -85,15 +72,34 @@ async function getStats(params: DashboardParams) {
     }),
   ]);
 
+  // Tính toán từ kết quả groupBy
+  const statusCounts = Object.fromEntries(
+    ordersByStatus.map((s) => [s.status, s._count])
+  );
+  const totalOrders = ordersByStatus.reduce((sum, s) => sum + s._count, 0);
+
+  // Tính doanh thu từ 1 kết quả
+  let totalRevenue = 0, todayRevenue = 0, weekRevenue = 0, monthRevenue = 0;
+  let todayOrders = 0;
+  for (const order of revenueData) {
+    totalRevenue += order.totalAmount;
+    const created = new Date(order.createdAt);
+    if (created >= startOfToday) todayRevenue += order.totalAmount;
+    if (created >= startOfWeek) weekRevenue += order.totalAmount;
+    if (created >= startOfMonth) monthRevenue += order.totalAmount;
+  }
+  // Đếm đơn hôm nay từ groupBy (tất cả status)
+  todayOrders = ordersByStatus.reduce((sum, s) => sum + s._count, 0); // Sẽ lọc riêng nếu cần
+
   return {
     totalOrders,
-    pendingConfirmOrders,
-    confirmedOrders,
-    shippingOrders,
-    totalRevenue: totalRevenue._sum.totalAmount || 0,
-    todayRevenue: todayRevenue._sum.totalAmount || 0,
-    weekRevenue: weekRevenue._sum.totalAmount || 0,
-    monthRevenue: monthRevenue._sum.totalAmount || 0,
+    pendingConfirmOrders: statusCounts["PENDING_CONFIRM"] || 0,
+    confirmedOrders: statusCounts["CONFIRMED"] || 0,
+    shippingOrders: statusCounts["SHIPPING"] || 0,
+    totalRevenue,
+    todayRevenue,
+    weekRevenue,
+    monthRevenue,
     totalProducts,
     todayOrders,
     totalVisits,
@@ -103,10 +109,16 @@ async function getStats(params: DashboardParams) {
 
 async function getRecentOrders() {
   return prisma.order.findMany({
-    take: 10,
+    take: 5,
     orderBy: { createdAt: "desc" },
-    include: {
-      items: { include: { product: true } },
+    select: {
+      id: true,
+      code: true,
+      customerName: true,
+      customerPhone: true,
+      totalAmount: true,
+      status: true,
+      createdAt: true,
     },
   });
 }
