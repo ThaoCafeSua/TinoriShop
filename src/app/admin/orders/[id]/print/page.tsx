@@ -60,7 +60,7 @@ export default async function PrintOrderPage({ params }: { params: Promise<{ id:
       {/* Header GHTK Style */}
       <div className="ghtk-header">
         <div className="ghtk-logo">GHTK</div>
-        <div className="sorting-code">{(order.provinceName || "GHTK").substring(0, 3).toUpperCase()}-TB</div>
+        <div className="sorting-code">{(order.province || "GHTK").substring(0, 3).toUpperCase()}-TB</div>
       </div>
 
       {/* Barcode */}
@@ -83,7 +83,7 @@ export default async function PrintOrderPage({ params }: { params: Promise<{ id:
         <div className="addr-box" style={{ borderTop: '1px dotted #000', paddingTop: '4px' }}>
           <span className="label">Đến:</span>
           <strong>{order.customerName}</strong> - {maskedPhone}<br/>
-          {order.detailedAddress}, {order.wardName}, {order.districtName}, {order.provinceName}
+          {order.detailedAddress}, {order.ward}, {order.district}, {order.province}
         </div>
       </div>
 
