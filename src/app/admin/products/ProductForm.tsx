@@ -204,10 +204,18 @@ export default function ProductForm({ product }: ProductFormProps) {
           url,
           isPrimary: images.length === 0 && idx === 0,
         }));
-        setImages((prev) => [...prev, ...newImages]);
+        setImages((prev) => {
+          const combined = [...prev, ...newImages];
+          // Ensure at least one is primary
+          if (combined.length > 0 && !combined.some(img => img.isPrimary)) {
+            combined[0].isPrimary = true;
+          }
+          return combined;
+        });
+        toast({ title: `Đã tải lên ${uploadedImages.length} ảnh` });
       }
-    } catch {
-      toast({ title: "Lỗi tải ảnh", variant: "destructive" });
+    } catch (err: any) {
+      toast({ title: "Lỗi tải ảnh", description: err.message, variant: "destructive" });
     }
     setUploading(false);
     e.target.value = ''; // Reset input
@@ -228,9 +236,12 @@ export default function ProductForm({ product }: ProductFormProps) {
       const data = await res.json();
       if (data.url) {
         updateVariant(index, "image", data.url);
+        toast({ title: "Đã tải ảnh phân loại lên" });
+      } else {
+        throw new Error(data.error || "Lỗi tải ảnh");
       }
-    } catch {
-      toast({ title: "Lỗi tải ảnh", variant: "destructive" });
+    } catch (err: any) {
+      toast({ title: "Lỗi tải ảnh", description: err.message, variant: "destructive" });
     }
     setUploading(false);
     e.target.value = '';
@@ -395,11 +406,49 @@ export default function ProductForm({ product }: ProductFormProps) {
                   )}
                </div>
                <div className="flex-1 space-y-2">
-                 <Input 
-                   value={img.url} 
-                   onChange={(e) => updateImageUrl(i, e.target.value)} 
-                   placeholder="Nhập URL ảnh (hoặc dùng nút tải ảnh lên phía trên)..." 
-                 />
+                 <div className="flex gap-2">
+                   <Input 
+                     value={img.url} 
+                     onChange={(e) => updateImageUrl(i, e.target.value)} 
+                     placeholder="Nhập URL ảnh hoặc bấm nút tải lên..." 
+                     className="flex-1"
+                   />
+                   <input
+                     type="file"
+                     id={`row-upload-${i}`}
+                     className="hidden"
+                     accept="image/*"
+                     onChange={async (e) => {
+                       const file = e.target.files?.[0];
+                       if (!file) return;
+                       setUploading(true);
+                       try {
+                         const fd = new FormData();
+                         fd.append("file", file);
+                         const r = await fetch("/api/upload", { method: "POST", body: fd });
+                         const d = await r.json();
+                         if (d.url) {
+                           updateImageUrl(i, d.url);
+                           toast({ title: "Đã tải ảnh lên" });
+                         }
+                       } catch {
+                         toast({ title: "Lỗi tải ảnh", variant: "destructive" });
+                       } finally {
+                         setUploading(false);
+                         e.target.value = "";
+                       }
+                     }}
+                   />
+                   <Button
+                     type="button"
+                     variant="outline"
+                     size="icon"
+                     onClick={() => document.getElementById(`row-upload-${i}`)?.click()}
+                     disabled={uploading}
+                   >
+                     {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                   </Button>
+                 </div>
                  <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-gray-700">
                    <input 
                      type="radio" 
