@@ -4,9 +4,10 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 
 const beVietnamPro = Be_Vietnam_Pro({
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  weight: ["400", "500", "600", "700", "800"],
   subsets: ["vietnamese", "latin"],
   variable: "--font-be-vietnam",
+  display: "swap",
 });
 
 export const metadata: Metadata = {

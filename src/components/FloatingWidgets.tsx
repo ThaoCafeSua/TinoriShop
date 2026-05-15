@@ -1,28 +1,28 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ChevronUp, MessageCircle } from "lucide-react";
 
 const FloatingWidgets = () => {
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const ticking = useRef(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 400) {
-        setShowBackToTop(true);
-      } else {
-        setShowBackToTop(false);
+      if (!ticking.current) {
+        requestAnimationFrame(() => {
+          setShowBackToTop(window.scrollY > 400);
+          ticking.current = false;
+        });
+        ticking.current = true;
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -55,4 +55,4 @@ const FloatingWidgets = () => {
   );
 };
 
-export default FloatingWidgets;
+export default React.memo(FloatingWidgets);

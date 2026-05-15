@@ -29,15 +29,22 @@ export default function BannerCarousel({ banners }: { banners: Banner[] }) {
 
   const content = (
     <div className="relative w-full overflow-hidden">
-      {banners.map((b, i) => (
-        <img
-          key={b.id}
-          src={b.image}
-          alt={`Banner ${i + 1}`}
-          className={`w-full h-auto block transition-opacity duration-700 ${i === current ? "opacity-100 relative" : "opacity-0 absolute inset-0"}`}
-          style={{ maxHeight: "none" }}
-        />
-      ))}
+      {/* Only render current and adjacent banners for performance */}
+      {banners.map((b, i) => {
+        const isVisible = i === current;
+        const isAdjacent = i === (current + 1) % banners.length || i === (current - 1 + banners.length) % banners.length;
+        if (!isVisible && !isAdjacent) return null;
+        return (
+          <img
+            key={b.id}
+            src={b.image}
+            alt={`Banner ${i + 1}`}
+            className={`w-full h-auto block transition-opacity duration-700 ${isVisible ? "opacity-100 relative" : "opacity-0 absolute inset-0"}`}
+            style={{ maxHeight: "none" }}
+            loading={isVisible ? "eager" : "lazy"}
+          />
+        );
+      })}
 
       {/* Nav arrows */}
       {banners.length > 1 && (
