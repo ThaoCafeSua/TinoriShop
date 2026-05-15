@@ -174,3 +174,22 @@ body {
   pointer-events: none;
   animation: fly-to-cart 0.8s cubic-bezier(0.2, 0, 0.2, 1) forwards;
 }
+
+/* Kawaii Backgrounds */
+.bg-kawaii-dots {
+  background-image: radial-gradient(#f9a8d4 2px, transparent 2px);
+  background-size: 30px 30px;
+  background-color: #fffafc;
+}
+
+.bg-kawaii-grid {
+  background-image: linear-gradient(#fce7f3 1px, transparent 1px), linear-gradient(90deg, #fce7f3 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-color: #ffffff;
+}
+
+.kawaii-border {
+  border: 3px solid #f9a8d4;
+  border-radius: 2rem;
+  box-shadow: 4px 4px 0px #fbcfe8;
+}

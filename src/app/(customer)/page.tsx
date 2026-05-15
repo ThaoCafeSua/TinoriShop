@@ -96,9 +96,9 @@ export default async function HomePage() {
   ]);
 
   return (
-    <div>
+    <div className="bg-kawaii-dots min-h-screen pb-10">
       {/* ── Hero: Logo + tagline + 2 buttons ── */}
-      <section className="relative overflow-hidden border-b-2 border-white" style={{ background: "#ffffff" }}>
+      <section className="relative overflow-hidden border-b-4 border-pink-200 bg-white/80 backdrop-blur-sm rounded-b-[3rem] shadow-sm mb-8">
         <div className="max-w-5xl mx-auto px-4 flex flex-col items-center text-center" style={{ paddingTop: '20px', paddingBottom: '30px' }}>
           <div className="relative w-full animate-fade-in group">
             {/* Logo */}
@@ -136,7 +136,7 @@ export default async function HomePage() {
 
 
       {/* ── Features bar ── */}
-      <section className="py-8 shadow-sm" style={{ backgroundColor: "#f2d5e0" }}>
+      <section className="py-8 mx-4 my-8 kawaii-border bg-white/90 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
@@ -164,14 +164,14 @@ export default async function HomePage() {
 
       {/* ── Voucher Section ── */}
       {vouchers.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 py-8">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-bold" style={{ color: "#9a7182" }}>Mã giảm giá</h2>
-              <p className="text-gray-500 text-sm">Áp mã khi thanh toán để nhận ưu đãi</p>
-            </div>
+        <section className="max-w-7xl mx-auto px-4 py-8 relative">
+          <div className="absolute top-4 right-10 text-pink-300 opacity-50 text-4xl animate-bounce">✨</div>
+          <div className="flex flex-col items-center justify-center mb-8 text-center">
+            <span className="text-pink-400 font-black tracking-widest text-xs uppercase mb-1">割引クーポン (Vouchers)</span>
+            <h2 className="text-3xl font-black text-[#d53c83] bg-pink-50 px-8 py-2 rounded-full border-2 border-pink-200 shadow-sm inline-block">Mã giảm giá</h2>
+            <p className="text-gray-500 text-sm mt-3 font-medium">Áp mã khi thanh toán để nhận ưu đãi siêu hời nha~</p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {vouchers.map((v) => (
               <VoucherCard key={v.id} voucher={v as any} />
             ))}
@@ -183,14 +183,18 @@ export default async function HomePage() {
 
       {/* ── Featured Products ── */}
       {featuredProducts.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 py-8">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-bold" style={{ color: "#9a7182" }}>Sản phẩm nổi bật</h2>
-              <p className="text-gray-500 text-sm">Được yêu thích nhất</p>
+        <section className="max-w-7xl mx-auto px-4 py-12 relative">
+          <div className="absolute top-10 left-10 text-pink-300 opacity-50 text-3xl animate-pulse">🌸</div>
+          <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4 bg-white/60 p-4 rounded-3xl border-2 border-pink-100">
+            <div className="text-center sm:text-left flex-1">
+              <span className="text-pink-400 font-black tracking-widest text-xs uppercase mb-1 block">おすすめ (Recommended)</span>
+              <h2 className="text-3xl font-black text-[#d53c83]">Sản phẩm nổi bật</h2>
+              <p className="text-gray-500 text-sm mt-1">Được các bạn yêu thích nhất đó!</p>
             </div>
             <Link href="/products?featured=true">
-              <Button variant="outline" size="sm">Xem thêm <ArrowRight className="h-4 w-4" /></Button>
+              <Button variant="outline" className="rounded-full border-pink-200 text-pink-600 hover:bg-pink-50 font-bold px-6">
+                Xem thêm <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
             </Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -213,22 +217,26 @@ export default async function HomePage() {
 
       {/* ── Banner Carousel ── */}
       {banners.length > 0 && (
-        <section className="max-w-5xl mx-auto px-4 py-6">
-          <div className="rounded-3xl overflow-hidden">
+        <section className="max-w-5xl mx-auto px-4 py-8">
+          <div className="rounded-[2.5rem] overflow-hidden shadow-xl border-4 border-white">
             <BannerCarousel banners={banners} />
           </div>
         </section>
       )}
 
       {/* ── Latest Products ── */}
-      <section className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-2xl font-bold" style={{ color: "#9a7182" }}>Sản phẩm mới nhất</h2>
-            <p className="text-gray-500 text-sm">Vừa cập nhật</p>
+      <section className="max-w-7xl mx-auto px-4 py-12 relative">
+        <div className="absolute -top-4 right-20 text-pink-300 opacity-50 text-4xl animate-bounce" style={{ animationDelay: '0.5s' }}>⭐</div>
+        <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4 bg-white/60 p-4 rounded-3xl border-2 border-pink-100">
+          <div className="text-center sm:text-left flex-1">
+            <span className="text-pink-400 font-black tracking-widest text-xs uppercase mb-1 block">新製品 (New Arrivals)</span>
+            <h2 className="text-3xl font-black text-[#d53c83]">Sản phẩm mới nhất</h2>
+            <p className="text-gray-500 text-sm mt-1">Vừa cập nhật nóng hổi luôn nè~</p>
           </div>
           <Link href="/products">
-            <Button variant="outline" size="sm">Tất cả sản phẩm <ArrowRight className="h-4 w-4" /></Button>
+            <Button variant="outline" className="rounded-full border-pink-200 text-pink-600 hover:bg-pink-50 font-bold px-6">
+              Tất cả sản phẩm <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
           </Link>
         </div>
         {latestProducts.length > 0 ? (
@@ -261,34 +269,37 @@ export default async function HomePage() {
 
       {/* ── News / Blog Section ── */}
       {posts.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 py-10">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-bold" style={{ color: "#9a7182" }}>Tin tức &amp; Sự kiện</h2>
-              <p className="text-gray-500 text-sm">Những điều xinh xắn mới nhất từ Tinori</p>
-            </div>
-            <Link href="/news">
-              <Button variant="outline" size="sm">Xem tất cả <ChevronRight className="h-4 w-4" /></Button>
+        <section className="max-w-7xl mx-auto px-4 py-16 relative">
+          <div className="absolute top-10 right-1/4 text-pink-300 opacity-50 text-3xl animate-pulse">☁️</div>
+          <div className="flex flex-col items-center justify-center mb-10 text-center">
+            <span className="text-pink-400 font-black tracking-widest text-xs uppercase mb-1">ニュース (News & Events)</span>
+            <h2 className="text-3xl font-black text-[#d53c83] bg-white px-8 py-2 rounded-[2rem] border-4 border-pink-100 shadow-sm inline-block">Tin tức &amp; Sự kiện</h2>
+            <p className="text-gray-500 text-sm mt-3 font-medium">Những điều xinh xắn mới nhất từ Tinori</p>
+            <Link href="/news" className="mt-4">
+              <Button variant="outline" className="rounded-full border-pink-200 text-pink-600 hover:bg-pink-50 font-bold px-6">
+                Xem tất cả <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {posts.map((post) => (
-              <Link key={post.id} href={`/news/${post.id}`} className="group bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-pink-50">
+              <Link key={post.id} href={`/news/${post.id}`} className="group bg-white rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border-2 border-pink-100 hover:border-pink-300">
                 {post.image ? (
-                  <div className="aspect-video overflow-hidden">
+                  <div className="aspect-video overflow-hidden relative">
+                    <div className="absolute inset-0 bg-pink-200/20 group-hover:bg-transparent transition-colors z-10" />
                     <img
                       src={post.image}
                       alt={post.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     />
                   </div>
                 ) : (
-                  <div className="aspect-video bg-gradient-to-br from-pink-50 to-rose-100 flex items-center justify-center">
-                    <div className="w-16 h-16 bg-pink-200/50 rounded-full flex items-center justify-center text-pink-400 font-bold">News</div>
+                  <div className="aspect-video bg-kawaii-grid flex items-center justify-center">
+                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-pink-400 font-bold shadow-sm border border-pink-100">News</div>
                   </div>
                 )}
-                <div className="p-4">
-                  <p className="text-xs text-pink-400 mb-2 font-medium">
+                <div className="p-5">
+                  <p className="text-xs text-white bg-pink-400 inline-block px-3 py-1 rounded-full mb-3 font-bold shadow-sm">
                     {new Date(post.createdAt).toLocaleDateString("vi-VN", { day: "numeric", month: "long", year: "numeric" })}
                   </p>
                   <h3 className="font-bold text-gray-800 mb-2 leading-tight line-clamp-2 group-hover:text-pink-600 transition-colors">
