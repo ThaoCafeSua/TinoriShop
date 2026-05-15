@@ -1,6 +1,8 @@
 "use client";
 import React, { useEffect, useRef } from "react";
 
+const FLOATING_ICONS = ["🎀", "✨", "💖", "🌸", "⭐", "🎁", "💎", "🦋"];
+
 const MagicEffects = () => {
   const cursorRef = useRef<HTMLDivElement>(null);
   const dotRef = useRef<HTMLDivElement>(null);
@@ -41,6 +43,24 @@ const MagicEffects = () => {
 
   return (
     <>
+      {/* Floating Icons - Pure CSS animation (no JS overhead) */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden hidden md:block" aria-hidden="true">
+        {FLOATING_ICONS.map((icon, i) => (
+          <span
+            key={i}
+            className="absolute animate-float-icon text-2xl opacity-20 select-none"
+            style={{
+              left: `${8 + i * 12}%`,
+              top: `${10 + (i % 3) * 25}%`,
+              animationDelay: `${i * 1.2}s`,
+              animationDuration: `${12 + (i % 4) * 3}s`,
+            }}
+          >
+            {icon}
+          </span>
+        ))}
+      </div>
+
       {/* Custom Cursor - desktop only */}
       <div
         ref={cursorRef}
