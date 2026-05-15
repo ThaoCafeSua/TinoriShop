@@ -3,6 +3,8 @@ import ProductCard from "@/components/ProductCard";
 import Link from "next/link";
 import { Filter, SlidersHorizontal } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 interface SearchParams {
   category?: string;
   q?: string;

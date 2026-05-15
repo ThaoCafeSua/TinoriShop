@@ -16,6 +16,8 @@ import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/utils";
 import BannerCarousel from "@/components/BannerCarousel";
 
+export const dynamic = "force-dynamic";
+
 async function getFeaturedProducts() {
   try {
     return await prisma.product.findMany({
