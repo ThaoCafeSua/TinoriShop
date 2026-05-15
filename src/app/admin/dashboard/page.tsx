@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import AutoRefresh from "@/components/AutoRefresh";
+import SystemMaintenance from "@/components/admin/SystemMaintenance";
 
 interface DashboardParams {
   startDate?: string;
@@ -203,6 +204,8 @@ export default async function DashboardPage({
             <button type="submit" className="bg-gray-900 text-white px-4 py-2 rounded-xl text-sm font-bold">Lọc</button>
           </form>
         </div>
+        
+        <SystemMaintenance />
 
         {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
@@ -288,7 +291,7 @@ export default async function DashboardPage({
                         <p className="text-gray-400 text-xs">{order.customerPhone}</p>
                       </td>
                       <td className="px-4 py-3 hidden sm:table-cell text-gray-500 text-xs">
-                        {new Date(order.createdAt).toLocaleDateString("vi-VN")}
+                        {new Date(order.createdAt).toLocaleDateString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })}
                       </td>
                       <td className="px-4 py-3 text-right font-bold text-gray-800">
                         {formatPrice(order.totalAmount)}

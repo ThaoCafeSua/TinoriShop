@@ -9,6 +9,10 @@ const MagicEffects = () => {
   const mouseY = useRef(0);
 
   useEffect(() => {
+    // Only enable custom cursor on desktop with pointer device
+    const isPointer = window.matchMedia("(pointer: fine)").matches;
+    if (!isPointer) return;
+
     const handleMouseMove = (e: MouseEvent) => {
       mouseX.current = e.clientX;
       mouseY.current = e.clientY;
@@ -35,21 +39,9 @@ const MagicEffects = () => {
     };
   }, []);
 
-  // Static icon positions - no state needed
-  const icons = [
-    { top: '10%', left: '5%', size: '80px', delay: '0s', duration: '6s' },
-    { top: '25%', left: '80%', size: '70px', delay: '2s', duration: '8s' },
-    { top: '60%', left: '15%', size: '90px', delay: '1s', duration: '10s' },
-    { top: '45%', left: '50%', size: '60px', delay: '3s', duration: '7s' },
-    { top: '80%', left: '70%', size: '75px', delay: '0.5s', duration: '9s' },
-    { top: '15%', left: '40%', size: '65px', delay: '4s', duration: '11s' },
-    { top: '70%', left: '90%', size: '85px', delay: '1.5s', duration: '8.5s' },
-    { top: '5%', left: '60%', size: '70px', delay: '2.5s', duration: '7.5s' },
-  ];
-
   return (
     <>
-      {/* Custom Cursor - using refs instead of state to avoid re-renders */}
+      {/* Custom Cursor - desktop only */}
       <div
         ref={cursorRef}
         className="custom-cursor hidden lg:block"
@@ -60,29 +52,6 @@ const MagicEffects = () => {
         className="custom-cursor-dot hidden lg:block"
         style={{ transform: 'translate(-50%, -50%)' }}
       />
-
-      {/* Floating Icons */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        {icons.map((icon, index) => (
-          <div
-            key={index}
-            className="absolute animate-float opacity-40"
-            style={{
-              top: icon.top,
-              left: icon.left,
-              width: icon.size,
-              height: icon.size,
-              backgroundImage: 'url("/brand/floating-icons-transparent.png")',
-              backgroundSize: 'contain',
-              backgroundRepeat: 'no-repeat',
-              animationDelay: icon.delay,
-              animationDuration: icon.duration,
-              mixBlendMode: "multiply",
-              willChange: "transform",
-            }}
-          />
-        ))}
-      </div>
     </>
   );
 };

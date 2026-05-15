@@ -227,11 +227,14 @@ export default async function AdminOrdersPage({
                         </span>
                       </td>
                       <td className="px-4 py-3 hidden md:table-cell text-xs text-gray-500">
-                        {new Date(order.createdAt).toLocaleDateString("vi-VN")}
+                        {new Date(order.createdAt).toLocaleDateString("vi-VN", {
+                          timeZone: "Asia/Ho_Chi_Minh"
+                        })}
                         <br />
                         {new Date(order.createdAt).toLocaleTimeString("vi-VN", {
                           hour: "2-digit",
                           minute: "2-digit",
+                          timeZone: "Asia/Ho_Chi_Minh"
                         })}
                       </td>
                       <td className="px-4 py-3 text-center">

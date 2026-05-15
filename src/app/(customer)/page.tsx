@@ -134,7 +134,6 @@ export default async function HomePage() {
       </section>
 
 
-
       {/* ── Features bar ── */}
       <section className="py-8 shadow-sm" style={{ backgroundColor: "#f2d5e0" }}>
         <div className="max-w-7xl mx-auto px-4">
@@ -178,7 +177,6 @@ export default async function HomePage() {
           </div>
         </section>
       )}
-
 
 
       {/* ── Featured Products ── */}
@@ -289,7 +287,7 @@ export default async function HomePage() {
                 )}
                 <div className="p-4">
                   <p className="text-xs text-pink-400 mb-2 font-medium">
-                    {new Date(post.createdAt).toLocaleDateString("vi-VN", { day: "numeric", month: "long", year: "numeric" })}
+                    {new Date(post.createdAt).toLocaleDateString("vi-VN", { day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Ho_Chi_Minh" })}
                   </p>
                   <h3 className="font-bold text-gray-800 mb-2 leading-tight line-clamp-2 group-hover:text-pink-600 transition-colors">
                     {post.title}

@@ -8,18 +8,9 @@ export default function LogoImage() {
 
   if (error) {
     return (
-      <div
-        style={{
-          fontFamily: "sans-serif",
-          fontSize: "4rem",
-          fontWeight: 900,
-          color: "#9a7182",
-          letterSpacing: "-2px",
-          lineHeight: 1,
-        }}
-      >
+      <span className="text-[4rem] font-black text-[#9a7182] tracking-tight leading-none">
         Tinori
-      </div>
+      </span>
     );
   }
 

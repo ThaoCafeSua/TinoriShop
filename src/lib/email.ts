@@ -173,13 +173,17 @@ export async function sendOrderConfirmationEmail(
     <p>Tinori đợi cậu nha 💕</p>
   `);
 
-  await transporter.sendMail({
-    from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
-    to,
-    subject: `🎀 Xác nhận đơn hàng #${orderCode} - Tinori Shop`,
-    html,
-  });
-  console.log("[EMAIL] Order confirmation sent to", to, "for order", orderCode);
+  try {
+    await transporter.sendMail({
+      from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
+      to,
+      subject: `🎀 Xác nhận đơn hàng #${orderCode} - Tinori Shop`,
+      html,
+    });
+    console.log(`[EMAIL] SUCCESS: Order confirmation sent to ${to} for #${orderCode}`);
+  } catch (error) {
+    console.error(`[EMAIL] ERROR: Failed to send confirmation to ${to}:`, error);
+  }
 }
 
 // Email 5: Thông báo cho Admin có đơn mới
@@ -202,12 +206,16 @@ export async function sendNewOrderAdminEmail(orderCode: string, customerName: st
     </p>
   `);
 
-  await transporter.sendMail({
-    from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
-    to: adminEmail,
-    subject: `🔔 CÓ ĐƠN HÀNG MỚI! #${orderCode}`,
-    html,
-  });
-  console.log("[EMAIL] Admin notified for order", orderCode);
+  try {
+    await transporter.sendMail({
+      from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
+      to: adminEmail,
+      subject: `🔔 CÓ ĐƠN HÀNG MỚI! #${orderCode}`,
+      html,
+    });
+    console.log(`[EMAIL] SUCCESS: Admin notified for #${orderCode}`);
+  } catch (error) {
+    console.error(`[EMAIL] ERROR: Failed to notify admin for #${orderCode}:`, error);
+  }
 }
 

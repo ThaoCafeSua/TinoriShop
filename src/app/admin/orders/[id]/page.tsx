@@ -250,7 +250,7 @@ export default function AdminOrderDetailPage() {
           <div>
             <h1 className="text-xl font-black text-gray-900">Đơn hàng #{order.code}</h1>
             <p className="text-xs text-gray-500">
-              {new Date(order.createdAt).toLocaleString("vi-VN")}
+              {new Date(order.createdAt).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })}
             </p>
           </div>
         </div>
@@ -363,7 +363,7 @@ export default function AdminOrderDetailPage() {
                     </p>
                     {order.depositPaidAt && (
                       <p className="text-xs text-green-600 mt-1.5">
-                        Xác nhận lúc: {new Date(order.depositPaidAt).toLocaleString("vi-VN")}
+                        Xác nhận lúc: {new Date(order.depositPaidAt).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })}
                       </p>
                     )}
                     {order.depositNote && (

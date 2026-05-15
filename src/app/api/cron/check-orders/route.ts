@@ -3,8 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { sendDepositReminderEmail, sendOrderCancelledEmail } from "@/lib/email";
 
 // API này được gọi định kỳ (mỗi phút) để:
-// 1. Gửi email nhắc cọc sau 7 phút
-// 2. Tự động hủy đơn sau 15 phút nếu chưa có cọc
+// 1. Gửi email nhắc cọc sau 60 phút (1 tiếng)
+// 2. Tự động hủy đơn sau 1440 phút (24 tiếng) nếu chưa có cọc
 export async function GET() {
   const now = new Date();
 
@@ -26,8 +26,8 @@ export async function GET() {
     const createdAt = new Date(order.createdAt);
     const minutesPassed = (now.getTime() - createdAt.getTime()) / (1000 * 60);
 
-    // Sau 15 phút → hủy đơn nếu chưa có cọc
-    if (minutesPassed >= 15) {
+    // Sau 24 tiếng (1440 phút) → hủy đơn nếu chưa có cọc
+    if (minutesPassed >= 1440) {
       await prisma.order.update({
         where: { id: order.id },
         data: {
@@ -59,8 +59,8 @@ export async function GET() {
       continue;
     }
 
-    // Sau 7 phút → gửi email nhắc cọc (chỉ gửi 1 lần)
-    if (minutesPassed >= 7 && !order.reminderSentAt) {
+    // Sau 60 phút (1 tiếng) → gửi email nhắc cọc (chỉ gửi 1 lần)
+    if (minutesPassed >= 60 && !order.reminderSentAt) {
       if (order.customerEmail) {
         sendDepositReminderEmail(order.customerEmail, order.code).catch(console.error);
       }

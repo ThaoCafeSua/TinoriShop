@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 
 export async function GET() {
   try {
-    const adminEmail = process.env.ADMIN_EMAIL || "thannhthaoo099@gmail.com";
+    const adminEmail = process.env.ADMIN_EMAIL || "thanhthaooo099@gmail.com";
     const adminPassword = process.env.ADMIN_PASSWORD || "@Thao2004";
 
     // Check if admin already exists
