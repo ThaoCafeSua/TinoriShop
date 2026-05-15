@@ -327,7 +327,7 @@ export default async function HomePage() {
             </a>
             <a href="https://shopee.vn/tinori?entryPoint=ShopBySearch&searchKeyword=tinori" target="_blank" rel="noopener noreferrer" title="Shopee">
               <div className="w-14 h-14 bg-white rounded-full shadow-md flex items-center justify-center hover:scale-110 hover:shadow-xl transition-all duration-300">
-                <img src="https://static.vecteezy.com/system/resources/previews/011/618/138/non_2x/shopee-element-symbol-shopee-food-shopee-icon-free-vector.jpg" alt="Shopee" className="h-7 w-7 object-contain" />
+                <img src="https://cdn.simpleicons.org/shopee/#ee4d2d" alt="Shopee" className="h-7 w-7 object-contain" />
               </div>
             </a>
           </div>
