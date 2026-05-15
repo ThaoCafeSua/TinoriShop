@@ -65,6 +65,7 @@ const MagicEffects = () => {
               backgroundRepeat: 'no-repeat',
               animationDelay: icon.delay,
               animationDuration: icon.duration,
+              mixBlendMode: "multiply",
             }}
           />
         ))}
