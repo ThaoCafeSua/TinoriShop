@@ -9,6 +9,10 @@ import { toast } from "@/hooks/useToast";
 export default function AdminPopupPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({
+    title: "",
+    image: "",
+    link: "",
     active: false,
   });
   const [uploading, setUploading] = useState(false);
