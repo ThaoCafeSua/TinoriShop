@@ -24,20 +24,14 @@ export default function LogoImage() {
   }
 
   return (
-    <div className="relative mx-auto h-48 md:h-80 w-full max-w-lg group">
-      <div className="absolute -top-4 -right-4 bg-white p-2 rounded-full shadow-lg z-10 animate-bounce group-hover:scale-125 transition-transform">
-        <span className="text-2xl">🎀</span>
-      </div>
-      <div className="absolute -bottom-4 -left-4 bg-white p-2 rounded-full shadow-lg z-10 animate-pulse group-hover:scale-125 transition-transform">
-        <span className="text-2xl">💗</span>
-      </div>
+    <div className="relative mx-auto h-48 md:h-80 w-full max-w-lg">
       <Image
         src="/brand/logo.jpg"
         alt="Tinori"
         fill
         sizes="(max-width: 768px) 100vw, 512px"
         priority
-        className="object-contain drop-shadow-2xl"
+        className="object-contain"
         onError={() => setError(true)}
       />
     </div>
