@@ -11,6 +11,8 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
     where: { id },
   });
 
+  if (!post) return notFound();
+
   const getYoutubeEmbedUrl = (url: string) => {
     let videoId = "";
     if (url.includes("youtube.com/watch?v=")) {
