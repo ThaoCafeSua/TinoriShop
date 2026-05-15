@@ -3,6 +3,8 @@ import Footer from "@/components/Footer";
 import CartSync from "@/components/CartSync";
 import MagicEffects from "@/components/MagicEffects";
 
+export const dynamic = "force-dynamic";
+
 export default function CustomerLayout({
   children,
 }: {
