@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import AdminNav from "@/components/AdminNav";
 import { Button } from "@/components/ui/button";
-import { Loader2, Plus, Trash2, GripVertical, ExternalLink, ImageIcon } from "lucide-react";
+import { Loader2, Plus, Trash2, ExternalLink, ImageIcon, X, Check } from "lucide-react";
 import { toast } from "@/hooks/useToast";
 
 interface Banner {
@@ -17,8 +17,9 @@ interface Banner {
 export default function AdminBannersPage() {
   const [banners, setBanners] = useState<Banner[]>([]);
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ image: "", link: "" });
+  const [saving, setSaving] = useState(false);
 
   const fetchBanners = async () => {
     try {
@@ -35,25 +36,27 @@ export default function AdminBannersPage() {
 
   useEffect(() => { fetchBanners(); }, []);
 
-  const handleAddBannerURL = async () => {
-    const imageUrl = prompt("Vui lòng dán link ảnh banner vào đây (Ví dụ: https://...):");
-    if (!imageUrl) return;
+  const handleSaveBanner = async () => {
+    if (!form.image.trim()) {
+      toast({ title: "Vui lòng nhập link ảnh", variant: "destructive" });
+      return;
+    }
     
-    setUploading(true);
+    setSaving(true);
     try {
-      const link = prompt("Nhập link khi bấm vào banner (tùy chọn, để trống nếu không cần):");
-
       await fetch("/api/banners", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image: imageUrl, link: link || null, order: banners.length }),
+        body: JSON.stringify({ image: form.image, link: form.link || null, order: banners.length }),
       });
       toast({ title: "Đã thêm banner" });
+      setShowForm(false);
+      setForm({ image: "", link: "" });
       fetchBanners();
     } catch (err: any) {
       toast({ title: "Lỗi", description: err.message, variant: "destructive" });
     } finally {
-      setUploading(false);
+      setSaving(false);
     }
   };
 
@@ -83,12 +86,58 @@ export default function AdminBannersPage() {
             <p className="text-sm text-gray-500">Ảnh vòng quay hiển thị trên trang chủ</p>
           </div>
           <div>
-            <Button onClick={handleAddBannerURL} disabled={uploading} className="bg-pink-600 hover:bg-pink-700">
-              {uploading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
+            <Button onClick={() => setShowForm(true)} className="bg-pink-600 hover:bg-pink-700">
+              <Plus className="h-4 w-4 mr-2" />
               Thêm banner
             </Button>
           </div>
         </div>
+
+        {/* Form Modal */}
+        {showForm && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+              <div className="flex items-center justify-between p-5 border-b">
+                <h2 className="font-bold text-lg text-gray-900">Thêm banner mới</h2>
+                <button onClick={() => setShowForm(false)}><X className="h-5 w-5 text-gray-500 hover:text-gray-700" /></button>
+              </div>
+              <div className="p-5 space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Link ảnh banner <span className="text-red-500">*</span></label>
+                  <input
+                    value={form.image}
+                    onChange={e => setForm(f => ({ ...f, image: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:border-pink-400 focus:ring-1 focus:ring-pink-400 outline-none"
+                    placeholder="VD: https://.../image.jpg"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">Lấy link ảnh từ Facebook, Imgur, Google Drive, v.v.</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Link chuyển hướng (Khi bấm vào banner)</label>
+                  <input
+                    value={form.link}
+                    onChange={e => setForm(f => ({ ...f, link: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:border-pink-400 focus:ring-1 focus:ring-pink-400 outline-none"
+                    placeholder="Tùy chọn. VD: https://tinori.vn/products"
+                  />
+                </div>
+                
+                {form.image && (
+                  <div className="mt-4 aspect-video bg-gray-100 rounded-xl overflow-hidden border border-gray-200">
+                     <img src={form.image} alt="Preview" className="w-full h-full object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} onLoad={(e) => (e.currentTarget.style.display = 'block')} />
+                  </div>
+                )}
+              </div>
+              <div className="flex gap-3 p-5 border-t bg-gray-50">
+                <Button onClick={handleSaveBanner} disabled={saving} className="bg-pink-600 hover:bg-pink-700 w-full sm:w-auto">
+                  {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Check className="h-4 w-4 mr-2" />}
+                  Lưu banner
+                </Button>
+                <Button variant="outline" onClick={() => setShowForm(false)} className="w-full sm:w-auto">Hủy</Button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {loading ? (
           <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-pink-600" /></div>

@@ -64,12 +64,7 @@ export default function AdminBlogPage() {
     setShowForm(true);
   };
 
-  const handleImageUpload = () => {
-    const url = prompt("Vui lòng dán link ảnh vào đây (Ví dụ: https://...):");
-    if (url) {
-      setForm(f => ({ ...f, image: url }));
-    }
-  };
+
 
   const handleSave = async () => {
     if (!form.title.trim() || !form.content.trim()) {
@@ -156,12 +151,14 @@ export default function AdminBlogPage() {
                         </button>
                       </div>
                     )}
-                    <div>
-                      <Button type="button" variant="outline" size="sm" onClick={handleImageUpload}>
-                        <ImageIcon className="h-4 w-4 mr-2" />
-                        {form.image ? "Đổi link ảnh" : "Nhập link ảnh"}
-                      </Button>
-                      <p className="text-xs text-gray-400 mt-1">Khuyến nghị: 1200×630px</p>
+                    <div className="flex-1">
+                      <input
+                        value={form.image || ""}
+                        onChange={e => setForm(f => ({ ...f, image: e.target.value }))}
+                        className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:border-pink-400 focus:ring-1 focus:ring-pink-400 outline-none"
+                        placeholder="Dán link ảnh (https://...) vào đây"
+                      />
+                      <p className="text-xs text-gray-400 mt-1">Khuyến nghị: 1200×630px. Có thể lấy link ảnh từ Facebook, Google Drive, v.v.</p>
                     </div>
                   </div>
                 </div>
