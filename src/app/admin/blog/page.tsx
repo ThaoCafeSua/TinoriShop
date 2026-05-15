@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import AdminNav from "@/components/AdminNav";
 import { Button } from "@/components/ui/button";
 import {
-  Loader2, Plus, Pencil, Trash2, ImageIcon, X, Check, Newspaper
+  Loader2, Plus, Pencil, Trash2, ImageIcon, X, Check, Newspaper, Upload
 } from "lucide-react";
 import { toast } from "@/hooks/useToast";
 
@@ -98,6 +98,33 @@ export default function AdminBlogPage() {
     fetchPosts();
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImg(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.url) {
+        setForm(f => ({ ...f, image: data.url }));
+        toast({ title: "Đã tải ảnh lên" });
+      } else {
+        throw new Error(data.error || "Lỗi tải ảnh");
+      }
+    } catch (err: any) {
+      toast({ title: "Lỗi", description: err.message, variant: "destructive" });
+    } finally {
+      setUploadingImg(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
   const toggleActive = async (post: BlogPost) => {
     await fetch(`/api/blog-posts/${post.id}`, {
       method: "PUT",
@@ -152,13 +179,31 @@ export default function AdminBlogPage() {
                       </div>
                     )}
                     <div className="flex-1">
-                      <input
-                        value={form.image || ""}
-                        onChange={e => setForm(f => ({ ...f, image: e.target.value }))}
-                        className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:border-pink-400 focus:ring-1 focus:ring-pink-400 outline-none"
-                        placeholder="Dán link ảnh (https://...) vào đây"
-                      />
-                      <p className="text-xs text-gray-400 mt-1">Khuyến nghị: 1200×630px. Có thể lấy link ảnh từ Facebook, Google Drive, v.v.</p>
+                      <div className="flex gap-2">
+                        <input
+                          value={form.image || ""}
+                          onChange={e => setForm(f => ({ ...f, image: e.target.value }))}
+                          className="flex-1 border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:border-pink-400 focus:ring-1 focus:ring-pink-400 outline-none"
+                          placeholder="Dán link ảnh (https://...) hoặc tải lên"
+                        />
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          className="hidden"
+                          accept="image/*"
+                          onChange={handleFileUpload}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={uploadingImg}
+                          className="rounded-xl px-3 border-gray-300"
+                        >
+                          {uploadingImg ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                        </Button>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1">Khuyến nghị: Tải ảnh lên hoặc dùng link từ Facebook, Imgur, v.v.</p>
                     </div>
                   </div>
                 </div>

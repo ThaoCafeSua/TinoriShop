@@ -1,20 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import AdminNav from "@/components/AdminNav";
 import { Button } from "@/components/ui/button";
-import { Loader2, Check, X } from "lucide-react";
+import { Loader2, Check, X, Upload } from "lucide-react";
 import { toast } from "@/hooks/useToast";
 
 export default function AdminPopupPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({
-    title: "",
-    image: "",
-    link: "",
     active: false,
   });
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetch("/api/popup")
@@ -51,6 +49,33 @@ export default function AdminPopupPage() {
       toast({ title: "Lỗi", description: err.message, variant: "destructive" });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.url) {
+        setForm(f => ({ ...f, image: data.url }));
+        toast({ title: "Đã tải ảnh lên" });
+      } else {
+        throw new Error(data.error || "Lỗi tải ảnh");
+      }
+    } catch (err: any) {
+      toast({ title: "Lỗi", description: err.message, variant: "destructive" });
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
@@ -92,14 +117,32 @@ export default function AdminPopupPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Link ảnh Popup <span className="text-red-500">*</span></label>
-                <input
-                  value={form.image}
-                  onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:border-pink-400 focus:ring-1 focus:ring-pink-400 outline-none"
-                  placeholder="VD: https://imgur.com/.../popup.png"
-                />
-                <p className="text-xs text-gray-400 mt-1">Nên dùng ảnh dọc hoặc vuông (Tỷ lệ 4:5 hoặc 1:1) để hiển thị đẹp nhất trên điện thoại.</p>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Ảnh Popup <span className="text-red-500">*</span></label>
+                <div className="flex gap-2">
+                  <input
+                    value={form.image}
+                    onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))}
+                    className="flex-1 border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:border-pink-400 focus:ring-1 focus:ring-pink-400 outline-none"
+                    placeholder="Dán link ảnh (https://...) hoặc tải lên"
+                  />
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                    className="rounded-xl px-3 border-gray-300"
+                  >
+                    {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                  </Button>
+                </div>
+                <p className="text-xs text-gray-400 mt-1">Khuyên dùng tỷ lệ 4:5 hoặc 1:1. Có thể tải lên hoặc dùng link ảnh.</p>
               </div>
 
               <div>

@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import AdminNav from "@/components/AdminNav";
 import { Button } from "@/components/ui/button";
-import { Loader2, Plus, Trash2, ExternalLink, ImageIcon, X, Check } from "lucide-react";
+import { Loader2, Plus, Trash2, ExternalLink, ImageIcon, X, Check, Upload } from "lucide-react";
 import { toast } from "@/hooks/useToast";
 
 interface Banner {
@@ -20,6 +20,8 @@ export default function AdminBannersPage() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ image: "", link: "" });
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchBanners = async () => {
     try {
@@ -57,6 +59,33 @@ export default function AdminBannersPage() {
       toast({ title: "Lỗi", description: err.message, variant: "destructive" });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.url) {
+        setForm(f => ({ ...f, image: data.url }));
+        toast({ title: "Đã tải ảnh lên" });
+      } else {
+        throw new Error(data.error || "Lỗi tải ảnh");
+      }
+    } catch (err: any) {
+      toast({ title: "Lỗi", description: err.message, variant: "destructive" });
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
@@ -103,14 +132,31 @@ export default function AdminBannersPage() {
               </div>
               <div className="p-5 space-y-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Link ảnh banner <span className="text-red-500">*</span></label>
-                  <input
-                    value={form.image}
-                    onChange={e => setForm(f => ({ ...f, image: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:border-pink-400 focus:ring-1 focus:ring-pink-400 outline-none"
-                    placeholder="VD: https://.../image.jpg"
-                  />
-                  <p className="text-xs text-gray-400 mt-1">Lấy link ảnh từ Facebook, Imgur, Google Drive, v.v.</p>
+                  <div className="flex gap-2">
+                    <input
+                      value={form.image}
+                      onChange={e => setForm(f => ({ ...f, image: e.target.value }))}
+                      className="flex-1 border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:border-pink-400 focus:ring-1 focus:ring-pink-400 outline-none"
+                      placeholder="Dán link ảnh (https://...) hoặc tải lên"
+                    />
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleFileUpload}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                      className="rounded-xl px-3 border-gray-300"
+                    >
+                      {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1">Khuyến nghị: Tải ảnh lên hoặc dùng link từ Facebook, Imgur, v.v.</p>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Link chuyển hướng (Khi bấm vào banner)</label>
