@@ -15,6 +15,7 @@ import {
   MousePointerClick,
 } from "lucide-react";
 import Link from "next/link";
+import AutoRefresh from "@/components/AutoRefresh";
 
 interface DashboardParams {
   startDate?: string;
@@ -34,15 +35,24 @@ async function getStats(params: DashboardParams) {
     }
   }
 
+  const now = new Date();
+  const startOfToday = new Date(now.setHours(0, 0, 0, 0));
+  const startOfWeek = new Date(new Date().setDate(new Date().getDate() - 7));
+  const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+
   const [
     totalOrders,
     pendingConfirmOrders,
     confirmedOrders,
     shippingOrders,
     totalRevenue,
+    todayRevenue,
+    weekRevenue,
+    monthRevenue,
     totalProducts,
     todayOrders,
     totalVisits,
+    lowStockProducts,
   ] = await Promise.all([
     prisma.order.count({ where: dateWhere }),
     prisma.order.count({ where: { ...dateWhere, status: "PENDING_CONFIRM" } }),
@@ -52,15 +62,26 @@ async function getStats(params: DashboardParams) {
       _sum: { totalAmount: true },
       where: { ...dateWhere, status: { in: ["COMPLETED", "SHIPPING", "CONFIRMED"] } },
     }),
-    prisma.product.count({ where: { active: true } }),
-    prisma.order.count({
-      where: {
-        createdAt: {
-          gte: new Date(new Date().setHours(0, 0, 0, 0)),
-        },
-      },
+    prisma.order.aggregate({
+      _sum: { totalAmount: true },
+      where: { createdAt: { gte: startOfToday }, status: { in: ["COMPLETED", "SHIPPING", "CONFIRMED"] } },
     }),
+    prisma.order.aggregate({
+      _sum: { totalAmount: true },
+      where: { createdAt: { gte: startOfWeek }, status: { in: ["COMPLETED", "SHIPPING", "CONFIRMED"] } },
+    }),
+    prisma.order.aggregate({
+      _sum: { totalAmount: true },
+      where: { createdAt: { gte: startOfMonth }, status: { in: ["COMPLETED", "SHIPPING", "CONFIRMED"] } },
+    }),
+    prisma.product.count({ where: { active: true } }),
+    prisma.order.count({ where: { createdAt: { gte: startOfToday } } }),
     prisma.pageVisit.count({ where: dateWhere }),
+    prisma.product.findMany({
+      where: { stock: { lt: 5 }, active: true },
+      select: { id: true, name: true, stock: true },
+      take: 5,
+    }),
   ]);
 
   return {
@@ -69,9 +90,13 @@ async function getStats(params: DashboardParams) {
     confirmedOrders,
     shippingOrders,
     totalRevenue: totalRevenue._sum.totalAmount || 0,
+    todayRevenue: todayRevenue._sum.totalAmount || 0,
+    weekRevenue: weekRevenue._sum.totalAmount || 0,
+    monthRevenue: monthRevenue._sum.totalAmount || 0,
     totalProducts,
     todayOrders,
     totalVisits,
+    lowStockProducts,
   };
 }
 
@@ -98,73 +123,60 @@ export default async function DashboardPage({
 
   const statCards = [
     {
-      title: "Tổng đơn hàng",
-      value: stats.totalOrders,
-      icon: ShoppingBag,
-      color: "from-pink-500 to-pink-700",
-      bg: "bg-pink-50",
-      text: "text-pink-600",
-    },
-    {
-      title: "Chờ xác nhận cọc",
-      value: stats.pendingConfirmOrders,
-      icon: Clock,
-      color: "from-yellow-500 to-orange-500",
-      bg: "bg-yellow-50",
-      text: "text-yellow-600",
-    },
-    {
-      title: "Đã xác nhận",
-      value: stats.confirmedOrders,
-      icon: Package,
-      color: "from-blue-500 to-blue-700",
-      bg: "bg-blue-50",
-      text: "text-blue-600",
-    },
-    {
-      title: "Đơn hôm nay",
-      value: stats.todayOrders,
+      title: "Hôm nay",
+      value: formatPrice(stats.todayRevenue),
       icon: TrendingUp,
-      color: "from-green-500 to-green-700",
       bg: "bg-green-50",
       text: "text-green-600",
     },
     {
-      title: "Doanh thu dự kiến",
-      value: formatPrice(stats.totalRevenue),
-      icon: DollarSign,
-      color: "from-pink-500 to-rose-600",
-      bg: "bg-pink-50",
-      text: "text-pink-600",
-      isLarge: true,
+      title: "7 ngày qua",
+      value: formatPrice(stats.weekRevenue),
+      icon: TrendingUp,
+      bg: "bg-blue-50",
+      text: "text-blue-600",
     },
     {
-      title: "Sản phẩm đang bán",
-      value: stats.totalProducts,
-      icon: Users,
-      color: "from-indigo-500 to-indigo-700",
-      bg: "bg-indigo-50",
-      text: "text-indigo-600",
+      title: "Tháng này",
+      value: formatPrice(stats.monthRevenue),
+      icon: TrendingUp,
+      bg: "bg-purple-50",
+      text: "text-purple-600",
     },
     {
       title: "Lượt truy cập",
       value: stats.totalVisits,
       icon: MousePointerClick,
-      color: "from-purple-500 to-purple-700",
-      bg: "bg-purple-50",
-      text: "text-purple-600",
+      bg: "bg-orange-50",
+      text: "text-orange-600",
+    },
+    {
+      title: "Chờ xác nhận cọc",
+      value: stats.pendingConfirmOrders,
+      icon: Clock,
+      bg: "bg-yellow-50",
+      text: "text-yellow-600",
+    },
+    {
+      title: "Tổng doanh thu",
+      value: formatPrice(stats.totalRevenue),
+      icon: DollarSign,
+      bg: "bg-pink-50",
+      text: "text-pink-600",
+      isLarge: true,
     },
   ];
 
   return (
     <div className="lg:pl-64">
+      <AutoRefresh interval={15000} />
       <AdminNav />
       <div className="p-4 sm:p-6 lg:p-8 pt-16 lg:pt-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
           <div>
             <h1 className="text-2xl font-black text-gray-900">Tổng quan</h1>
             <p className="text-gray-500 text-sm">
-              Xin chào, {session.user?.name || session.user?.email} 👋
+              Xin chào, {session.user?.name || session.user?.email}
             </p>
           </div>
           
@@ -199,10 +211,10 @@ export default async function DashboardPage({
             return (
               <div
                 key={i}
-                className={`bg-white rounded-2xl shadow-sm p-5 ${i === 4 ? "col-span-2 lg:col-span-2" : ""}`}
+                className={`bg-white rounded-2xl shadow-sm p-5 border border-transparent hover:border-pink-100 transition-all ${i === 5 ? "col-span-2 lg:col-span-1" : ""}`}
               >
                 <div className="flex items-center justify-between mb-3">
-                  <p className="text-sm font-medium text-gray-500">{card.title}</p>
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{card.title}</p>
                   <div className={`w-10 h-10 ${card.bg} rounded-xl flex items-center justify-center`}>
                     <Icon className={`h-5 w-5 ${card.text}`} />
                   </div>
@@ -214,6 +226,24 @@ export default async function DashboardPage({
             );
           })}
         </div>
+
+        {/* Low Stock Alerts */}
+        {stats.lowStockProducts.length > 0 && (
+          <div className="mb-8 bg-red-50 border border-red-100 rounded-2xl p-5">
+            <div className="flex items-center gap-2 mb-4">
+              <Package className="h-5 w-5 text-red-600" />
+              <h2 className="text-lg font-black text-red-900">Cảnh báo hết hàng!</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {stats.lowStockProducts.map((p) => (
+                <Link key={p.id} href={`/admin/products?search=${p.name}`} className="flex items-center justify-between bg-white p-3 rounded-xl border border-red-200 hover:border-red-400 transition-colors">
+                  <span className="text-sm font-bold text-gray-700 truncate mr-2">{p.name}</span>
+                  <span className="bg-red-600 text-white text-[10px] font-black px-2 py-1 rounded-full">Còn {p.stock}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Recent orders */}
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">

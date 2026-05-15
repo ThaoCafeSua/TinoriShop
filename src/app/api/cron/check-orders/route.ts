@@ -14,6 +14,9 @@ export async function GET() {
       status: "PENDING_DEPOSIT",
       depositStatus: "PENDING",
     },
+    include: {
+      items: true,
+    }
   });
 
   let reminded = 0;
@@ -23,7 +26,7 @@ export async function GET() {
     const createdAt = new Date(order.createdAt);
     const minutesPassed = (now.getTime() - createdAt.getTime()) / (1000 * 60);
 
-    // Sau 24h (1440 phút) → hủy đơn
+    // Sau 24 giờ (1440 phút) → hủy đơn nếu chưa có cọc
     if (minutesPassed >= 1440) {
       await prisma.order.update({
         where: { id: order.id },
@@ -32,6 +35,21 @@ export async function GET() {
           cancelledAt: now,
         },
       });
+
+      // Hoàn trả tồn kho
+      for (const item of order.items) {
+        if (item.variantId) {
+          await prisma.productVariant.update({
+            where: { id: item.variantId },
+            data: { stock: { increment: item.quantity } }
+          });
+        } else {
+          await prisma.product.update({
+            where: { id: item.productId },
+            data: { stock: { increment: item.quantity } }
+          });
+        }
+      }
 
       // Gửi email hủy đơn
       if (order.customerEmail) {

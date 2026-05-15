@@ -1,9 +1,9 @@
 "use client";
 
-import { Suspense, useEffect, useState, useRef } from "react";
+import { Suspense, useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle, Copy, ExternalLink, MessageCircle, Upload, Truck, Loader2 } from "lucide-react";
+import { CheckCircle, Copy, ExternalLink, MessageCircle, Truck, AlertCircle, XCircle, User, Phone, Mail, MapPin, Home, Building2, Map } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/utils";
 import { toast } from "@/hooks/useToast";
@@ -13,6 +13,7 @@ interface Order {
   code: string;
   customerName: string;
   customerPhone: string;
+  customerEmail?: string | null;
   province: string;
   district: string;
   ward: string;
@@ -49,22 +50,68 @@ function OrderSuccessContent() {
   const code = searchParams.get("code");
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
-  
-  const fetchOrder = () => {
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+
+  const fetchOrder = useCallback(() => {
     if (!code) { setLoading(false); return; }
     fetch(`/api/orders/by-code/${code}`)
       .then((r) => r.json())
-      .then((data) => { setOrder(data); setLoading(false); })
+      .then((data) => { 
+        setOrder(data); 
+        setLoading(false);
+        if (data.status === "PENDING_DEPOSIT") {
+          calculateTimeLeft(data.createdAt);
+        }
+      })
       .catch(() => setLoading(false));
+  }, [code]);
+
+  const calculateTimeLeft = (createdAt: string) => {
+    const created = new Date(createdAt).getTime();
+    const deadline = created + 24 * 60 * 60 * 1000;
+    const now = new Date().getTime();
+    const diff = Math.max(0, Math.floor((deadline - now) / 1000));
+    setTimeLeft(diff);
   };
 
   useEffect(() => {
     fetchOrder();
-  }, [code]);
+  }, [fetchOrder]);
 
-  const copyCode = (text: string) => {
+  // Silent auto-reload mỗi 15s để tự động cập nhật giao diện khi Admin/SePay xác nhận
+  useEffect(() => {
+    if (!order || order.status !== "PENDING_DEPOSIT") return;
+    const interval = setInterval(() => {
+      fetchOrder();
+    }, 15000);
+    return () => clearInterval(interval);
+  }, [order?.status, fetchOrder]);
+
+  useEffect(() => {
+    if (timeLeft === null || timeLeft <= 0) return;
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev === null || prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [timeLeft]);
+
+  const formatTime = (seconds: number) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    if (h > 0) return `${h}:${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+
+  const copyText = (text: string, label?: string) => {
     navigator.clipboard.writeText(text);
-    toast({ title: "Đã sao chép!" });
+    toast({ title: `Đã sao chép ${label || ""}! ✓` });
   };
 
   if (loading) {
@@ -85,35 +132,65 @@ function OrderSuccessContent() {
     );
   }
 
-  const qrContent = `COC ${code}`;
-  const vietQRUrl = `https://img.vietqr.io/image/${BANK_INFO.bankId}-${BANK_INFO.accountNo}-compact2.png?amount=${BANK_INFO.amount}&addInfo=${encodeURIComponent(qrContent)}&accountName=${encodeURIComponent(BANK_INFO.accountName)}`;
+  const depositNote = `Dat coc ma don hang ${code}`;
+  const vietQRUrl = `https://img.vietqr.io/image/${BANK_INFO.bankId}-${BANK_INFO.accountNo}-compact2.png?amount=${BANK_INFO.amount}&addInfo=${encodeURIComponent(depositNote)}&accountName=${encodeURIComponent(BANK_INFO.accountName)}`;
 
   const isPendingDeposit = order.status === "PENDING_DEPOSIT";
   const isCancelled = order.status === "CANCELLED";
+  const isConfirmed = order.status === "CONFIRMED" || order.status === "SHIPPING" || order.status === "COMPLETED";
+
+  // Thông tin nhận hàng — tách rõ từng mục để copy
+  const shippingInfoFields = [
+    { icon: <User className="h-4 w-4 text-pink-600" />, label: "Người nhận", value: order.customerName, bgColor: "bg-pink-100" },
+    { icon: <Phone className="h-4 w-4 text-green-600" />, label: "Số điện thoại", value: order.customerPhone, bgColor: "bg-green-100" },
+    ...(order.customerEmail ? [{ icon: <Mail className="h-4 w-4 text-blue-600" />, label: "Email", value: order.customerEmail, bgColor: "bg-blue-100" }] : []),
+    { icon: <Home className="h-4 w-4 text-orange-600" />, label: "Địa chỉ chi tiết", value: order.detailedAddress, bgColor: "bg-orange-100" },
+    { icon: <Building2 className="h-4 w-4 text-purple-600" />, label: "Phường/Xã", value: order.ward, bgColor: "bg-purple-100" },
+    { icon: <Map className="h-4 w-4 text-cyan-600" />, label: "Quận/Huyện", value: order.district, bgColor: "bg-cyan-100" },
+    { icon: <MapPin className="h-4 w-4 text-red-600" />, label: "Tỉnh/Thành phố", value: order.province, bgColor: "bg-red-100" },
+  ];
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
-      <div className="text-center mb-8">
-        {isCancelled ? (
-          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <XCircle className="h-12 w-12 text-red-500" />
-          </div>
-        ) : (
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle className="h-12 w-12 text-green-500" />
-          </div>
-        )}
-        <h1 className="text-2xl font-black text-gray-900 mb-2">
-          {isCancelled ? "Đơn hàng đã bị hủy" : "Đặt hàng thành công! 🎉"}
-        </h1>
-        {isPendingDeposit && (
-          <p className="text-gray-500">Cảm ơn bạn đã tin tưởng Tinori. Vui lòng hoàn tất đặt cọc để xác nhận đơn hàng.</p>
-        )}
-        {order.status === "PENDING_CONFIRM" && (
-          <p className="text-green-600 font-medium">Đã gửi ảnh chuyển khoản. Chờ shop xác nhận nhé!</p>
-        )}
-      </div>
+    <div className="relative min-h-screen">
+      <div className="max-w-2xl mx-auto px-4 py-8 relative z-10">
+        <div className="text-center mb-8">
+          {isCancelled ? (
+            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <XCircle className="h-12 w-12 text-red-500" />
+            </div>
+          ) : isConfirmed ? (
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+              <CheckCircle className="h-12 w-12 text-green-500" />
+            </div>
+          ) : (
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="h-12 w-12 text-green-500" />
+            </div>
+          )}
+          <h1 className="text-2xl font-black text-gray-900 mb-2">
+            {isCancelled ? "Đơn hàng đã bị hủy" : isConfirmed ? "Đơn hàng đã được xác nhận! 🎉" : "Đặt hàng thành công! 🎉"}
+          </h1>
+          {isPendingDeposit && (
+            <p className="text-gray-500">Cảm ơn bạn đã tin tưởng Tinori. Vui lòng hoàn tất đặt cọc để xác nhận đơn hàng.</p>
+          )}
+          {isConfirmed && (
+            <p className="text-green-600 font-medium">Shop đã xác nhận cọc và đang xử lý đơn hàng! 💕</p>
+          )}
+        </div>
 
+        {isPendingDeposit && timeLeft !== null && (
+          <div className={`mb-6 p-4 rounded-2xl flex items-center gap-3 animate-pulse border ${timeLeft < 300 ? 'bg-red-50 border-red-200 text-red-700' : 'bg-orange-50 border-orange-200 text-orange-700'}`}>
+            <AlertCircle className="h-5 w-5 shrink-0" />
+            <div className="flex-1">
+              <p className="text-sm font-bold">
+                Thời gian giữ đơn còn lại: <span className="text-lg font-black">{formatTime(timeLeft)}</span>
+              </p>
+              <p className="text-xs opacity-80">⏰ Đơn hàng sẽ tự động hủy nếu không nhận được cọc trong <strong>24 giờ</strong></p>
+            </div>
+          </div>
+        )}
+
+      {/* Mã đơn hàng */}
       <div className="bg-gradient-to-r from-rose-50 to-pink-50 border-2 border-pink-200 rounded-2xl p-5 mb-6">
         <div className="flex items-center justify-between">
           <div>
@@ -121,8 +198,8 @@ function OrderSuccessContent() {
             <p className="text-2xl font-black text-pink-800">{code}</p>
           </div>
           <button
-            onClick={() => copyCode(code || "")}
-            className="flex items-center gap-2 px-4 py-2 bg-pink-600 text-white rounded-xl text-sm font-medium hover:bg-pink-700"
+            onClick={() => copyText(code || "", "mã đơn")}
+            className="flex items-center gap-2 px-4 py-2 bg-pink-600 text-white rounded-xl text-sm font-medium hover:bg-pink-700 transition-colors"
           >
             <Copy className="h-4 w-4" />
             Sao chép
@@ -130,6 +207,7 @@ function OrderSuccessContent() {
         </div>
       </div>
 
+      {/* Shipping tracking */}
       {order.shippingCode && (
         <div className="bg-orange-50 border border-orange-200 rounded-2xl p-6 mb-6">
           <h2 className="text-lg font-black text-orange-900 mb-2 flex items-center gap-2">
@@ -150,26 +228,11 @@ function OrderSuccessContent() {
         </div>
       )}
 
+      {/* Thanh toán cọc */}
       {isPendingDeposit && (
         <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
           <h2 className="text-lg font-black text-gray-900 mb-4">Thanh toán đặt cọc {formatPrice(BANK_INFO.amount)}</h2>
-          {order?.paymentMethod === "MOMO" ? (
-            <div className="text-center">
-              <div className="bg-pink-50 rounded-2xl p-6 mb-4">
-                <div className="text-4xl mb-3">💜</div>
-                <h3 className="font-bold text-pink-700 mb-2">Chuyển khoản qua MoMo</h3>
-                <p className="text-2xl font-black text-pink-600 mb-3">SĐT MoMo: 0123456789</p>
-                <p className="text-sm text-gray-600">Nội dung chuyển khoản:</p>
-                <div className="flex items-center justify-center gap-2 mt-2">
-                  <code className="bg-pink-100 text-pink-800 px-3 py-1 rounded-lg font-bold text-lg">COC {code}</code>
-                  <button onClick={() => copyCode(`COC ${code}`)}>
-                    <Copy className="h-4 w-4 text-pink-500" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div>
+          <div>
               <div className="flex flex-col items-center mb-4">
                 <img
                   src={vietQRUrl}
@@ -178,6 +241,9 @@ function OrderSuccessContent() {
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                 />
                 <p className="text-xs text-gray-500 mt-2">Quét mã QR để chuyển khoản nhanh</p>
+                <p className="text-sm text-pink-600 font-semibold mt-1">
+                  📝 Ghi chú: <span className="font-black">Đặt cọc mã đơn hàng {code}</span>
+                </p>
               </div>
               <div className="bg-blue-50 rounded-xl p-4 space-y-2 mb-4">
                 {[
@@ -185,14 +251,14 @@ function OrderSuccessContent() {
                   { label: "Số tài khoản", value: BANK_INFO.accountNo, copy: true },
                   { label: "Tên tài khoản", value: BANK_INFO.accountName },
                   { label: "Số tiền", value: formatPrice(BANK_INFO.amount) },
-                  { label: "Nội dung", value: `COC ${code}`, copy: true },
+                  { label: "Nội dung CK", value: `Dat coc ma don hang ${code}`, copy: true },
                 ].map((item) => (
                   <div key={item.label} className="flex items-center justify-between">
                     <span className="text-xs text-gray-500">{item.label}:</span>
                     <div className="flex items-center gap-1">
-                      <span className="text-sm font-bold text-gray-800">{item.value}</span>
+                       <span className="text-sm font-bold text-gray-800">{item.value}</span>
                       {item.copy && (
-                        <button onClick={() => copyCode(item.value || "")} className="text-blue-500 hover:text-blue-700">
+                        <button onClick={() => copyText(item.value || "", item.label)} className="text-blue-500 hover:text-blue-700">
                           <Copy className="h-3.5 w-3.5" />
                         </button>
                       )}
@@ -200,8 +266,7 @@ function OrderSuccessContent() {
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+          </div>
         </div>
       )}
 
@@ -210,8 +275,8 @@ function OrderSuccessContent() {
           <h2 className="text-lg font-black text-gray-900 mb-4">Các bước tiếp theo</h2>
           <div className="space-y-4">
             {[
-              { step: "1", title: "Chuyển khoản đặt cọc", desc: `Chuyển 25.000đ với nội dung COC ${code}`, color: "bg-pink-100 text-pink-700" },
-              { step: "2", title: "Admin xác nhận cọc", desc: "Shop sẽ tự động kiểm tra và xác nhận đơn", color: "bg-blue-100 text-blue-700" },
+              { step: "1", title: "Chuyển khoản đặt cọc", desc: `Chuyển 25.000đ với nội dung "Đặt cọc mã đơn hàng ${code}"`, color: "bg-pink-100 text-pink-700" },
+              { step: "2", title: "Admin xác nhận cọc", desc: "Shop sẽ kiểm tra và xác nhận đơn", color: "bg-blue-100 text-blue-700" },
               { step: "3", title: "Đóng gói và giao hàng", desc: "Thời gian giao hàng 2-5 ngày", color: "bg-green-100 text-green-700" },
             ].map((s) => (
               <div key={s.step} className="flex gap-3">
@@ -228,25 +293,48 @@ function OrderSuccessContent() {
         </div>
       )}
 
+      {/* Thông tin nhận hàng — tách rõ từng dòng + nút copy */}
+      {order && (
+        <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+          <h2 className="text-lg font-black text-gray-900 mb-4">Thông tin nhận hàng</h2>
+          <div className="space-y-3">
+            {shippingInfoFields.map((field) => (
+              <div key={field.label} className="flex items-center gap-3 group">
+                <div className={`w-8 h-8 rounded-full ${field.bgColor} flex items-center justify-center shrink-0`}>
+                  {field.icon}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] text-gray-400 uppercase tracking-wide font-bold">{field.label}</p>
+                  <p className="text-sm font-semibold text-gray-800 break-words">{field.value}</p>
+                </div>
+                <button
+                  onClick={() => copyText(field.value, field.label)}
+                  className="p-1.5 text-gray-300 hover:text-pink-500 hover:bg-pink-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100 sm:opacity-100"
+                  title={`Copy ${field.label}`}
+                >
+                  <Copy className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            ))}
+            
+            {/* Nút copy toàn bộ địa chỉ */}
+            <button
+              onClick={() => copyText(`${order.detailedAddress}, ${order.ward}, ${order.district}, ${order.province}`, "địa chỉ đầy đủ")}
+              className="w-full mt-2 text-sm font-bold text-pink-600 bg-pink-50 hover:bg-pink-100 py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2"
+            >
+              <Copy className="h-4 w-4" />
+              Copy toàn bộ địa chỉ
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Chi tiết đơn hàng */}
       {order && (
         <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
           <h2 className="text-lg font-black text-gray-900 mb-4">Chi tiết đơn hàng</h2>
           <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-500">Người nhận:</span>
-              <span className="font-semibold">{order.customerName}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-500">Điện thoại:</span>
-              <span className="font-semibold">{order.customerPhone}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-500">Địa chỉ:</span>
-              <span className="font-semibold text-right max-w-[60%]">
-                {order.detailedAddress}, {order.ward}, {order.district}, {order.province}
-              </span>
-            </div>
-            <div className="border-t pt-2 mt-2">
+            <div className="border-b pb-2">
               {order.items.map((item) => (
                 <div key={item.id} className="flex justify-between py-1">
                   <span className="text-gray-600 pr-4">
@@ -256,7 +344,7 @@ function OrderSuccessContent() {
                 </div>
               ))}
             </div>
-            <div className="border-t pt-2 mt-2 space-y-1">
+            <div className="space-y-1 pt-2">
               <div className="flex justify-between text-gray-500">
                 <span>Tạm tính:</span>
                 <span>{formatPrice(order.subtotal)}</span>
@@ -302,22 +390,30 @@ function OrderSuccessContent() {
         </a>
       </div>
 
-      <div className="flex gap-3">
-        <Link href="/products" className="flex-1">
+      <div className="flex flex-col gap-3">
+        <Button 
+          onClick={() => {
+            const text = `Mình vừa tậu được đơn hàng siêu xinh tại Tinori Shop! 🎀 Mã đơn: ${code}. Ghé shop xem đồ xinh nhé: ${window.location.origin}`;
+            if (navigator.share) {
+              navigator.share({ title: 'Khoe đơn hàng Tinori', text, url: window.location.href });
+            } else {
+              copyText(text, "link khoe đơn");
+            }
+          }}
+          className="w-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold"
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-lg">✨</span> Khoe đơn hàng ngay
+          </div>
+        </Button>
+        <Link href="/products" className="w-full">
           <Button variant="outline" className="w-full">Tiếp tục mua sắm</Button>
         </Link>
       </div>
     </div>
-  );
-}
-
-const XCircle = ({ className }: { className?: string }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <circle cx="12" cy="12" r="10"></circle>
-    <line x1="15" y1="9" x2="9" y2="15"></line>
-    <line x1="9" y1="9" x2="15" y2="15"></line>
-  </svg>
+  </div>
 );
+}
 
 export default function OrderSuccessPage() {
   return (

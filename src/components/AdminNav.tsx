@@ -11,7 +11,9 @@ import {
   Store,
   Menu,
   X,
-  Tag,
+  Image,
+  Newspaper,
+  Ticket,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -20,6 +22,9 @@ const navItems = [
   { href: "/admin/dashboard", label: "Tổng quan", icon: LayoutDashboard },
   { href: "/admin/products", label: "Sản phẩm", icon: Package },
   { href: "/admin/orders", label: "Đơn hàng", icon: ShoppingBag },
+  { href: "/admin/vouchers", label: "Voucher", icon: Ticket },
+  { href: "/admin/banners", label: "Banner ảnh", icon: Image },
+  { href: "/admin/blog", label: "Tin tức", icon: Newspaper },
 ];
 
 export default function AdminNav() {

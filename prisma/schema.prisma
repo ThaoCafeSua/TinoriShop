@@ -98,6 +98,8 @@ model Order {
   shippingFee     Float       @default(0)
   depositAmount   Float       @default(25000)
   totalAmount     Float
+  voucherCode     String?
+  voucherDiscount Float       @default(0)
   status          String      @default("PENDING_DEPOSIT")
   depositStatus   String      @default("PENDING")
   depositPaidAt   DateTime?
@@ -137,4 +139,49 @@ model PageVisit {
   createdAt DateTime @default(now())
 
   @@map("page_visits")
+}
+
+model BlogPost {
+  id        String   @id @default(cuid())
+  title     String
+  slug      String   @unique
+  content   String
+  image     String?
+  videoUrl  String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("blog_posts")
+}
+
+model Banner {
+  id        String   @id @default(cuid())
+  image     String
+  link      String?
+  active    Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("banners")
+}
+
+model Voucher {
+  id            String    @id @default(cuid())
+  code          String    @unique
+  description   String?
+  discountType  String    @default("FIXED")
+  discountValue Float
+  minOrderValue Float     @default(0)
+  maxDiscount   Float?
+  usageLimit    Int       @default(1)
+  usedCount     Int       @default(0)
+  active        Boolean   @default(true)
+  startDate     DateTime  @default(now())
+  endDate       DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("vouchers")
 }

@@ -61,8 +61,7 @@ const MagicEffects = () => {
               width: icon.size,
               height: icon.size,
               backgroundImage: 'url("/brand/floating-icons.png")',
-              backgroundSize: '300%', // Phóng to để lấy từng icon đơn lẻ
-              backgroundPosition: icon.pos,
+              backgroundSize: 'contain', 
               backgroundRepeat: 'no-repeat',
               animationDelay: icon.delay,
               animationDuration: icon.duration,

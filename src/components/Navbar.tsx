@@ -1,13 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { Search, Store, Menu, X } from "lucide-react";
+import { Search, Store, Menu, X, Heart } from "lucide-react";
 import { useState } from "react";
 import CartDrawer from "@/components/CartDrawer";
+import { useWishlist } from "@/hooks/useWishlist";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const { items: wishlistItems } = useWishlist();
 
   return (
     <header className="sticky top-0 z-30 bg-white border-b border-gray-100 shadow-sm">
@@ -35,6 +37,9 @@ export default function Navbar() {
             <Link href="/blogs/huong-dan-dat-hang" className="transition-colors hover:opacity-70" style={{ color: '#d53c83' }}>
               Hướng dẫn
             </Link>
+            <Link href="/news" className="transition-colors hover:opacity-70" style={{ color: '#d53c83' }}>
+              Tin tức
+            </Link>
 
             <a
               href="https://www.facebook.com/tinori.official"
@@ -56,6 +61,18 @@ export default function Navbar() {
             >
               <Search className="h-6 w-6" />
             </button>
+            <Link 
+              href="/wishlist" 
+              className="p-2 transition-colors hover:opacity-70 relative"
+              style={{ color: '#d53c83' }}
+            >
+              <Heart className="h-6 w-6" />
+              {wishlistItems.length > 0 && (
+                <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                  {wishlistItems.length}
+                </span>
+              )}
+            </Link>
             <CartDrawer />
             <button
               className="md:hidden p-2"
@@ -101,7 +118,9 @@ export default function Navbar() {
             {[
               { href: "/", label: "Trang chủ" },
               { href: "/products", label: "Sản phẩm" },
+              { href: "/wishlist", label: "Yêu thích" },
               { href: "/track-order", label: "Tra cứu đơn" },
+              { href: "/news", label: "Tin tức" },
               { href: "/blogs/huong-dan-dat-hang", label: "Hướng dẫn đặt hàng" },
             ].map((item) => (
               <Link

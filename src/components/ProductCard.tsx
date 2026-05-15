@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ShoppingCart, Heart, Zap, Check, X } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { useCart } from "@/hooks/useCart";
+import { useWishlist } from "@/hooks/useWishlist";
 import { toast } from "@/hooks/useToast";
 
 interface ProductCardProps {
@@ -30,7 +31,14 @@ export default function ProductCard({
   hasVariants = false,
   variants = [],
 }: ProductCardProps) {
-  const [isFavorite, setIsFavorite] = useState(false);
+  const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlist();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const isFavorite = isMounted ? isInWishlist(id) : false;
   const [animateHeart, setAnimateHeart] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
   const [showSelector, setShowSelector] = useState(false);
@@ -66,11 +74,37 @@ export default function ProductCard({
   const toggleFavorite = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsFavorite(!isFavorite);
-    if (!isFavorite) {
+    
+    if (isFavorite) {
+      removeFromWishlist(id);
+      toast({ title: "Đã xóa khỏi danh sách yêu thích" });
+    } else {
+      addToWishlist({ id, name, price, salePrice, image, slug });
       setAnimateHeart(true);
+      toast({ title: "Đã thêm vào danh sách yêu thích!" });
       setTimeout(() => setAnimateHeart(false), 400);
     }
+  };
+
+  const [flying, setFlying] = useState<{ x: number, y: number, img: string } | null>(null);
+
+  const triggerFlyToCart = (e: React.MouseEvent, imgUrl: string) => {
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    
+    // Giả định vị trí giỏ hàng ở góc trên bên phải (thường là vậy)
+    const targetX = window.innerWidth - 80 - x;
+    const targetY = -y + 40;
+
+    setFlying({ x, y, img: imgUrl });
+    
+    // Set CSS variables for the animation
+    const root = document.documentElement;
+    root.style.setProperty('--target-x', `${targetX}px`);
+    root.style.setProperty('--target-y', `${targetY}px`);
+
+    setTimeout(() => setFlying(null), 800);
   };
 
   const handleConfirmSelection = (e: React.MouseEvent) => {
@@ -111,9 +145,10 @@ export default function ProductCard({
       addItem(cartItem);
       setAddedToCart(true);
       setShowSelector(false);
+      triggerFlyToCart(e, cartItem.image);
       toast({
-        title: "Đã thêm vào giỏ hàng!",
-        description: `${name} x1`,
+        title: "Đã thêm vào giỏ hàng! 💕",
+        description: `${name} x1 - Shop iu cậu quá đi~`,
         variant: "success",
       });
       setTimeout(() => setAddedToCart(false), 2000);
@@ -141,9 +176,10 @@ export default function ProductCard({
 
     addItem(cartItem);
     setAddedToCart(true);
+    triggerFlyToCart(e, cartItem.image);
     toast({
-      title: "Đã thêm vào giỏ hàng!",
-      description: `${name} x1`,
+      title: "Đã thêm vào giỏ hàng! 💕",
+      description: `${name} x1 - Shop iu cậu quá đi~`,
       variant: "success",
     });
     setTimeout(() => setAddedToCart(false), 2000);
@@ -190,6 +226,21 @@ export default function ProductCard({
 
   return (
     <div className="group block h-full relative">
+      {/* Fly to Cart Animation Ghost */}
+      {flying && (
+        <div 
+          className="animate-fly-to-cart rounded-full overflow-hidden border-2 border-pink-500 shadow-xl"
+          style={{ 
+            left: `${flying.x}px`, 
+            top: `${flying.y}px`,
+            width: '60px',
+            height: '60px'
+          }}
+        >
+          <img src={flying.img} alt="flying" className="w-full h-full object-cover" />
+        </div>
+      )}
+
       <Link href={`/products/${id}`} className="block h-full">
         <div className="relative overflow-hidden rounded-2xl bg-white shadow-sm hover:shadow-2xl transition-all duration-500 group-hover:-translate-y-2 h-full flex flex-col border border-transparent hover:border-pink-100">
           <div className="relative aspect-square overflow-hidden bg-gray-50">

@@ -84,7 +84,7 @@ export default function GuideBlogPage() {
               Lưu ý quan trọng
             </h2>
             <ul className="list-disc list-inside space-y-2 text-gray-600">
-              <li>Đơn hàng sẽ tự động hủy nếu shop <strong>không nhận được cọc trong vòng 15 phút</strong>.</li>
+              <li>Đơn hàng sẽ tự động hủy nếu shop <strong>không nhận được cọc trong vòng 24 giờ</strong>.</li>
               <li>Nhớ ghi đúng nội dung chuyển khoản: <code className="bg-gray-100 px-2 py-0.5 rounded text-pink-600">COC [Mã Đơn Hàng]</code>.</li>
               <li>Trường hợp bạn lỡ chuyển sai nội dung, hãy liên hệ ngay qua Fanpage Tinori để được hỗ trợ nhé.</li>
             </ul>

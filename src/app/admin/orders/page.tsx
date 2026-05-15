@@ -3,6 +3,8 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import AdminNav from "@/components/AdminNav";
+import AutoRefresh from "@/components/AutoRefresh";
+import TestSePayButton from "@/components/admin/TestSePayButton";
 import Link from "next/link";
 import { formatPrice, ORDER_STATUS_MAP } from "@/lib/utils";
 import { Eye, Search, Calendar } from "lucide-react";
@@ -65,16 +67,17 @@ export default async function AdminOrdersPage({
 
   const tabs = [
     { status: "", label: "Tất cả" },
-    { status: "PENDING_DEPOSIT", label: "⏳ Chờ cọc" },
-    { status: "PENDING_CONFIRM", label: "📸 Chờ xác nhận" },
-    { status: "CONFIRMED", label: "✅ Đã xác nhận" },
-    { status: "SHIPPING", label: "🚚 Đang giao" },
-    { status: "COMPLETED", label: "🎉 Hoàn tất" },
-    { status: "CANCELLED", label: "❌ Đã hủy" },
+    { status: "PENDING_DEPOSIT", label: "Chờ cọc" },
+    { status: "PENDING_CONFIRM", label: "Chờ xác nhận" },
+    { status: "CONFIRMED", label: "Đã xác nhận" },
+    { status: "SHIPPING", label: "Đang giao" },
+    { status: "COMPLETED", label: "Hoàn tất" },
+    { status: "CANCELLED", label: "Đã hủy" },
   ];
 
   return (
     <div className="lg:pl-64">
+      <AutoRefresh interval={15000} />
       <AdminNav />
       <div className="p-4 sm:p-6 lg:p-8 pt-16 lg:pt-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
@@ -208,7 +211,7 @@ export default async function AdminOrdersPage({
                               : "bg-yellow-100 text-yellow-700"
                           }`}
                         >
-                          {order.depositStatus === "PAID" ? "✓ Đã cọc" : "⏳ Chờ"}
+                          {order.depositStatus === "PAID" ? "Đã cọc" : "Chờ cọc"}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-center">
@@ -227,11 +230,16 @@ export default async function AdminOrdersPage({
                         })}
                       </td>
                       <td className="px-4 py-3 text-center">
-                        <Link href={`/admin/orders/${order.id}`}>
-                          <button className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors">
-                            <Eye className="h-4 w-4" />
-                          </button>
-                        </Link>
+                        <div className="flex items-center justify-center gap-1">
+                          {order.status === "PENDING_DEPOSIT" && (
+                            <TestSePayButton orderCode={order.code} depositAmount={order.depositAmount} />
+                          )}
+                          <Link href={`/admin/orders/${order.id}`}>
+                            <button className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors">
+                              <Eye className="h-4 w-4" />
+                            </button>
+                          </Link>
+                        </div>
                       </td>
                     </tr>
                   );

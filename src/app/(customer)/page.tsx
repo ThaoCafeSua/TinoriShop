@@ -1,6 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
-import { ArrowRight, Star, Truck, Shield, RefreshCw } from "lucide-react";
+import { ArrowRight, Star, Truck, Shield, RefreshCw, ChevronRight } from "lucide-react";
 
 function FacebookIcon({ className }: { className?: string }) {
   return (
@@ -9,9 +8,13 @@ function FacebookIcon({ className }: { className?: string }) {
     </svg>
   );
 }
+
 import { prisma } from "@/lib/prisma";
 import ProductCard from "@/components/ProductCard";
+import LogoImage from "@/components/LogoImage";
 import { Button } from "@/components/ui/button";
+import { formatPrice } from "@/lib/utils";
+import BannerCarousel from "@/components/BannerCarousel";
 
 async function getFeaturedProducts() {
   try {
@@ -20,16 +23,12 @@ async function getFeaturedProducts() {
       include: {
         images: { where: { isPrimary: true }, take: 1 },
         _count: { select: { variants: true } },
-        variants: {
-          where: { active: true },
-        },
+        variants: { where: { active: true } },
       },
       take: 8,
       orderBy: { createdAt: "desc" },
     });
-  } catch {
-    return [];
-  }
+  } catch { return []; }
 }
 
 async function getLatestProducts() {
@@ -39,64 +38,88 @@ async function getLatestProducts() {
       include: {
         images: { where: { isPrimary: true }, take: 1 },
         _count: { select: { variants: true } },
-        variants: {
-          where: { active: true },
-        },
+        variants: { where: { active: true } },
       },
       take: 8,
       orderBy: { createdAt: "desc" },
     });
-  } catch {
-    return [];
-  }
+  } catch { return []; }
+}
+
+async function getActiveBanners() {
+  try {
+    return await prisma.banner.findMany({
+      where: { active: true },
+      orderBy: { order: "asc" },
+    });
+  } catch { return []; }
+}
+
+async function getLatestPosts() {
+  try {
+    return await prisma.blogPost.findMany({
+      where: { active: true },
+      orderBy: { createdAt: "desc" },
+      take: 3,
+    });
+  } catch { return []; }
+}
+
+async function getActiveVouchers() {
+  try {
+    const now = new Date();
+    return await prisma.voucher.findMany({
+      where: {
+        active: true,
+        startDate: { lte: now },
+        OR: [
+          { endDate: null },
+          { endDate: { gte: now } },
+        ],
+      },
+      orderBy: { createdAt: "desc" },
+      take: 6,
+    });
+  } catch { return []; }
 }
 
 export default async function HomePage() {
-  const [featuredProducts, latestProducts] = await Promise.all([
+  const [featuredProducts, latestProducts, banners, posts, vouchers] = await Promise.all([
     getFeaturedProducts(),
     getLatestProducts(),
+    getActiveBanners(),
+    getLatestPosts(),
+    getActiveVouchers(),
   ]);
 
   return (
     <div>
-      {/* Hero Banner Section */}
-      <section className="relative overflow-hidden border-b-2 border-white" style={{ background: '#fdf2f8' }}>
-        <div className="max-w-5xl mx-auto px-4 pt-[5px] pb-[5px] flex flex-col items-center text-center">
-          <div className="relative w-full aspect-[1.4/1] md:aspect-[1.6/1] animate-fade-in group">
-            {/* The Image */}
-            <Image
-              src="/brand/hero-banner.png"
-              alt="Tinori Welcome"
-              fill
-              className="object-contain rounded-3xl"
-              priority
-            />
+      {/* ── Hero: Logo + tagline + 2 buttons ── */}
+      <section className="relative overflow-hidden border-b-2 border-white" style={{ background: "#ffffff" }}>
+        <div className="max-w-5xl mx-auto px-4 flex flex-col items-center text-center" style={{ paddingTop: '20px', paddingBottom: '30px' }}>
+          <div className="relative w-full animate-fade-in group">
+            {/* Logo */}
+            <div className="w-full">
+              <LogoImage />
+            </div>
 
-            {/* Overlay Buttons */}
-            <div className="absolute bottom-[8%] left-0 right-0 flex flex-col sm:flex-row items-center justify-center gap-4 px-4">
+            {/* Buttons Below Logo */}
+            <div className="mt-[-20px] mb-4 flex flex-col sm:flex-row items-center justify-center gap-4 px-4 relative z-10">
               <Link href="/products">
                 <Button
                   size="lg"
                   className="hover:scale-105 shadow-xl hover:shadow-2xl border-none font-bold transition-all duration-300 px-10"
-                  style={{
-                    backgroundColor: '#d53c83',
-                    color: '#ffffff'
-                  }}
+                  style={{ backgroundColor: "#d53c83", color: "#ffffff" }}
                 >
-                  Mua sắm ngay
-                  <ArrowRight className="h-5 w-5" />
+                  Mua sắm ngay <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
-              <a
-                href="https://www.facebook.com/tinori.official"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href="https://www.facebook.com/tinori.official" target="_blank" rel="noopener noreferrer">
                 <Button
                   size="lg"
                   variant="outline"
                   className="bg-white hover:bg-[#f2d5e0]/20 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl font-bold"
-                  style={{ color: '#d53c83', borderColor: '#d53c83', borderWidth: '2px' }}
+                  style={{ color: "#d53c83", borderColor: "#d53c83", borderWidth: "2px" }}
                 >
                   <FacebookIcon className="h-5 w-5" />
                   Theo dõi Facebook
@@ -107,51 +130,27 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Features */}
-      <section className="py-8 shadow-sm" style={{ backgroundColor: '#f2d5e0' }}>
+
+
+      {/* ── Features bar ── */}
+      <section className="py-8 shadow-sm" style={{ backgroundColor: "#f2d5e0" }}>
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
-              {
-                icon: Truck,
-                title: "Giao hàng toàn quốc",
-                desc: "Nhanh chóng, an toàn",
-                color: "text-brand-main",
-                bg: "bg-white",
-              },
-              {
-                icon: Shield,
-                title: "Quà tặng siu xinh",
-                desc: "Mỗi đơn hàng 1 món quà",
-                color: "text-brand-main",
-                bg: "bg-white",
-              },
-              {
-                icon: RefreshCw,
-                title: "Yên tâm lựa chọn",
-                desc: "Luôn hỗ trợ cậu",
-                color: "text-brand-main",
-                bg: "bg-white",
-              },
-              {
-                icon: Star,
-                title: "Ưu đãi mỗi ngày",
-                desc: "Flash sale hàng ngày",
-                color: "text-brand-main",
-                bg: "bg-white",
-              },
+              { icon: Truck, title: "Giao hàng toàn quốc", desc: "Nhanh chóng, an toàn" },
+              { icon: Shield, title: "Quà tặng siu xinh", desc: "Mỗi đơn hàng 1 món quà" },
+              { icon: RefreshCw, title: "Yên tâm lựa chọn", desc: "Luôn hỗ trợ cậu" },
+              { icon: Star, title: "Ưu đãi mỗi ngày", desc: "Flash sale hàng ngày" },
             ].map((feature, i) => {
               const Icon = feature.icon;
               return (
                 <div key={i} className="flex items-center gap-3">
-                  <div
-                    className={`w-10 h-10 ${feature.bg} rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm`}
-                  >
-                    <Icon className={`h-5 w-5`} style={{ color: '#9a7182' }} />
+                  <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
+                    <Icon className="h-5 w-5" style={{ color: "#9a7182" }} />
                   </div>
                   <div>
-                    <p className="text-sm font-bold" style={{ color: '#d53c83' }}>{feature.title}</p>
-                    <p className="text-xs" style={{ color: '#d53c83', opacity: 0.8 }}>{feature.desc}</p>
+                    <p className="text-sm font-bold" style={{ color: "#d53c83" }}>{feature.title}</p>
+                    <p className="text-xs" style={{ color: "#d53c83", opacity: 0.8 }}>{feature.desc}</p>
                   </div>
                 </div>
               );
@@ -160,20 +159,57 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ── Voucher Section ── */}
+      {vouchers.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 py-8">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold" style={{ color: "#9a7182" }}>Mã giảm giá</h2>
+              <p className="text-gray-500 text-sm">Áp mã khi thanh toán để nhận ưu đãi</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+            {vouchers.map((v) => (
+              <div key={v.id} className="group relative bg-white rounded-lg overflow-hidden flex border border-pink-100 hover:border-pink-300 transition-colors shadow-[0_2px_8px_-3px_rgba(213,60,131,0.1)]">
+                {/* Left Part: Discount Value */}
+                <div className="w-14 flex-shrink-0 bg-[#fff5f8] flex flex-col items-center justify-center border-r border-dashed border-pink-200 p-1">
+                  <div className="text-sm font-black text-[#d53c83]">
+                    {v.discountType === "PERCENT" ? `${v.discountValue}%` : (v.discountValue / 1000) + 'k'}
+                  </div>
+                  <div className="text-[7px] font-bold text-[#9a7182] uppercase scale-90">Giảm</div>
+                </div>
+                
+                {/* Right Part: Code & Min Order */}
+                <div className="flex-1 p-2 flex flex-col justify-center min-w-0">
+                  <div className="font-mono font-bold text-[10px] text-[#d53c83] tracking-tighter bg-white px-1 py-0.5 rounded border border-pink-100 truncate inline-block w-fit">
+                    {v.code}
+                  </div>
+                  <div className="text-[8px] text-gray-400 mt-0.5 truncate">
+                    {v.minOrderValue > 0 ? `Đơn từ ${(v.minOrderValue / 1000)}k` : 'Mọi đơn hàng'}
+                  </div>
+                </div>
+
+                {/* Decorative Half Circles */}
+                <div className="absolute left-[54px] -top-1.5 w-3 h-3 bg-white border border-pink-100 rounded-full" />
+                <div className="absolute left-[54px] -bottom-1.5 w-3 h-3 bg-white border border-pink-100 rounded-full" />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
 
-      {/* Featured Products */}
+
+      {/* ── Featured Products ── */}
       {featuredProducts.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 py-8">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-2xl font-bold" style={{ color: '#9a7182' }}>Sản phẩm nổi bật</h2>
+              <h2 className="text-2xl font-bold" style={{ color: "#9a7182" }}>Sản phẩm nổi bật</h2>
               <p className="text-gray-500 text-sm">Được yêu thích nhất</p>
             </div>
             <Link href="/products?featured=true">
-              <Button variant="outline" size="sm">
-                Xem thêm <ArrowRight className="h-4 w-4" />
-              </Button>
+              <Button variant="outline" size="sm">Xem thêm <ArrowRight className="h-4 w-4" /></Button>
             </Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -194,17 +230,24 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* Latest Products */}
+      {/* ── Banner Carousel ── */}
+      {banners.length > 0 && (
+        <section className="max-w-5xl mx-auto px-4 py-6">
+          <div className="rounded-3xl overflow-hidden">
+            <BannerCarousel banners={banners} />
+          </div>
+        </section>
+      )}
+
+      {/* ── Latest Products ── */}
       <section className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-2xl font-bold" style={{ color: '#9a7182' }}>Sản phẩm mới nhất</h2>
+            <h2 className="text-2xl font-bold" style={{ color: "#9a7182" }}>Sản phẩm mới nhất</h2>
             <p className="text-gray-500 text-sm">Vừa cập nhật</p>
           </div>
           <Link href="/products">
-            <Button variant="outline" size="sm">
-              Tất cả sản phẩm <ArrowRight className="h-4 w-4" />
-            </Button>
+            <Button variant="outline" size="sm">Tất cả sản phẩm <ArrowRight className="h-4 w-4" /></Button>
           </Link>
         </div>
         {latestProducts.length > 0 ? (
@@ -218,7 +261,6 @@ export default async function HomePage() {
                 salePrice={product.salePrice}
                 image={product.images[0]?.url}
                 slug={product.slug}
-
                 hasVariants={product._count?.variants > 0}
                 variants={product.variants}
               />
@@ -226,85 +268,90 @@ export default async function HomePage() {
           </div>
         ) : (
           <div className="text-center py-16 bg-white rounded-2xl">
-            <div className="text-6xl mb-4">🛍️</div>
-            <h3 className="text-xl font-bold mb-2" style={{ color: '#9a7182' }}>
-              Sắp có sản phẩm mới!
-            </h3>
-            <p className="text-gray-500 mb-6">
-              Theo dõi fanpage để không bỏ lỡ sản phẩm mới nhất
-            </p>
-            <a
-              href="https://www.facebook.com/tinori.official"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button>
-                <FacebookIcon className="h-5 w-5" />
-                Theo dõi Fanpage
-              </Button>
+            <div className="text-pink-100 mb-4 font-black text-6xl">SHOP</div>
+            <h3 className="text-xl font-bold mb-2" style={{ color: "#9a7182" }}>Sắp có sản phẩm mới!</h3>
+            <p className="text-gray-500 mb-6">Theo dõi fanpage để không bỏ lỡ sản phẩm mới nhất</p>
+            <a href="https://www.facebook.com/tinori.official" target="_blank" rel="noopener noreferrer">
+              <Button><FacebookIcon className="h-5 w-5" /> Theo dõi Fanpage</Button>
             </a>
           </div>
         )}
       </section>
 
-      {/* Minimalist Multi-Channel CTA */}
+      {/* ── News / Blog Section ── */}
+      {posts.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 py-10">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold" style={{ color: "#9a7182" }}>Tin tức &amp; Sự kiện</h2>
+              <p className="text-gray-500 text-sm">Những điều xinh xắn mới nhất từ Tinori</p>
+            </div>
+            <Link href="/news">
+              <Button variant="outline" size="sm">Xem tất cả <ChevronRight className="h-4 w-4" /></Button>
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {posts.map((post) => (
+              <Link key={post.id} href={`/news/${post.id}`} className="group bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-pink-50">
+                {post.image ? (
+                  <div className="aspect-video overflow-hidden">
+                    <img
+                      src={post.image}
+                      alt={post.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                ) : (
+                  <div className="aspect-video bg-gradient-to-br from-pink-50 to-rose-100 flex items-center justify-center">
+                    <div className="w-16 h-16 bg-pink-200/50 rounded-full flex items-center justify-center text-pink-400 font-bold">News</div>
+                  </div>
+                )}
+                <div className="p-4">
+                  <p className="text-xs text-pink-400 mb-2 font-medium">
+                    {new Date(post.createdAt).toLocaleDateString("vi-VN", { day: "numeric", month: "long", year: "numeric" })}
+                  </p>
+                  <h3 className="font-bold text-gray-800 mb-2 leading-tight line-clamp-2 group-hover:text-pink-600 transition-colors">
+                    {post.title}
+                  </h3>
+                  <p className="text-sm text-gray-500 line-clamp-3 leading-relaxed">{post.content}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ── Social CTA ── */}
       <section className="relative py-12 my-8 overflow-hidden">
-        {/* Very Light Subtle Pink to match Feature Bar */}
         <div className="absolute inset-0 bg-[#f2d5e0]" />
         <div className="relative max-w-5xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-black mb-3 text-[#d53c83] tracking-tight">
             Ghé thăm "nhà" của Tinori
           </h2>
           <p className="text-[#9a7182] text-sm font-medium mb-8 max-w-xl mx-auto leading-relaxed">
-            Đừng bỏ lỡ những món đồ xinh xắn và các chương trình ưu đãi độc quyền từ chúng mình nhé! ✨          </p>
-
+            Đừng bỏ lỡ những món đồ xinh xắn và các chương trình ưu đãi độc quyền từ chúng mình nhé!
+          </p>
           <div className="flex justify-center gap-6 md:gap-10">
-            <a
-              href="https://www.facebook.com/tinori.official"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group"
-              title="Facebook"
-            >
+            <a href="https://www.facebook.com/tinori.official" target="_blank" rel="noopener noreferrer" title="Facebook">
               <div className="w-14 h-14 bg-white text-[#1877F2] rounded-full shadow-md flex items-center justify-center hover:scale-110 hover:shadow-xl transition-all duration-300">
                 <FacebookIcon className="h-7 w-7" />
               </div>
             </a>
-
-            <a
-              href="https://www.instagram.com/tinori.shop/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group"
-              title="Instagram"
-            >
+            <a href="https://www.instagram.com/tinori.shop/" target="_blank" rel="noopener noreferrer" title="Instagram">
               <div className="w-14 h-14 bg-white text-[#ee2a7b] rounded-full shadow-md flex items-center justify-center hover:scale-110 hover:shadow-xl transition-all duration-300">
                 <svg className="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
                 </svg>
               </div>
             </a>
-
-            <a
-              href="https://shopee.vn/tinori?entryPoint=ShopBySearch&searchKeyword=tinori"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group"
-              title="Shopee"
-            >
+            <a href="https://shopee.vn/tinori?entryPoint=ShopBySearch&searchKeyword=tinori" target="_blank" rel="noopener noreferrer" title="Shopee">
               <div className="w-14 h-14 bg-white rounded-full shadow-md flex items-center justify-center hover:scale-110 hover:shadow-xl transition-all duration-300">
-                <img
-                  src="https://static.vecteezy.com/system/resources/previews/011/618/138/non_2x/shopee-element-symbol-shopee-food-shopee-icon-free-vector.jpg"
-                  alt="Shopee"
-                  className="h-7 w-7 object-contain"
-                />
+                <img src="https://static.vecteezy.com/system/resources/previews/011/618/138/non_2x/shopee-element-symbol-shopee-food-shopee-icon-free-vector.jpg" alt="Shopee" className="h-7 w-7 object-contain" />
               </div>
             </a>
           </div>
         </div>
       </section>
-
-
     </div>
   );
 }

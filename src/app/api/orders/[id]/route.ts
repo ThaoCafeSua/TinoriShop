@@ -38,7 +38,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   const body = await req.json();
   const { status, shippingCode, shippingLink, depositNote } = body;
 
-  const order = await prisma.order.findUnique({ where: { id } });
+  const order = await prisma.order.findUnique({ 
+    where: { id },
+    include: { items: true }
+  });
   if (!order) return NextResponse.json({ error: "Không tìm thấy đơn hàng" }, { status: 404 });
 
   const validStatuses = ["PENDING_DEPOSIT", "PENDING_CONFIRM", "CONFIRMED", "SHIPPING", "COMPLETED", "CANCELLED"];
@@ -71,6 +74,25 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         finalCode,
         finalLink || undefined
       ).catch(console.error);
+    }
+  }
+
+  // Khôi phục tồn kho nếu hủy đơn bằng tay
+  if (status === "CANCELLED" && order.status !== "CANCELLED") {
+    updateData.cancelledAt = new Date();
+    
+    for (const item of order.items) {
+      if (item.variantId) {
+        await prisma.productVariant.update({
+          where: { id: item.variantId },
+          data: { stock: { increment: item.quantity } }
+        });
+      } else {
+        await prisma.product.update({
+          where: { id: item.productId },
+          data: { stock: { increment: item.quantity } }
+        });
+      }
     }
   }
 

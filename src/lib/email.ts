@@ -21,10 +21,10 @@ function wrapEmailHtml(content: string): string {
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background: #fdf2f8; }
-        .container { max-width: 520px; margin: 20px auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(213,60,131,0.1); }
-        .header { background: linear-gradient(135deg, #d53c83, #e91e8c); padding: 24px; text-align: center; color: white; }
-        .header h1 { margin: 0; font-size: 22px; font-weight: 800; }
+        body { font-family: 'Segoe UI', Arial, Helvetica, sans-serif; margin: 0; padding: 0; background: #fdf2f8; }
+        .container { max-width: 520px; margin: 20px auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(213,60,131,0.1); }
+        .header { background: #ffffff; padding: 24px; text-align: center; color: #d53c83; border-bottom: 2px dashed #fce7f3; }
+        .header h1 { margin: 0; font-size: 24px; font-weight: 800; }
         .body { padding: 24px; color: #333; line-height: 1.7; }
         .body p { margin: 12px 0; }
         .highlight { background: #fdf2f8; border-left: 4px solid #d53c83; padding: 14px 18px; border-radius: 8px; margin: 16px 0; }
@@ -65,7 +65,7 @@ export async function sendDepositReminderEmail(to: string, orderCode: string) {
     <p>Chào cậu 💗</p>
     <p>Đơn hàng <strong>#${orderCode}</strong> của bạn đang chờ đặt cọc <strong style="color:#d53c83">25.000đ</strong> để tụi mình giữ hàng nè ~</p>
     <div class="highlight">
-      <p>⏰ Đơn hàng sẽ tự động hủy nếu không nhận được cọc trong <strong>15 phút</strong></p>
+      <p>⏰ Đơn hàng sẽ tự động hủy nếu không nhận được cọc trong <strong>24 giờ</strong></p>
       <p>💳 Nội dung chuyển khoản: <strong>COC ${orderCode}</strong></p>
     </div>
     <p>Nếu bạn vẫn muốn mua, hãy chuyển khoản giúp tụi mình nha ✨</p>
@@ -92,7 +92,7 @@ export async function sendOrderCancelledEmail(to: string, orderCode: string) {
     <p>Chào cậu 💗</p>
     <p>Do quá thời gian giữ đơn mà chưa nhận được cọc, đơn hàng <strong>#${orderCode}</strong> của bạn đã được huỷ rồi nè 😢</p>
     <div class="highlight">
-      <p>❌ Đơn hàng <strong>#${orderCode}</strong> đã bị hủy do quá 15 phút chưa đặt cọc</p>
+      <p>❌ Đơn hàng <strong>#${orderCode}</strong> đã bị hủy do quá 24 giờ chưa đặt cọc</p>
     </div>
     <p>Nếu vẫn muốn mua, bạn có thể đặt lại bất cứ lúc nào nha ✨</p>
     <p>Tinori luôn chờ cậu 💕</p>
@@ -166,9 +166,9 @@ export async function sendOrderConfirmationEmail(
       <p class="tracking-code">#${orderCode}</p>
     </div>
     <div class="highlight">
-      <p>💳 Vui lòng đặt cọc <strong style="color:#d53c83">25.000đ</strong> trong vòng 15 phút</p>
+      <p>💳 Vui lòng đặt cọc <strong style="color:#d53c83">25.000đ</strong> trong vòng 24 giờ</p>
       <p>📝 Nội dung chuyển khoản: <strong>COC ${orderCode}</strong></p>
-      <p>⏰ Đơn sẽ tự động hủy nếu chưa nhận được cọc sau 15 phút</p>
+      <p>⏰ Đơn sẽ tự động hủy nếu chưa nhận được cọc sau 24 giờ</p>
     </div>
     <p>Tinori đợi cậu nha 💕</p>
   `);

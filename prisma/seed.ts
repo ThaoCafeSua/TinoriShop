@@ -19,8 +19,8 @@ if (isLibsql) {
 async function main() {
   console.log("🌱 Seeding database...");
 
-  const adminEmail = "admin@tinori.vn";
-  const adminPassword = "tinori@2024";
+  const adminEmail = process.env.ADMIN_EMAIL || "admin@tinori.vn";
+  const adminPassword = process.env.ADMIN_PASSWORD || "tinori@2024";
 
   // Create or update admin user
   const hashedPassword = await bcrypt.hash(adminPassword, 10);

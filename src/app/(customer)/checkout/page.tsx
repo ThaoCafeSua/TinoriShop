@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import Link from "next/link";
-import { CreditCard, Wallet, ArrowRight, ShoppingCart, Loader2 } from "lucide-react";
+import { CreditCard, Wallet, ArrowRight, ShoppingCart, Loader2, Ticket, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,6 +36,39 @@ export default function CheckoutPage() {
     wardCode: "",
     wardName: "",
   });
+
+  const [voucherCodeInput, setVoucherCodeInput] = useState("");
+  const [appliedVoucher, setAppliedVoucher] = useState<any>(null);
+  const [checkingVoucher, setCheckingVoucher] = useState(false);
+  const [voucherError, setVoucherError] = useState("");
+
+  const handleApplyVoucher = async () => {
+    if (!voucherCodeInput.trim()) return;
+    setCheckingVoucher(true);
+    setVoucherError("");
+    try {
+      const res = await fetch("/api/vouchers/check", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: voucherCodeInput.trim(), subtotal: totalPrice }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Lỗi kiểm tra voucher");
+      setAppliedVoucher(data);
+      toast({ title: "Đã áp dụng mã giảm giá" });
+    } catch (err: any) {
+      setVoucherError(err.message);
+      setAppliedVoucher(null);
+    } finally {
+      setCheckingVoucher(false);
+    }
+  };
+
+  const removeVoucher = () => {
+    setAppliedVoucher(null);
+    setVoucherCodeInput("");
+    setVoucherError("");
+  };
 
   const {
     register,
@@ -79,6 +112,7 @@ export default function CheckoutPage() {
             price: item.price,
           })),
           totalAmount: totalPrice,
+          voucherCode: appliedVoucher?.code,
         }),
       });
 
@@ -240,24 +274,6 @@ export default function CheckoutPage() {
                     </div>
                   </div>
                 </label>
-
-                <label className="flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-colors has-[:checked]:border-pink-500 has-[:checked]:bg-pink-50">
-                  <input
-                    type="radio"
-                    {...register("paymentMethod")}
-                    value="MOMO"
-                    className="accent-pink-600"
-                  />
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-pink-100 rounded-xl flex items-center justify-center">
-                      <Wallet className="h-5 w-5 text-pink-600" />
-                    </div>
-                    <div>
-                      <p className="font-semibold text-gray-800">Ví MoMo</p>
-                      <p className="text-xs text-gray-500">Chuyển khoản nhanh qua MoMo</p>
-                    </div>
-                  </div>
-                </label>
               </div>
             </div>
           </div>
@@ -310,14 +326,59 @@ export default function CheckoutPage() {
                   <span className="text-gray-600">Phí vận chuyển</span>
                   <span className="font-semibold">{calculateShippingFee(totalPrice) === 0 ? "Miễn phí" : formatPrice(calculateShippingFee(totalPrice))}</span>
                 </div>
+                {appliedVoucher && (
+                  <div className="flex justify-between text-sm text-green-600">
+                    <span className="font-semibold flex items-center gap-1"><Ticket className="h-4 w-4" /> Mã giảm giá ({appliedVoucher.code})</span>
+                    <span className="font-semibold">-{formatPrice(appliedVoucher.discount)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm text-amber-700">
                   <span className="font-semibold">Tiền cọc</span>
                   <span className="font-bold">25.000đ</span>
                 </div>
                 <div className="flex justify-between font-black text-lg border-t pt-2">
-                  <span>Tổng</span>
-                  <span className="text-pink-600">{formatPrice(totalPrice + calculateShippingFee(totalPrice))}</span>
+                  <span>Tổng thanh toán</span>
+                  <span className="text-pink-600">{formatPrice(totalPrice + calculateShippingFee(totalPrice) - (appliedVoucher?.discount || 0))}</span>
                 </div>
+              </div>
+
+              {/* Voucher Input UI */}
+              <div className="mt-6 border-t pt-4">
+                {!appliedVoucher ? (
+                  <div>
+                    <Label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                      <Ticket className="h-4 w-4" /> Sử dụng mã giảm giá
+                    </Label>
+                    <div className="flex gap-2">
+                      <Input
+                        value={voucherCodeInput}
+                        onChange={(e) => setVoucherCodeInput(e.target.value.toUpperCase())}
+                        placeholder="Nhập mã voucher..."
+                        className="font-mono uppercase placeholder:normal-case placeholder:font-sans"
+                      />
+                      <Button
+                        type="button"
+                        onClick={handleApplyVoucher}
+                        disabled={!voucherCodeInput.trim() || checkingVoucher}
+                        className="bg-gray-800 hover:bg-gray-900 shrink-0"
+                      >
+                        {checkingVoucher ? <Loader2 className="h-4 w-4 animate-spin" /> : "Áp dụng"}
+                      </Button>
+                    </div>
+                    {voucherError && <p className="text-xs text-red-500 mt-2 font-medium">{voucherError}</p>}
+                  </div>
+                ) : (
+                  <div className="bg-green-50 border border-green-200 rounded-xl p-3 flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-green-700 font-semibold mb-0.5">Đã áp dụng mã</p>
+                      <p className="font-mono font-bold text-green-800">{appliedVoucher.code}</p>
+                      {appliedVoucher.description && <p className="text-xs text-green-600 mt-0.5">{appliedVoucher.description}</p>}
+                    </div>
+                    <Button type="button" variant="ghost" size="sm" onClick={removeVoucher} className="text-gray-500 hover:text-red-600 h-8 px-2">
+                      <X className="h-4 w-4 mr-1" /> Hủy
+                    </Button>
+                  </div>
+                )}
               </div>
 
               <Button

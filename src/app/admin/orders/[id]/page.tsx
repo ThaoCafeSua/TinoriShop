@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import AdminNav from "@/components/AdminNav";
 import OrderStatusBadge from "@/components/OrderStatusBadge";
 import { Button } from "@/components/ui/button";
@@ -20,8 +19,12 @@ import {
   User,
   Mail,
   CreditCard,
-  Image as ImageIcon,
+  Copy,
+  Home,
+  Building2,
+  Map,
 } from "lucide-react";
+import { toast } from "@/hooks/useToast";
 
 type OrderStatus = "PENDING_DEPOSIT" | "PENDING_CONFIRM" | "CONFIRMED" | "SHIPPING" | "COMPLETED" | "CANCELLED";
 
@@ -79,6 +82,21 @@ export default function AdminOrderDetailPage() {
 
   const [confirmingDeposit, setConfirmingDeposit] = useState(false);
   const [confirmingStatus, setConfirmingStatus] = useState<OrderStatus | null>(null);
+  const [pushingGHTK, setPushingGHTK] = useState(false);
+
+  const handlePushGHTK = async () => {
+    setPushingGHTK(true);
+    // Giả lập API call 1.5s
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    const fakeCode = "GHTK" + Math.floor(Math.random() * 1000000000);
+    setShippingCode(fakeCode);
+    setShippingLink(`https://khachhang.ghtk.vn/tra-cuu/${fakeCode}`);
+    toast({
+      title: "Đẩy đơn thành công",
+      description: `Đã tạo mã vận đơn ảo: ${fakeCode}`,
+    });
+    setPushingGHTK(false);
+  };
 
   useEffect(() => {
     fetch(`/api/orders/${id}`)
@@ -92,6 +110,11 @@ export default function AdminOrderDetailPage() {
       })
       .catch(() => setLoading(false));
   }, [id]);
+
+  const copyText = (text: string, label?: string) => {
+    navigator.clipboard.writeText(text);
+    toast({ title: `Đã sao chép ${label || ""}!` });
+  };
 
   const confirmDeposit = async () => {
     setUpdating(true);
@@ -166,11 +189,51 @@ export default function AdminOrderDetailPage() {
     );
   }
 
-  const statusFlow: { status: OrderStatus; label: string; icon: React.ReactNode; requiresDeposit?: boolean }[] = [
-    { status: "CONFIRMED", label: "Đã xác nhận", icon: <CheckCircle className="h-4 w-4" /> },
-    { status: "SHIPPING", label: "Đang giao", icon: <Truck className="h-4 w-4" />, requiresDeposit: true },
-    { status: "COMPLETED", label: "Hoàn tất", icon: <Package className="h-4 w-4" />, requiresDeposit: true },
-    { status: "CANCELLED", label: "Hủy đơn", icon: <XCircle className="h-4 w-4" /> },
+  // Luồng trạng thái đúng logic:
+  // PENDING_DEPOSIT → (Admin xác nhận cọc) → CONFIRMED → SHIPPING → COMPLETED
+  // Bất kỳ lúc nào cũng có thể hủy (CANCELLED)
+  const statusFlow: { status: OrderStatus; label: string; icon: React.ReactNode; show: boolean }[] = [
+    { 
+      status: "CONFIRMED", 
+      label: "Xác nhận đơn", 
+      icon: <CheckCircle className="h-4 w-4" />,
+      // Chỉ hiện khi cọc đã xong nhưng chưa xác nhận đơn
+      show: order.depositStatus === "PAID" && order.status !== "CONFIRMED" && order.status !== "SHIPPING" && order.status !== "COMPLETED" && order.status !== "CANCELLED",
+    },
+    { 
+      status: "SHIPPING", 
+      label: "Đang giao", 
+      icon: <Truck className="h-4 w-4" />,
+      // Chỉ hiện khi đã xác nhận đơn
+      show: order.status === "CONFIRMED",
+    },
+    { 
+      status: "COMPLETED", 
+      label: "Hoàn tất", 
+      icon: <Package className="h-4 w-4" />,
+      // Chỉ hiện khi đang giao
+      show: order.status === "SHIPPING",
+    },
+    { 
+      status: "CANCELLED", 
+      label: "Hủy đơn", 
+      icon: <XCircle className="h-4 w-4" />,
+      // Hiện khi chưa hoàn tất hoặc chưa hủy
+      show: order.status !== "COMPLETED" && order.status !== "CANCELLED",
+    },
+  ];
+
+  const visibleStatusButtons = statusFlow.filter(s => s.show);
+
+  // Thông tin nhận hàng tách từng dòng
+  const shippingInfoFields = [
+    { icon: <User className="h-4 w-4 text-pink-600" />, label: "Người nhận", value: order.customerName, bgColor: "bg-pink-100" },
+    { icon: <Phone className="h-4 w-4 text-green-600" />, label: "Số điện thoại", value: order.customerPhone, bgColor: "bg-green-100" },
+    ...(order.customerEmail ? [{ icon: <Mail className="h-4 w-4 text-blue-600" />, label: "Email", value: order.customerEmail, bgColor: "bg-blue-100" }] : []),
+    { icon: <Home className="h-4 w-4 text-orange-600" />, label: "Địa chỉ chi tiết", value: order.detailedAddress, bgColor: "bg-orange-100" },
+    { icon: <Building2 className="h-4 w-4 text-purple-600" />, label: "Phường/Xã", value: order.ward, bgColor: "bg-purple-100" },
+    { icon: <Map className="h-4 w-4 text-cyan-600" />, label: "Quận/Huyện", value: order.district, bgColor: "bg-cyan-100" },
+    { icon: <MapPin className="h-4 w-4 text-red-600" />, label: "Tỉnh/Thành phố", value: order.province, bgColor: "bg-red-100" },
   ];
 
   return (
@@ -211,7 +274,7 @@ export default function AdminOrderDetailPage() {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full bg-pink-100 flex items-center justify-center text-2xl">📦</div>
+                        <div className="w-full h-full bg-pink-100 flex items-center justify-center text-xs text-pink-400 font-bold">No Image</div>
                       )}
                     </div>
                     <div className="flex-1">
@@ -263,7 +326,7 @@ export default function AdminOrderDetailPage() {
                 <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-xl mb-6">
                   <div className="flex items-center justify-between mb-3">
                     <p className="font-semibold text-yellow-800">
-                      ⏳ Chờ xác nhận cọc {formatPrice(order.depositAmount)}
+                      Chờ xác nhận cọc {formatPrice(order.depositAmount)}
                     </p>
                     <p className="text-xs font-medium text-yellow-700 bg-yellow-100 px-2 py-1 rounded-md">
                       {PAYMENT_METHOD_MAP[order.paymentMethod] || order.paymentMethod}
@@ -315,18 +378,36 @@ export default function AdminOrderDetailPage() {
 
               {/* Shipping info */}
               <div className="mb-6 bg-gray-50 p-4 rounded-xl border">
-                <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                  <Truck className="h-4 w-4 text-orange-500" />
-                  Thông tin Vận chuyển (SPX)
-                </h3>
+                <div className="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-3">
+                  <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                    <Truck className="h-4 w-4 text-green-600" />
+                    Giao Hàng Tiết Kiệm (GHTK)
+                  </h3>
+                  <div className="flex gap-2">
+                    <Button 
+                      onClick={handlePushGHTK} 
+                      disabled={pushingGHTK || !!shippingCode} 
+                      className="bg-green-600 hover:bg-green-700 text-white" 
+                      size="sm"
+                    >
+                      {pushingGHTK ? "Đang đẩy..." : "🚀 Đẩy đơn (Test)"}
+                    </Button>
+                    <Link href={`/admin/orders/${order.id}/print`} target="_blank">
+                      <Button variant="outline" size="sm" className="bg-white">
+                        🖨️ In đơn
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+                
                 <div className="grid sm:grid-cols-2 gap-3 mb-3">
                   <div>
                     <label className="block text-xs font-semibold text-gray-500 mb-1">Mã vận đơn <span className="text-red-500">*</span></label>
                     <input
                       value={shippingCode}
                       onChange={(e) => setShippingCode(e.target.value)}
-                      placeholder="VD: SPX123456789"
-                      className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 outline-none"
+                      placeholder="VD: GHTK123456789"
+                      className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none"
                     />
                   </div>
                   <div>
@@ -334,8 +415,8 @@ export default function AdminOrderDetailPage() {
                     <input
                       value={shippingLink}
                       onChange={(e) => setShippingLink(e.target.value)}
-                      placeholder="https://spx.vn/..."
-                      className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 outline-none"
+                      placeholder="https://khachhang.ghtk.vn/tra-cuu/..."
+                      className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none"
                     />
                   </div>
                 </div>
@@ -344,38 +425,40 @@ export default function AdminOrderDetailPage() {
                     Lưu thông tin vận chuyển
                   </Button>
                 </div>
-                <p className="text-xs text-gray-400 mt-2 italic">* Cần nhập mã vận đơn trước khi chuyển trạng thái sang "Đang giao". Khi chuyển sang "Đang giao", hệ thống sẽ tự động gửi email cho khách.</p>
+                <p className="text-xs text-gray-400 mt-2 italic">* Cần nhập mã vận đơn trước khi chuyển trạng thái sang &quot;Đang giao&quot;.</p>
               </div>
 
               {/* Status buttons */}
               <div>
                 <p className="text-sm font-semibold text-gray-700 mb-2">Cập nhật trạng thái</p>
-                <div className="flex flex-wrap gap-2">
-                  {statusFlow.map(({ status, label, icon, requiresDeposit }) => {
-                    const disabled = (requiresDeposit && order.depositStatus !== "PAID") || updating || order.status === status;
-                    const isConfirming = confirmingStatus === status;
-                    
-                    return (
-                      <Button
-                        key={status}
-                        onClick={() => isConfirming ? updateStatus(status) : setConfirmingStatus(status)}
-                        disabled={disabled}
-                        variant={order.status === status ? "default" : (isConfirming ? "destructive" : "outline")}
-                        size="sm"
-                        className={status === "CANCELLED" && !isConfirming ? "border-red-300 text-red-600 hover:bg-red-50" : ""}
-                        title={requiresDeposit && order.depositStatus !== "PAID" ? "Cần xác nhận cọc trước" : ""}
-                      >
-                        {icon}
-                        {isConfirming ? "Xác nhận?" : label}
+                {visibleStatusButtons.length === 0 ? (
+                  <p className="text-sm text-gray-400 italic">Đơn hàng đã hoàn tất hoặc đã hủy.</p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {visibleStatusButtons.map(({ status, label, icon }) => {
+                      const isConfirming = confirmingStatus === status;
+                      
+                      return (
+                        <Button
+                          key={status}
+                          onClick={() => isConfirming ? updateStatus(status) : setConfirmingStatus(status)}
+                          disabled={updating}
+                          variant={isConfirming ? "destructive" : "outline"}
+                          size="sm"
+                          className={status === "CANCELLED" && !isConfirming ? "border-red-300 text-red-600 hover:bg-red-50" : ""}
+                        >
+                          {icon}
+                          {isConfirming ? "Xác nhận?" : label}
+                        </Button>
+                      );
+                    })}
+                    {confirmingStatus && (
+                      <Button variant="ghost" size="sm" onClick={() => setConfirmingStatus(null)}>
+                        Hủy thao tác
                       </Button>
-                    );
-                  })}
-                  {confirmingStatus && (
-                    <Button variant="ghost" size="sm" onClick={() => setConfirmingStatus(null)}>
-                      Hủy thao tác
-                    </Button>
-                  )}
-                </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -397,7 +480,7 @@ export default function AdminOrderDetailPage() {
                       ? "bg-green-100 text-green-700"
                       : "bg-yellow-100 text-yellow-700"
                   }`}>
-                    {order.depositStatus === "PAID" ? "✓ Đã cọc" : "⏳ Chờ cọc"}
+                    {order.depositStatus === "PAID" ? "Đã cọc" : "Chờ cọc"}
                   </span>
                 </div>
                 {order.shippingCode && (
@@ -406,7 +489,7 @@ export default function AdminOrderDetailPage() {
                     <span className="font-mono text-sm font-bold text-pink-600 bg-pink-50 p-2 rounded text-center">{order.shippingCode}</span>
                     {order.shippingLink && (
                       <a href={order.shippingLink} target="_blank" rel="noreferrer" className="text-xs text-blue-500 hover:underline text-center">
-                        🔗 Mở link tracking
+                        Mở link tracking
                       </a>
                     )}
                   </div>
@@ -414,42 +497,41 @@ export default function AdminOrderDetailPage() {
               </div>
             </div>
 
-            {/* Customer info */}
+            {/* Customer info — tách riêng từng dòng + nút Copy */}
             <div className="bg-white rounded-2xl shadow-sm p-5">
               <h2 className="font-bold text-gray-900 mb-3">Thông tin nhận hàng</h2>
               <div className="space-y-3 text-sm">
-                <div className="flex items-center gap-3 text-gray-700">
-                  <div className="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center shrink-0">
-                    <User className="h-4 w-4 text-pink-600" />
-                  </div>
-                  <span className="font-semibold">{order.customerName}</span>
-                </div>
-                <div className="flex items-center gap-3 text-gray-700">
-                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center shrink-0">
-                    <Phone className="h-4 w-4 text-green-600" />
-                  </div>
-                  <a href={`tel:${order.customerPhone}`} className="hover:text-pink-600 font-medium">
-                    {order.customerPhone}
-                  </a>
-                </div>
-                {order.customerEmail && (
-                  <div className="flex items-center gap-3 text-gray-700">
-                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-                      <Mail className="h-4 w-4 text-blue-600" />
+                {shippingInfoFields.map((field) => (
+                  <div key={field.label} className="flex items-center gap-3 group">
+                    <div className={`w-8 h-8 rounded-full ${field.bgColor} flex items-center justify-center shrink-0`}>
+                      {field.icon}
                     </div>
-                    <span>{order.customerEmail}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] text-gray-400 uppercase tracking-wide font-bold">{field.label}</p>
+                      <p className="text-sm font-semibold text-gray-800 break-words">{field.value}</p>
+                    </div>
+                    <button
+                      onClick={() => copyText(field.value, field.label)}
+                      className="p-1.5 text-gray-300 hover:text-pink-500 hover:bg-pink-50 rounded-lg transition-colors"
+                      title={`Copy ${field.label}`}
+                    >
+                      <Copy className="h-3.5 w-3.5" />
+                    </button>
                   </div>
-                )}
-                <div className="flex items-start gap-3 text-gray-700 bg-gray-50 p-3 rounded-xl border">
-                  <MapPin className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
-                  <span className="leading-snug">
-                    {order.detailedAddress}<br/>
-                    {order.ward}, {order.district}, {order.province}
-                  </span>
-                </div>
+                ))}
+
+                {/* Nút copy toàn bộ địa chỉ */}
+                <button
+                  onClick={() => copyText(`${order.detailedAddress}, ${order.ward}, ${order.district}, ${order.province}`, "địa chỉ đầy đủ")}
+                  className="w-full mt-2 text-sm font-bold text-pink-600 bg-pink-50 hover:bg-pink-100 py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2"
+                >
+                  <Copy className="h-4 w-4" />
+                  Copy toàn bộ địa chỉ
+                </button>
+
                 {order.note && (
                   <div className="p-3 bg-amber-50 border border-amber-100 rounded-xl text-sm text-amber-900">
-                    <span className="font-bold block mb-1">📝 Ghi chú của khách:</span>
+                    <span className="font-bold block mb-1">Ghi chú của khách:</span>
                     {order.note}
                   </div>
                 )}
