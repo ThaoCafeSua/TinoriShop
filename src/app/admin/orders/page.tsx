@@ -85,6 +85,11 @@ export default async function AdminOrdersPage({
             <h1 className="text-2xl font-black text-gray-900">Đơn hàng</h1>
             <p className="text-gray-500 text-sm">{orders.length} đơn hàng được tìm thấy</p>
           </div>
+          <div>
+            <Link href="/admin/orders/new" className="inline-flex items-center justify-center gap-2 bg-pink-600 text-white font-bold px-4 py-2 rounded-xl shadow-md shadow-pink-200 hover:bg-pink-700 transition-colors">
+              <span className="text-lg leading-none mb-0.5">+</span> Tạo đơn hàng
+            </Link>
+          </div>
         </div>
 
         {/* Filters */}
