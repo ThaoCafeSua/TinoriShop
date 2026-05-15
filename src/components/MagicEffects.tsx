@@ -61,7 +61,7 @@ const MagicEffects = () => {
             }}
           >
             <Image
-              src="/brand/floating-icons-transparent.png"
+              src="/brand/floating-icons.png"
               alt="floating-icon"
               fill
               sizes="(max-width: 768px) 0px, 100px"
