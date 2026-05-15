@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import AdminNav from "@/components/AdminNav";
 import { Button } from "@/components/ui/button";
 import {
-  Loader2, Plus, Pencil, Trash2, ImageIcon, X, Check
+  Loader2, Plus, Pencil, Trash2, ImageIcon, X, Check, Newspaper
 } from "lucide-react";
 import { toast } from "@/hooks/useToast";
 
