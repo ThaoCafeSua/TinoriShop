@@ -12,7 +12,7 @@ export default function Navbar() {
   const { items: wishlistItems } = useWishlist();
 
   return (
-    <header className="sticky top-0 z-30 bg-white border-b border-gray-100 shadow-sm">
+    <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b-2 border-[#f2d5e0] shadow-[0_4px_20px_-10px_rgba(213,60,131,0.1)]">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-14">
           {/* Logo */}
@@ -24,20 +24,17 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-            <Link href="/" className="transition-colors hover:opacity-70" style={{ color: '#d53c83' }}>
+          <nav className="hidden md:flex items-center gap-2 text-sm font-bold">
+            <Link href="/" className="px-4 py-2 rounded-full transition-all hover:bg-pink-50" style={{ color: '#d53c83' }}>
               Trang chủ
             </Link>
-            <Link href="/products" className="transition-colors hover:opacity-70" style={{ color: '#d53c83' }}>
+            <Link href="/products" className="px-4 py-2 rounded-full transition-all hover:bg-pink-50" style={{ color: '#d53c83' }}>
               Sản phẩm
             </Link>
-            <Link href="/track-order" className="transition-colors hover:opacity-70" style={{ color: '#d53c83' }}>
+            <Link href="/track-order" className="px-4 py-2 rounded-full transition-all hover:bg-pink-50" style={{ color: '#d53c83' }}>
               Tra cứu đơn
             </Link>
-            <Link href="/blogs/huong-dan-dat-hang" className="transition-colors hover:opacity-70" style={{ color: '#d53c83' }}>
-              Hướng dẫn
-            </Link>
-            <Link href="/news" className="transition-colors hover:opacity-70" style={{ color: '#d53c83' }}>
+            <Link href="/news" className="px-4 py-2 rounded-full transition-all hover:bg-pink-50" style={{ color: '#d53c83' }}>
               Tin tức
             </Link>
 

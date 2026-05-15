@@ -167,7 +167,7 @@ export default async function HomePage() {
         <section className="max-w-7xl mx-auto px-4 py-8 relative">
           <div className="absolute top-4 right-10 text-pink-300 opacity-50 text-4xl animate-bounce">✨</div>
           <div className="flex flex-col items-center justify-center mb-8 text-center">
-            <span className="text-pink-400 font-black tracking-widest text-xs uppercase mb-1">割引クーポン (Vouchers)</span>
+            <span className="text-pink-400 font-black tracking-widest text-xs uppercase mb-1">Ưu đãi siêu hot</span>
             <h2 className="text-3xl font-black text-[#d53c83] bg-pink-50 px-8 py-2 rounded-full border-2 border-pink-200 shadow-sm inline-block">Mã giảm giá</h2>
             <p className="text-gray-500 text-sm mt-3 font-medium">Áp mã khi thanh toán để nhận ưu đãi siêu hời nha~</p>
           </div>
@@ -187,7 +187,7 @@ export default async function HomePage() {
           <div className="absolute top-10 left-10 text-pink-300 opacity-50 text-3xl animate-pulse">🌸</div>
           <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4 bg-white/60 p-4 rounded-3xl border-2 border-pink-100">
             <div className="text-center sm:text-left flex-1">
-              <span className="text-pink-400 font-black tracking-widest text-xs uppercase mb-1 block">おすすめ (Recommended)</span>
+              <span className="text-pink-400 font-black tracking-widest text-xs uppercase mb-1 block">Gợi ý cho bạn</span>
               <h2 className="text-3xl font-black text-[#d53c83]">Sản phẩm nổi bật</h2>
               <p className="text-gray-500 text-sm mt-1">Được các bạn yêu thích nhất đó!</p>
             </div>
@@ -229,7 +229,7 @@ export default async function HomePage() {
         <div className="absolute -top-4 right-20 text-pink-300 opacity-50 text-4xl animate-bounce" style={{ animationDelay: '0.5s' }}>⭐</div>
         <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4 bg-white/60 p-4 rounded-3xl border-2 border-pink-100">
           <div className="text-center sm:text-left flex-1">
-            <span className="text-pink-400 font-black tracking-widest text-xs uppercase mb-1 block">新製品 (New Arrivals)</span>
+            <span className="text-pink-400 font-black tracking-widest text-xs uppercase mb-1 block">Hàng mới về</span>
             <h2 className="text-3xl font-black text-[#d53c83]">Sản phẩm mới nhất</h2>
             <p className="text-gray-500 text-sm mt-1">Vừa cập nhật nóng hổi luôn nè~</p>
           </div>
@@ -272,7 +272,7 @@ export default async function HomePage() {
         <section className="max-w-7xl mx-auto px-4 py-16 relative">
           <div className="absolute top-10 right-1/4 text-pink-300 opacity-50 text-3xl animate-pulse">☁️</div>
           <div className="flex flex-col items-center justify-center mb-10 text-center">
-            <span className="text-pink-400 font-black tracking-widest text-xs uppercase mb-1">ニュース (News & Events)</span>
+            <span className="text-pink-400 font-black tracking-widest text-xs uppercase mb-1">Cập nhật mới nhất</span>
             <h2 className="text-3xl font-black text-[#d53c83] bg-white px-8 py-2 rounded-[2rem] border-4 border-pink-100 shadow-sm inline-block">Tin tức &amp; Sự kiện</h2>
             <p className="text-gray-500 text-sm mt-3 font-medium">Những điều xinh xắn mới nhất từ Tinori</p>
             <Link href="/news" className="mt-4">

@@ -242,7 +242,7 @@ export default function ProductCard({
       )}
 
       <Link href={`/products/${id}`} className="block h-full">
-        <div className="relative overflow-hidden rounded-2xl bg-white shadow-sm hover:shadow-2xl transition-all duration-500 group-hover:-translate-y-2 h-full flex flex-col border border-transparent hover:border-pink-100">
+        <div className="relative overflow-hidden kawaii-border bg-white shadow-sm hover:shadow-2xl transition-all duration-500 group-hover:-translate-y-2 h-full flex flex-col hover:border-[#d53c83]">
           <div className="relative aspect-square overflow-hidden bg-gray-50">
             {image ? (
               <Image

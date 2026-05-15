@@ -11,16 +11,17 @@ function FacebookIcon({ className }: { className?: string }) {
 
 export default function StandardFooter() {
   return (
-    <footer className="bg-[#fdf2f8] text-[#9a7182] mt-16">
+    <footer className="bg-white border-t-4 border-[#f2d5e0] text-[#9a7182] mt-16 relative overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-2 bg-kawaii-dots opacity-20"></div>
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand */}
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                <Store className="h-6 w-6" />
+            <div className="flex items-center gap-2 mb-4 group">
+              <div className="w-12 h-12 bg-[#f2d5e0] rounded-2xl flex items-center justify-center transition-transform group-hover:rotate-12">
+                <Store className="h-6 w-6 text-[#d53c83]" />
               </div>
-              <span className="text-2xl font-black">TINORI</span>
+              <span className="text-3xl font-black text-[#d53c83] tracking-tighter">TINORI</span>
             </div>
             <p className="text-gray-600 text-sm leading-relaxed">
               Sản phẩm rất xinh và dễ thương. Giá hợp lý,
@@ -54,14 +55,16 @@ export default function StandardFooter() {
           {/* Links */}
           <div>
             <h3 className="font-bold text-lg mb-4" style={{ color: "#d53c83" }}>Liên kết</h3>
-            <ul className="space-y-2 text-sm text-gray-600">
+            <ul className="space-y-2 text-sm font-bold">
               <li>
-                <Link href="/" className="hover:text-[#d53c83] transition-colors">
+                <Link href="/" className="hover:text-[#d53c83] transition-colors flex items-center gap-2 group">
+                  <span className="w-1.5 h-1.5 bg-[#f2d5e0] group-hover:bg-[#d53c83] rounded-full transition-colors"></span>
                   Trang chủ
                 </Link>
               </li>
               <li>
-                <Link href="/products" className="hover:text-[#d53c83] transition-colors">
+                <Link href="/products" className="hover:text-[#d53c83] transition-colors flex items-center gap-2 group">
+                  <span className="w-1.5 h-1.5 bg-[#f2d5e0] group-hover:bg-[#d53c83] rounded-full transition-colors"></span>
                   Tất cả sản phẩm
                 </Link>
               </li>
@@ -71,8 +74,9 @@ export default function StandardFooter() {
                   href="https://shopee.vn/tinori"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-[#d53c83] transition-colors"
+                  className="hover:text-[#d53c83] transition-colors flex items-center gap-2 group"
                 >
+                  <span className="w-1.5 h-1.5 bg-[#f2d5e0] group-hover:bg-[#d53c83] rounded-full transition-colors"></span>
                   Shopee của chúng tôi
                 </a>
               </li>
