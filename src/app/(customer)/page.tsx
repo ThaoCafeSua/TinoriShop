@@ -15,6 +15,7 @@ import LogoImage from "@/components/LogoImage";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/utils";
 import BannerCarousel from "@/components/BannerCarousel";
+import VoucherCard from "@/components/VoucherCard";
 
 export const dynamic = "force-dynamic";
 
@@ -172,29 +173,7 @@ export default async function HomePage() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
             {vouchers.map((v) => (
-              <div key={v.id} className="group relative bg-white rounded-lg overflow-hidden flex border border-pink-100 hover:border-pink-300 transition-colors shadow-[0_2px_8px_-3px_rgba(213,60,131,0.1)]">
-                {/* Left Part: Discount Value */}
-                <div className="w-14 flex-shrink-0 bg-[#fff5f8] flex flex-col items-center justify-center border-r border-dashed border-pink-200 p-1">
-                  <div className="text-sm font-black text-[#d53c83]">
-                    {v.discountType === "PERCENT" ? `${v.discountValue}%` : (v.discountValue / 1000) + 'k'}
-                  </div>
-                  <div className="text-[7px] font-bold text-[#9a7182] uppercase scale-90">Giảm</div>
-                </div>
-                
-                {/* Right Part: Code & Min Order */}
-                <div className="flex-1 p-2 flex flex-col justify-center min-w-0">
-                  <div className="font-mono font-bold text-[10px] text-[#d53c83] tracking-tighter bg-white px-1 py-0.5 rounded border border-pink-100 truncate inline-block w-fit">
-                    {v.code}
-                  </div>
-                  <div className="text-[8px] text-gray-400 mt-0.5 truncate">
-                    {v.minOrderValue > 0 ? `Đơn từ ${(v.minOrderValue / 1000)}k` : 'Mọi đơn hàng'}
-                  </div>
-                </div>
-
-                {/* Decorative Half Circles */}
-                <div className="absolute left-[54px] -top-1.5 w-3 h-3 bg-white border border-pink-100 rounded-full" />
-                <div className="absolute left-[54px] -bottom-1.5 w-3 h-3 bg-white border border-pink-100 rounded-full" />
-              </div>
+              <VoucherCard key={v.id} voucher={v as any} />
             ))}
           </div>
         </section>

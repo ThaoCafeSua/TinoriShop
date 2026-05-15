@@ -15,11 +15,13 @@ import { useCart } from "@/hooks/useCart";
 import { formatPrice, calculateShippingFee } from "@/lib/utils";
 import { checkoutSchema, CheckoutFormData } from "@/lib/validations";
 import { toast } from "@/hooks/useToast";
+import { useSavedVouchers } from "@/hooks/useSavedVouchers";
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, getTotalPrice, clearCart } = useCart();
   const [mounted, setMounted] = useState(false);
+  const { savedVouchers } = useSavedVouchers();
 
   useEffect(() => {
     setMounted(true);
@@ -42,15 +44,15 @@ export default function CheckoutPage() {
   const [checkingVoucher, setCheckingVoucher] = useState(false);
   const [voucherError, setVoucherError] = useState("");
 
-  const handleApplyVoucher = async () => {
-    if (!voucherCodeInput.trim()) return;
+  const handleApplyVoucher = async (codeToApply: string = voucherCodeInput) => {
+    if (!codeToApply.trim()) return;
     setCheckingVoucher(true);
     setVoucherError("");
     try {
       const res = await fetch("/api/vouchers/check", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: voucherCodeInput.trim(), subtotal: totalPrice }),
+        body: JSON.stringify({ code: codeToApply.trim(), subtotal: totalPrice }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Lỗi kiểm tra voucher");
@@ -346,19 +348,37 @@ export default function CheckoutPage() {
               <div className="mt-6 border-t pt-4">
                 {!appliedVoucher ? (
                   <div>
-                    <Label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                    <Label className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
                       <Ticket className="h-4 w-4" /> Sử dụng mã giảm giá
                     </Label>
+                    
+                    {/* Saved Vouchers List */}
+                    {savedVouchers.length > 0 && (
+                      <div className="mb-4 flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
+                        {savedVouchers.map(code => (
+                          <button
+                            key={code}
+                            type="button"
+                            onClick={() => { setVoucherCodeInput(code); handleApplyVoucher(code); }}
+                            disabled={checkingVoucher}
+                            className="shrink-0 bg-pink-50 border border-pink-200 hover:bg-pink-100 text-pink-700 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors shadow-sm"
+                          >
+                            Mã: {code}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
                     <div className="flex gap-2">
                       <Input
                         value={voucherCodeInput}
                         onChange={(e) => setVoucherCodeInput(e.target.value.toUpperCase())}
-                        placeholder="Nhập mã voucher..."
+                        placeholder={savedVouchers.length > 0 ? "Hoặc nhập mã khác..." : "Nhập mã voucher..."}
                         className="font-mono uppercase placeholder:normal-case placeholder:font-sans"
                       />
                       <Button
                         type="button"
-                        onClick={handleApplyVoucher}
+                        onClick={() => handleApplyVoucher()}
                         disabled={!voucherCodeInput.trim() || checkingVoucher}
                         className="bg-gray-800 hover:bg-gray-900 shrink-0"
                       >
