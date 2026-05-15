@@ -1,7 +1,8 @@
 "use client";
 import React, { useEffect, useRef } from "react";
+import Image from "next/image";
 
-const FLOATING_ICONS = ["🎀", "✨", "💖", "🌸", "⭐", "🎁", "💎", "🦋"];
+const FLOATING_ICONS_COUNT = 8;
 
 const MagicEffects = () => {
   const cursorRef = useRef<HTMLDivElement>(null);
@@ -43,21 +44,30 @@ const MagicEffects = () => {
 
   return (
     <>
-      {/* Floating Icons - Pure CSS animation (no JS overhead) */}
+      {/* Floating Icons - Pure CSS animation with user's transparent image */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden hidden md:block" aria-hidden="true">
-        {FLOATING_ICONS.map((icon, i) => (
-          <span
+        {Array.from({ length: FLOATING_ICONS_COUNT }).map((_, i) => (
+          <div
             key={i}
-            className="absolute animate-float-icon text-2xl opacity-20 select-none"
+            className="absolute animate-float-icon select-none"
             style={{
               left: `${8 + i * 12}%`,
               top: `${10 + (i % 3) * 25}%`,
               animationDelay: `${i * 1.2}s`,
               animationDuration: `${12 + (i % 4) * 3}s`,
+              width: `${40 + (i % 3) * 20}px`,
+              height: `${40 + (i % 3) * 20}px`,
+              opacity: 0.6,
             }}
           >
-            {icon}
-          </span>
+            <Image
+              src="/brand/floating-icons-transparent.png"
+              alt="floating-icon"
+              fill
+              sizes="(max-width: 768px) 0px, 100px"
+              className="object-contain"
+            />
+          </div>
         ))}
       </div>
 
