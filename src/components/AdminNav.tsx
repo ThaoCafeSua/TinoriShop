@@ -14,6 +14,7 @@ import {
   Image,
   Newspaper,
   Ticket,
+  Bell,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -25,6 +26,7 @@ const navItems = [
   { href: "/admin/vouchers", label: "Voucher", icon: Ticket },
   { href: "/admin/banners", label: "Banner ảnh", icon: Image },
   { href: "/admin/blog", label: "Tin tức", icon: Newspaper },
+  { href: "/admin/popup", label: "Popup", icon: Bell },
 ];
 
 export default function AdminNav() {
