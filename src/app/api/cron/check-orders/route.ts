@@ -26,8 +26,8 @@ export async function GET() {
     const createdAt = new Date(order.createdAt);
     const minutesPassed = (now.getTime() - createdAt.getTime()) / (1000 * 60);
 
-    // Sau 24 giờ (1440 phút) → hủy đơn nếu chưa có cọc
-    if (minutesPassed >= 1440) {
+    // Sau 15 phút → hủy đơn nếu chưa có cọc
+    if (minutesPassed >= 15) {
       await prisma.order.update({
         where: { id: order.id },
         data: {
@@ -59,8 +59,8 @@ export async function GET() {
       continue;
     }
 
-    // Sau 60 phút → gửi email nhắc cọc (chỉ gửi 1 lần)
-    if (minutesPassed >= 60 && !order.reminderSentAt) {
+    // Sau 7 phút → gửi email nhắc cọc (chỉ gửi 1 lần)
+    if (minutesPassed >= 7 && !order.reminderSentAt) {
       if (order.customerEmail) {
         sendDepositReminderEmail(order.customerEmail, order.code).catch(console.error);
       }
