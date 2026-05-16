@@ -4,10 +4,10 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ShoppingCart, Heart, Zap, Check, X } from "lucide-react";
+import { ShoppingCart, Zap, Check, X } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { useCart } from "@/hooks/useCart";
-import { useWishlist } from "@/hooks/useWishlist";
+
 import { toast } from "@/hooks/useToast";
 
 interface ProductCardProps {
@@ -33,14 +33,14 @@ export default function ProductCard({
   variants = [],
   stock,
 }: ProductCardProps) {
-  const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlist();
+
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  const isFavorite = isMounted ? isInWishlist(id) : false;
+  const isFavorite = false;
   const [animateHeart, setAnimateHeart] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
   const [showSelector, setShowSelector] = useState(false);
@@ -73,20 +73,7 @@ export default function ProductCard({
     ? Math.round(((price - salePrice!) / price) * 100)
     : 0;
 
-  const toggleFavorite = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    if (isFavorite) {
-      removeFromWishlist(id);
-      toast({ title: "Đã xóa khỏi danh sách yêu thích" });
-    } else {
-      addToWishlist({ id, name, price, salePrice, image, slug });
-      setAnimateHeart(true);
-      toast({ title: "Đã thêm vào danh sách yêu thích!" });
-      setTimeout(() => setAnimateHeart(false), 400);
-    }
-  };
+
 
   const [flying, setFlying] = useState<{ x: number, y: number, img: string } | null>(null);
 
@@ -272,19 +259,7 @@ export default function ProductCard({
               </div>
             )}
 
-            {/* Favorite Button */}
-            <button
-              onClick={toggleFavorite}
-              className={`absolute top-3 right-3 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-md transition-all duration-300 hover:scale-110 active:scale-90 z-20 ${
-                isFavorite ? "opacity-100 scale-110" : "opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0"
-              }`}
-            >
-              <Heart
-                className={`h-4 w-4 transition-all duration-300 ${
-                  isFavorite ? "fill-[#d53c83] text-[#d53c83]" : "text-gray-400"
-                } ${animateHeart ? "animate-heart-pop" : ""}`}
-              />
-            </button>
+
 
             {/* Hover Actions Overlay */}
             <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-10 hidden sm:block">
