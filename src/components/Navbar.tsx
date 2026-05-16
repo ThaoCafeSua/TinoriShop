@@ -5,15 +5,11 @@ import { Search, Store, Menu, X, Heart } from "lucide-react";
 import { useState } from "react";
 import CartDrawer from "@/components/CartDrawer";
 import { useWishlist } from "@/hooks/useWishlist";
-import { usePathname } from "next/navigation";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const { items: wishlistItems } = useWishlist();
-  const pathname = usePathname();
-
-  if (pathname === "/") return null;
 
   return (
     <header className="sticky top-0 z-30 bg-white border-b border-gray-100 shadow-sm">

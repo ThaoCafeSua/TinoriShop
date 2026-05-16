@@ -13,6 +13,7 @@ export default function CustomerLayout({
   return (
     <>
 
+      <MagicEffects />
       <CartSync />
       <Navbar />
       <main className="min-h-screen">{children}</main>
