@@ -68,7 +68,7 @@ async function getStats(params: DashboardParams) {
     prisma.product.findMany({
       where: { stock: { lt: 5 }, active: true },
       select: { id: true, name: true, stock: true },
-      take: 5,
+      take: 12,
     }),
   ]);
 
@@ -253,7 +253,9 @@ export default async function DashboardPage({
               {stats.lowStockProducts.map((p) => (
                 <Link key={p.id} href={`/admin/products?search=${p.name}`} className="flex items-center justify-between bg-white p-3 rounded-xl border border-red-200 hover:border-red-400 transition-colors">
                   <span className="text-sm font-bold text-gray-700 truncate mr-2">{p.name}</span>
-                  <span className="bg-red-600 text-white text-[10px] font-black px-2 py-1 rounded-full">Còn {p.stock}</span>
+                  <span className={`${p.stock === 0 ? "bg-red-600" : "bg-orange-500"} text-white text-[10px] font-black px-2 py-1 rounded-full whitespace-nowrap`}>
+                    {p.stock === 0 ? "Hết hàng" : `Còn ${p.stock}`}
+                  </span>
                 </Link>
               ))}
             </div>
