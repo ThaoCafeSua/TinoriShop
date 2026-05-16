@@ -68,16 +68,25 @@ export default function ProductDetailPage() {
   const { addItem, clearCart } = useCart();
   const router = useRouter();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const isProgrammaticScroll = useRef(false);
+  const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
 
   // Sync scroll position with selected image
   useEffect(() => {
     if (scrollRef.current) {
       const container = scrollRef.current;
       const width = container.clientWidth;
+      isProgrammaticScroll.current = true;
+      if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+      
       container.scrollTo({
         left: selectedImage * width,
         behavior: 'smooth'
       });
+      
+      scrollTimeout.current = setTimeout(() => {
+        isProgrammaticScroll.current = false;
+      }, 600);
     }
   }, [selectedImage]);
 
@@ -117,6 +126,7 @@ export default function ProductDetailPage() {
   }, [variantImage]);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    if (isProgrammaticScroll.current) return;
     const container = e.currentTarget;
     const width = container.clientWidth;
     const index = Math.round(container.scrollLeft / width);
