@@ -38,7 +38,11 @@ export const useCart = create<CartStore>()(
           set({
             items: get().items.map((i) =>
               i.productId === item.productId && i.variantId === item.variantId
-                ? { ...i, quantity: Math.min(i.maxStock ?? Infinity, i.quantity + item.quantity) }
+                ? { 
+                    ...i, 
+                    maxStock: item.maxStock ?? i.maxStock,
+                    quantity: Math.min(item.maxStock ?? i.maxStock ?? Infinity, i.quantity + item.quantity) 
+                  }
                 : i
             ),
           });
