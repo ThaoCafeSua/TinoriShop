@@ -51,7 +51,7 @@ export default function ProductCard({
   // Extract attributes from combination variants (Shopee style)
   const attributeNames = variants[0]?.type?.split(' - ') || [];
   const attributeGroups = attributeNames.map((name: string, index: number) => {
-    const values = Array.from(new Set(variants.map(v => {
+    const values = Array.from(new Set(variants.filter(v => v.active !== false).map(v => {
       const parts = v.value.split(' - ');
       if (index === attributeNames.length - 1 && parts.length > attributeNames.length) {
         return parts.slice(index).join(' - ');
@@ -63,7 +63,7 @@ export default function ProductCard({
 
   // Find matched variant based on selection
   const selectedValuesString = attributeNames.map((name: string) => selectedVariants[name] || "").join(' - ');
-  const matchedVariant = variants.find((v: any) => v.value === selectedValuesString);
+  const matchedVariant = variants.find((v: any) => v.value === selectedValuesString && v.active !== false);
 
   const displayPrice = matchedVariant?.salePrice || matchedVariant?.price || salePrice || price;
   const hasDiscount = salePrice && salePrice < price;

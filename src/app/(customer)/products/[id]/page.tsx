@@ -116,7 +116,7 @@ export default function ProductDetailPage() {
   // Extract attributes from combination variants
   const attributeNames = product.variants[0]?.type?.split(' - ') || [];
   const attributeGroups = attributeNames.map((name: string, index: number) => {
-    const values = Array.from(new Set(product.variants.map(v => {
+    const values = Array.from(new Set(product.variants.filter(v => v.active !== false).map(v => {
       const parts = v.value.split(' - ');
       if (index === attributeNames.length - 1 && parts.length > attributeNames.length) {
         return parts.slice(index).join(' - ');
@@ -128,7 +128,7 @@ export default function ProductDetailPage() {
 
   // Find matched variant based on selection
   const selectedValuesString = attributeNames.map((name: string) => selectedVariants[name] || "").join(' - ');
-  const matchedVariant = product.variants.find((v: ProductVariant) => v.value === selectedValuesString);
+  const matchedVariant = product.variants.find((v: ProductVariant) => v.value === selectedValuesString && v.active !== false);
 
   const currentDisplayPrice = matchedVariant?.salePrice || matchedVariant?.price || displayPrice;
   const currentOriginalPrice = matchedVariant?.price || product.price;
@@ -139,7 +139,7 @@ export default function ProductDetailPage() {
     ? Math.round(((currentOriginalPrice - currentDisplayPrice) / currentOriginalPrice) * 100)
     : 0;
   
-  const currentStock = matchedVariant ? matchedVariant.stock : product.stock;
+  const currentStock = matchedVariant ? matchedVariant.stock : (product.variants.length > 0 ? 0 : product.stock);
   const displayImage = matchedVariant?.image || product.images[selectedImage]?.url;
 
   const handleAddToCart = () => {
