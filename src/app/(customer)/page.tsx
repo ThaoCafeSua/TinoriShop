@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/utils";
 import BannerCarousel from "@/components/BannerCarousel";
 import VoucherCard from "@/components/VoucherCard";
+import MagicEffects from "@/components/MagicEffects";
 
 export const dynamic = "force-dynamic";
 
@@ -97,6 +98,7 @@ export default async function HomePage() {
 
   return (
     <div>
+      <MagicEffects />
       {/* ── Hero: Logo + tagline + 2 buttons ── */}
       <section className="relative overflow-hidden border-b-2 border-white" style={{ background: "#ffffff" }}>
         <div className="max-w-5xl mx-auto px-4 flex flex-col items-center text-center" style={{ paddingTop: '20px', paddingBottom: '30px' }}>

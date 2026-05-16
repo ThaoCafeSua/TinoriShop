@@ -13,7 +13,7 @@ export default function CustomerLayout({
 }) {
   return (
     <>
-      <MagicEffects />
+
       <CartSync />
       <GlobalPopup />
       <Navbar />
