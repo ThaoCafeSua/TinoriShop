@@ -312,6 +312,11 @@ export default function ProductForm({ product }: ProductFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      {Object.keys(errors).length > 0 && (
+        <div className="bg-red-50 border-2 border-red-200 text-red-600 p-4 rounded-2xl font-bold">
+          Vui lòng kiểm tra lại các trường thông tin: {Object.keys(errors).join(", ")}
+        </div>
+      )}
       {/* Basic info */}
       <div className="bg-white rounded-2xl shadow-sm p-6">
         <h2 className="text-lg font-bold text-gray-900 mb-5">Thông tin cơ bản</h2>
