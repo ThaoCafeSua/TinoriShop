@@ -288,11 +288,11 @@ export default function ProductDetailPage() {
 
       <div className="grid md:grid-cols-2 gap-8">
         {/* Images */}
-        <div>
+        <div className="min-w-0">
           <div 
             ref={scrollRef}
             onScroll={handleScroll}
-            className="relative flex overflow-x-auto snap-x snap-mandatory custom-scrollbar rounded-2xl bg-gray-50 mb-3"
+            className="relative flex w-full overflow-x-auto snap-x snap-mandatory custom-scrollbar rounded-2xl bg-gray-50 mb-3"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {displayImages.length > 0 ? (
