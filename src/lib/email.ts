@@ -69,6 +69,9 @@ export async function sendDepositReminderEmail(to: string, orderCode: string) {
       <p>💳 Nội dung chuyển khoản: <strong>COC ${orderCode}</strong></p>
     </div>
     <p>Nếu bạn vẫn muốn mua, hãy chuyển khoản giúp tụi mình nha ✨</p>
+    <p style="text-align:center;margin-top:12px;">
+      <a href="${process.env.NEXTAUTH_URL}/order-success?code=${orderCode}" class="btn" style="color:white;">💳 Xem QR & Đặt cọc ngay</a>
+    </p>
     <p>Tinori đợi cậu 💕</p>
   `);
 
@@ -171,6 +174,9 @@ export async function sendOrderConfirmationEmail(
       <p>⏰ Đơn sẽ tự động hủy nếu chưa nhận được cọc sau 24 giờ</p>
     </div>
     <p>Tinori đợi cậu nha 💕</p>
+    <p style="text-align:center;margin-top:12px;">
+      <a href="${process.env.NEXTAUTH_URL}/order-success?code=${orderCode}" class="btn" style="color:white;">💳 Xem QR & Đặt cọc ngay</a>
+    </p>
   `);
 
   try {
