@@ -250,7 +250,7 @@ export default function ProductDetailPage() {
     setAddedToCart(true);
     toast({
       title: "Đã thêm vào giỏ hàng!",
-      description: `${product.name} x${quantity}`,
+      description: `${product.name.length > 30 ? product.name.substring(0, 30) + '...' : product.name} x${quantity}`,
       variant: "success",
     });
     setTimeout(() => setAddedToCart(false), 2000);

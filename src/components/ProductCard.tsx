@@ -151,7 +151,7 @@ export default function ProductCard({
       triggerFlyToCart(e, cartItem.image);
       toast({
         title: "Đã thêm vào giỏ hàng! 💕",
-        description: `${name} x1 - Shop iu cậu quá đi~`,
+        description: `${name.length > 30 ? name.substring(0, 30) + '...' : name} x1 - Shop iu cậu quá đi~`,
         variant: "success",
       });
       setTimeout(() => setAddedToCart(false), 2000);
@@ -183,7 +183,7 @@ export default function ProductCard({
     triggerFlyToCart(e, cartItem.image);
     toast({
       title: "Đã thêm vào giỏ hàng! 💕",
-      description: `${name} x1 - Shop iu cậu quá đi~`,
+      description: `${name.length > 30 ? name.substring(0, 30) + '...' : name} x1 - Shop iu cậu quá đi~`,
       variant: "success",
     });
     setTimeout(() => setAddedToCart(false), 2000);
