@@ -31,7 +31,7 @@ export const productSchema = z.object({
   featured: z.boolean().optional(),
   active: z.boolean().optional(),
 }).refine((data) => {
-  if (data.salePrice !== null && data.salePrice !== undefined && data.salePrice >= data.price) {
+  if (data.price > 0 && data.salePrice !== null && data.salePrice !== undefined && data.salePrice >= data.price) {
     return false;
   }
   return true;
