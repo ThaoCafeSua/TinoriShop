@@ -98,12 +98,12 @@ export default async function HomePage() {
     <div>
       <MagicEffects />
       {/* ── Hero: Logo + tagline + 2 buttons ── */}
-      <section className="relative overflow-hidden border-b-2 border-white" style={{ background: "#ffffff" }}>
-        <div className="max-w-5xl mx-auto flex flex-col items-center text-center">
+      <section className="relative overflow-hidden border-b-2 border-white" style={{ background: "#f2d5e0" }}>
+        <div className="max-w-4xl mx-auto flex flex-col items-center text-center py-[5px] px-4">
           <div className="relative w-full animate-fade-in group">
             {/* Banner Image */}
             <div className="w-full">
-              <img src="/brand/hero-banner.png" alt="Tinori Banner" className="w-full h-auto" />
+              <img src="/brand/hero-banner.png" alt="Tinori Banner" className="w-full h-auto rounded-xl shadow-sm" />
             </div>
 
             {/* Buttons */}
