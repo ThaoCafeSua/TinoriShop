@@ -98,16 +98,15 @@ export default async function HomePage() {
     <div>
       <MagicEffects />
       {/* ── Hero: Logo + tagline + 2 buttons ── */}
-      <section className="relative overflow-hidden border-b-2 border-white" style={{ background: "#f2d5e0" }}>
+      <section className="relative overflow-hidden border-b-2 border-white" style={{ background: "#fdf2f8" }}>
         <div className="max-w-4xl mx-auto flex flex-col items-center text-center py-[5px] px-4">
           <div className="relative w-full animate-fade-in group">
             {/* Banner Image */}
-            <div className="w-full">
+            <div className="w-full relative">
               <img src="/brand/hero-banner.png" alt="Tinori Banner" className="w-full h-auto rounded-xl shadow-sm" />
-            </div>
-
-            {/* Buttons */}
-            <div className="mt-[-20px] sm:mt-[-40px] md:mt-[-60px] mb-4 flex flex-col sm:flex-row items-center justify-center gap-4 px-4 relative z-10">
+              
+              {/* Buttons Inside Image */}
+              <div className="absolute bottom-[2%] md:bottom-[5%] left-0 right-0 flex flex-col sm:flex-row items-center justify-center gap-3 px-4 z-10">
               <Link href="/products">
                 <Button
                   size="lg"
@@ -128,6 +127,7 @@ export default async function HomePage() {
                   Theo dõi Facebook
                 </Button>
               </a>
+              </div>
             </div>
           </div>
         </div>
