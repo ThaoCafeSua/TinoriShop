@@ -139,8 +139,15 @@ export default function ProductDetailPage() {
     ? Math.round(((currentOriginalPrice - currentDisplayPrice) / currentOriginalPrice) * 100)
     : 0;
   
-  const currentStock = matchedVariant ? matchedVariant.stock : (product.variants.length > 0 ? 0 : product.stock);
+  const currentStock = matchedVariant ? matchedVariant.stock : (product.variants.length > 0 ? product.variants.filter(v => v.active !== false).reduce((acc, v) => acc + v.stock, 0) : product.stock);
   const displayImage = matchedVariant?.image || product.images[selectedImage]?.url;
+
+  // Sync quantity with current stock
+  useEffect(() => {
+    if (currentStock > 0 && quantity > currentStock) {
+      setQuantity(currentStock);
+    }
+  }, [currentStock, quantity]);
 
   const handleAddToCart = () => {
     if (attributeNames.length > 0) {
@@ -356,14 +363,15 @@ export default function ProductDetailPage() {
                   {quantity}
                 </span>
                 <button
-                  onClick={() => setQuantity(quantity + 1)}
+                  onClick={() => setQuantity(prev => Math.min(currentStock, prev + 1))}
                   className="p-3 hover:bg-gray-50"
+                  disabled={quantity >= currentStock}
                 >
                   <Plus className="h-4 w-4" />
                 </button>
               </div>
               <span className="text-sm text-gray-500">
-                Còn {product.stock} sản phẩm
+                Còn {currentStock} sản phẩm
               </span>
             </div>
           </div>

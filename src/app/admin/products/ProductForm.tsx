@@ -268,7 +268,7 @@ export default function ProductForm({ product }: ProductFormProps) {
       }
       
       // For stock, we sum up all variants
-      finalStock = finalVariants.reduce((sum, v) => sum + (v.stock || 0), 0);
+      finalStock = finalVariants.filter(v => v.active !== false).reduce((sum, v) => sum + (v.stock || 0), 0);
     }
 
     const payload = {
