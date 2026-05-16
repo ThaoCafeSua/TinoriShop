@@ -81,11 +81,30 @@ export default function ProductDetailPage() {
     }
   }, [selectedImage]);
 
+  const attributeNames = product?.variants[0]?.type?.split(' - ') || [];
+  const selectedValuesString = attributeNames.map((name: string) => selectedVariants[name] || "").join(' - ');
+  const matchedVariant = product?.variants.find((v: ProductVariant) => v.value === selectedValuesString && v.active !== false);
+
+  const displayImages = product ? [...product.images] : [];
+  if (matchedVariant?.image && !displayImages.some((img) => img.url === matchedVariant.image)) {
+    displayImages.unshift({ id: "variant-image", url: matchedVariant.image, isPrimary: false } as any);
+  }
+
+  useEffect(() => {
+    if (matchedVariant?.image) {
+      const index = displayImages.findIndex((img) => img.url === matchedVariant.image);
+      if (index !== -1 && index !== selectedImage) {
+        setSelectedImage(index);
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matchedVariant?.image]);
+
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const container = e.currentTarget;
     const width = container.clientWidth;
     const index = Math.round(container.scrollLeft / width);
-    if (index !== selectedImage && index >= 0 && product && index < product.images.length) {
+    if (index !== selectedImage && index >= 0 && index < displayImages.length) {
       setSelectedImage(index);
     }
   };
@@ -100,8 +119,6 @@ export default function ProductDetailPage() {
       .catch(() => setLoading(false));
   }, [id]);
 
-  // Extract attributes from combination variants
-  const attributeNames = product?.variants[0]?.type?.split(' - ') || [];
   const attributeGroups = attributeNames.map((name: string, index: number) => {
     const values = Array.from(new Set(product?.variants.filter(v => v.active !== false).map(v => {
       const parts = v.value.split(' - ');
@@ -112,10 +129,6 @@ export default function ProductDetailPage() {
     }).filter(Boolean)));
     return { name, values };
   }).filter((g: { name: string; values: string[] }) => g.name);
-
-  // Find matched variant based on selection
-  const selectedValuesString = attributeNames.map((name: string) => selectedVariants[name] || "").join(' - ');
-  const matchedVariant = product?.variants.find((v: ProductVariant) => v.value === selectedValuesString && v.active !== false);
 
   const currentStock = matchedVariant ? matchedVariant.stock : (product && product.variants.length > 0 ? product.variants.filter(v => v.active !== false).reduce((acc, v) => acc + v.stock, 0) : (product?.stock || 0));
 
@@ -282,8 +295,8 @@ export default function ProductDetailPage() {
             className="relative flex overflow-x-auto snap-x snap-mandatory custom-scrollbar rounded-2xl bg-gray-50 mb-3"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
-            {product.images.length > 0 ? (
-              product.images.map((img, idx) => (
+            {displayImages.length > 0 ? (
+              displayImages.map((img, idx) => (
                 <div key={img.id} className="relative min-w-full aspect-square snap-center flex-shrink-0">
                   <Image
                     src={img.url}
@@ -304,9 +317,9 @@ export default function ProductDetailPage() {
               </div>
             )}
           </div>
-          {product.images.length > 1 && (
+          {displayImages.length > 1 && (
             <div className="flex gap-2 overflow-x-auto">
-              {product.images.map((img, i) => (
+              {displayImages.map((img, i) => (
                 <button
                   key={img.id}
                   onClick={() => setSelectedImage(i)}
