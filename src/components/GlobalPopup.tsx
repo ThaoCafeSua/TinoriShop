@@ -10,15 +10,15 @@ export default function GlobalPopup() {
 
   useEffect(() => {
     // Check if we already closed it in this session to not annoy the user
-    if (sessionStorage.getItem("tinori_popup_closed")) return;
+    // if (sessionStorage.getItem("tinori_popup_closed")) return;
 
-    fetch("/api/popup")
+    fetch("/api/popup?t=" + Date.now())
       .then((res) => res.json())
       .then((data) => {
         if (data && data.active && data.image) {
           setPopup(data);
           // Small delay before showing for better UX
-          setTimeout(() => setIsOpen(true), 1500);
+          setTimeout(() => setIsOpen(true), 500);
         }
       })
       .catch(() => {});
@@ -47,7 +47,7 @@ export default function GlobalPopup() {
   );
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/40 animate-in fade-in duration-300">
       <div className="relative w-full max-w-sm sm:max-w-md mx-auto animate-in zoom-in-95 duration-500">
         <button 
           onClick={handleClose}
