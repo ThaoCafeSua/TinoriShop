@@ -78,6 +78,32 @@ export default function ProductDetailPage() {
       .catch(() => setLoading(false));
   }, [id]);
 
+  // Extract attributes from combination variants
+  const attributeNames = product?.variants[0]?.type?.split(' - ') || [];
+  const attributeGroups = attributeNames.map((name: string, index: number) => {
+    const values = Array.from(new Set(product?.variants.filter(v => v.active !== false).map(v => {
+      const parts = v.value.split(' - ');
+      if (index === attributeNames.length - 1 && parts.length > attributeNames.length) {
+        return parts.slice(index).join(' - ');
+      }
+      return parts[index];
+    }).filter(Boolean)));
+    return { name, values };
+  }).filter((g: { name: string; values: string[] }) => g.name);
+
+  // Find matched variant based on selection
+  const selectedValuesString = attributeNames.map((name: string) => selectedVariants[name] || "").join(' - ');
+  const matchedVariant = product?.variants.find((v: ProductVariant) => v.value === selectedValuesString && v.active !== false);
+
+  const currentStock = matchedVariant ? matchedVariant.stock : (product && product.variants.length > 0 ? product.variants.filter(v => v.active !== false).reduce((acc, v) => acc + v.stock, 0) : (product?.stock || 0));
+
+  // Sync quantity with current stock
+  useEffect(() => {
+    if (currentStock > 0 && quantity > currentStock) {
+      setQuantity(currentStock);
+    }
+  }, [currentStock, quantity]);
+
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -113,23 +139,6 @@ export default function ProductDetailPage() {
       : product.price;
   const baseHasDiscount = product.salePrice && product.salePrice < product.price;
 
-  // Extract attributes from combination variants
-  const attributeNames = product.variants[0]?.type?.split(' - ') || [];
-  const attributeGroups = attributeNames.map((name: string, index: number) => {
-    const values = Array.from(new Set(product.variants.filter(v => v.active !== false).map(v => {
-      const parts = v.value.split(' - ');
-      if (index === attributeNames.length - 1 && parts.length > attributeNames.length) {
-        return parts.slice(index).join(' - ');
-      }
-      return parts[index];
-    }).filter(Boolean)));
-    return { name, values };
-  }).filter((g: { name: string; values: string[] }) => g.name);
-
-  // Find matched variant based on selection
-  const selectedValuesString = attributeNames.map((name: string) => selectedVariants[name] || "").join(' - ');
-  const matchedVariant = product.variants.find((v: ProductVariant) => v.value === selectedValuesString && v.active !== false);
-
   const currentDisplayPrice = matchedVariant?.salePrice || matchedVariant?.price || displayPrice;
   const currentOriginalPrice = matchedVariant?.price || product.price;
   const hasDiscount = matchedVariant 
@@ -139,15 +148,7 @@ export default function ProductDetailPage() {
     ? Math.round(((currentOriginalPrice - currentDisplayPrice) / currentOriginalPrice) * 100)
     : 0;
   
-  const currentStock = matchedVariant ? matchedVariant.stock : (product.variants.length > 0 ? product.variants.filter(v => v.active !== false).reduce((acc, v) => acc + v.stock, 0) : product.stock);
   const displayImage = matchedVariant?.image || product.images[selectedImage]?.url;
-
-  // Sync quantity with current stock
-  useEffect(() => {
-    if (currentStock > 0 && quantity > currentStock) {
-      setQuantity(currentStock);
-    }
-  }, [currentStock, quantity]);
 
   const handleAddToCart = () => {
     if (attributeNames.length > 0) {
