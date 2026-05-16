@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -67,6 +67,28 @@ export default function ProductDetailPage() {
   const [addedToCart, setAddedToCart] = useState(false);
   const { addItem, clearCart } = useCart();
   const router = useRouter();
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Sync scroll position with selected image
+  useEffect(() => {
+    if (scrollRef.current) {
+      const container = scrollRef.current;
+      const width = container.clientWidth;
+      container.scrollTo({
+        left: selectedImage * width,
+        behavior: 'smooth'
+      });
+    }
+  }, [selectedImage]);
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const container = e.currentTarget;
+    const width = container.clientWidth;
+    const index = Math.round(container.scrollLeft / width);
+    if (index !== selectedImage && index >= 0 && product && index < product.images.length) {
+      setSelectedImage(index);
+    }
+  };
 
   useEffect(() => {
     fetch(`/api/products/${id}`)
@@ -254,22 +276,31 @@ export default function ProductDetailPage() {
       <div className="grid md:grid-cols-2 gap-8">
         {/* Images */}
         <div>
-          <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-50 mb-3">
-            {product.images[selectedImage] ? (
-              <Image
-                src={product.images[selectedImage].url}
-                alt={product.name}
-                fill
-                className="object-cover"
-              />
+          <div 
+            ref={scrollRef}
+            onScroll={handleScroll}
+            className="relative flex overflow-x-auto snap-x snap-mandatory custom-scrollbar rounded-2xl bg-gray-50 mb-3"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {product.images.length > 0 ? (
+              product.images.map((img, idx) => (
+                <div key={img.id} className="relative min-w-full aspect-square snap-center flex-shrink-0">
+                  <Image
+                    src={img.url}
+                    alt={`${product.name} - ${idx + 1}`}
+                    fill
+                    className="object-cover"
+                  />
+                  {hasDiscount && (
+                    <div className="absolute top-4 left-4 bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-xl z-10">
+                      -{discountPercent}%
+                    </div>
+                  )}
+                </div>
+              ))
             ) : (
-              <div className="flex items-center justify-center h-full bg-gradient-to-br from-rose-50 to-pink-50 text-gray-400">
+              <div className="relative min-w-full aspect-square flex items-center justify-center bg-gradient-to-br from-rose-50 to-pink-50 text-gray-400">
                 <ShoppingCart className="h-20 w-20 opacity-20" />
-              </div>
-            )}
-            {hasDiscount && (
-              <div className="absolute top-4 left-4 bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-xl">
-                -{discountPercent}%
               </div>
             )}
           </div>
