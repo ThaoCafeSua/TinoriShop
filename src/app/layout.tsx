@@ -23,7 +23,6 @@ export const metadata: Metadata = {
 
 import FloatingWidgets from "@/components/FloatingWidgets";
 import VisitTracker from "@/components/VisitTracker";
-import MagicEffects from "@/components/MagicEffects";
 
 export default function RootLayout({
   children,
@@ -34,7 +33,6 @@ export default function RootLayout({
     <html lang="vi" className={`${beVietnamPro.variable}`} suppressHydrationWarning>
       <body className="min-h-screen bg-white font-[family-name:var(--font-be-vietnam)] antialiased">
         <VisitTracker />
-        <MagicEffects />
         <FloatingWidgets />
         {children}
         <Toaster />

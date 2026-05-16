@@ -58,11 +58,10 @@ const MagicEffects = () => {
               width: `${40 + (i % 3) * 20}px`,
               height: `${40 + (i % 3) * 20}px`,
               opacity: 0.6,
-              mixBlendMode: "multiply",
             }}
           >
             <Image
-              src="/brand/floating-icons.png"
+              src="/brand/floating-icons-transparent.png"
               alt="floating-icon"
               fill
               sizes="(max-width: 768px) 0px, 100px"
