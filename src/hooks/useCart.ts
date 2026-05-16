@@ -13,6 +13,7 @@ export interface CartItem {
   variantId?: string;
   variantName?: string;
   variantValue?: string;
+  maxStock?: number;
 }
 
 interface CartStore {
@@ -37,7 +38,7 @@ export const useCart = create<CartStore>()(
           set({
             items: get().items.map((i) =>
               i.productId === item.productId && i.variantId === item.variantId
-                ? { ...i, quantity: i.quantity + item.quantity }
+                ? { ...i, quantity: Math.min(i.maxStock ?? Infinity, i.quantity + item.quantity) }
                 : i
             ),
           });
@@ -53,7 +54,7 @@ export const useCart = create<CartStore>()(
           set({ items: get().items.filter((i) => i.id !== id) });
         } else {
           set({
-            items: get().items.map((i) => (i.id === id ? { ...i, quantity } : i)),
+            items: get().items.map((i) => (i.id === id ? { ...i, quantity: Math.min(i.maxStock ?? Infinity, quantity) } : i)),
           });
         }
       },

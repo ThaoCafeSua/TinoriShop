@@ -19,6 +19,7 @@ interface ProductCardProps {
   slug: string;
   hasVariants?: boolean;
   variants?: any[];
+  stock?: number;
 }
 
 export default function ProductCard({
@@ -30,6 +31,7 @@ export default function ProductCard({
   slug,
   hasVariants = false,
   variants = [],
+  stock,
 }: ProductCardProps) {
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlist();
   const [isMounted, setIsMounted] = useState(false);
@@ -135,6 +137,7 @@ export default function ProductCard({
       variantId: matchedVariant?.id,
       variantName: attributeNames.join(" - ") || undefined,
       variantValue: matchedVariant?.value || undefined,
+      maxStock: matchedVariant?.stock ?? stock,
     };
 
     if (selectorType === "buy_now") {
@@ -172,6 +175,7 @@ export default function ProductCard({
       price: displayPrice,
       image: image || "",
       quantity: 1,
+      maxStock: stock,
     };
 
     addItem(cartItem);
@@ -200,6 +204,7 @@ export default function ProductCard({
           image: matchedVariant.image || image || "",
           quantity: 1,
           variantId: matchedVariant.id,
+          maxStock: matchedVariant.stock ?? stock,
         };
         addItem(cartItem);
         router.push("/checkout");
@@ -217,6 +222,7 @@ export default function ProductCard({
       price: displayPrice,
       image: image || "",
       quantity: 1,
+      maxStock: stock,
     };
 
     clearCart();

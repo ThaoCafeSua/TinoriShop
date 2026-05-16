@@ -182,6 +182,7 @@ export default function ProductDetailPage() {
       variantId: matchedVariant?.id,
       variantName: attributeNames.join(" - ") || undefined,
       variantValue: matchedVariant?.value || undefined,
+      maxStock: currentStock,
     };
 
     addItem(cartItem);
@@ -226,6 +227,7 @@ export default function ProductDetailPage() {
       variantId: matchedVariant?.id,
       variantName: attributeNames.join(" - ") || undefined,
       variantValue: matchedVariant?.value || undefined,
+      maxStock: currentStock,
     };
 
     clearCart(); // Ensure only this product is checked out

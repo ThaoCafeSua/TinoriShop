@@ -185,6 +185,7 @@ export default async function HomePage() {
                 slug={product.slug}
                 hasVariants={product._count?.variants > 0}
                 variants={product.variants}
+                stock={product.stock}
               />
             ))}
           </div>
@@ -220,6 +221,7 @@ export default async function HomePage() {
                 slug={product.slug}
                 hasVariants={product._count?.variants > 0}
                 variants={product.variants}
+                stock={product.stock}
               />
             ))}
           </div>

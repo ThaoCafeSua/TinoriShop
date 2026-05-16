@@ -90,7 +90,12 @@ export default function CartPage() {
                     <span className="font-bold text-sm w-8 text-center">{item.quantity}</span>
                     <button
                       onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="w-7 h-7 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50"
+                      className={`w-7 h-7 rounded-lg border border-gray-200 flex items-center justify-center ${
+                        item.quantity >= (item.maxStock ?? Infinity)
+                          ? "opacity-50 cursor-not-allowed bg-gray-50"
+                          : "hover:bg-gray-50"
+                      }`}
+                      disabled={item.quantity >= (item.maxStock ?? Infinity)}
                     >
                       <Plus className="h-3 w-3" />
                     </button>

@@ -149,6 +149,7 @@ export default async function ProductsPage({
                   slug={product.slug}
                   hasVariants={product._count?.variants > 0}
                   variants={product.variants}
+                  stock={product.stock}
                 />
               ))}
             </div>
