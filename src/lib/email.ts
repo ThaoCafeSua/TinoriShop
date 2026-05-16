@@ -12,6 +12,7 @@ const transporter = nodemailer.createTransport({
 
 const FROM_NAME = "Tinori Shop 🎀";
 const FROM_EMAIL = process.env.SMTP_USER || "tinori@shop.com";
+const BASE_URL = process.env.NEXTAUTH_URL || "https://tinori.vercel.app";
 
 function wrapEmailHtml(content: string): string {
   return `
@@ -70,7 +71,7 @@ export async function sendDepositReminderEmail(to: string, orderCode: string) {
     </div>
     <p>Nếu bạn vẫn muốn mua, hãy chuyển khoản giúp tụi mình nha ✨</p>
     <p style="text-align:center;margin-top:12px;">
-      <a href="${process.env.NEXTAUTH_URL}/order-success?code=${orderCode}" class="btn" style="color:white;">💳 Xem QR & Đặt cọc ngay</a>
+      <a href="${BASE_URL}/order-success?code=${orderCode}" class="btn" style="color:white;">💳 Xem QR & Đặt cọc ngay</a>
     </p>
     <p>Tinori đợi cậu 💕</p>
   `);
@@ -175,7 +176,7 @@ export async function sendOrderConfirmationEmail(
     </div>
     <p>Tinori đợi cậu nha 💕</p>
     <p style="text-align:center;margin-top:12px;">
-      <a href="${process.env.NEXTAUTH_URL}/order-success?code=${orderCode}" class="btn" style="color:white;">💳 Xem QR & Đặt cọc ngay</a>
+      <a href="${BASE_URL}/order-success?code=${orderCode}" class="btn" style="color:white;">💳 Xem QR & Đặt cọc ngay</a>
     </p>
   `);
 
@@ -208,7 +209,7 @@ export async function sendNewOrderAdminEmail(orderCode: string, customerName: st
       <p>Tổng tiền: <strong>${new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(totalAmount)}</strong></p>
     </div>
     <p style="text-align:center;margin-top:12px;">
-      <a href="${process.env.NEXTAUTH_URL}/admin/orders" class="btn" style="color:white;">🚀 Xem đơn ngay</a>
+      <a href="${BASE_URL}/admin/orders" class="btn" style="color:white;">🚀 Xem đơn ngay</a>
     </p>
   `);
 
