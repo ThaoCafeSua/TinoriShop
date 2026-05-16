@@ -49,12 +49,10 @@ const MagicEffects = () => {
         {Array.from({ length: FLOATING_ICONS_COUNT }).map((_, i) => (
           <div
             key={i}
-            className="absolute animate-float-icon select-none"
+            className="absolute select-none"
             style={{
               left: `${8 + i * 12}%`,
               top: `${10 + (i % 3) * 25}%`,
-              animationDelay: `${i * 1.2}s`,
-              animationDuration: `${12 + (i % 4) * 3}s`,
               width: `${40 + (i % 3) * 20}px`,
               height: `${40 + (i % 3) * 20}px`,
               opacity: 0.6,
