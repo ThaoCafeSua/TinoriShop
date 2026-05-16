@@ -85,20 +85,36 @@ export default function ProductDetailPage() {
   const selectedValuesString = attributeNames.map((name: string) => selectedVariants[name] || "").join(' - ');
   const matchedVariant = product?.variants.find((v: ProductVariant) => v.value === selectedValuesString && v.active !== false);
 
+  // Partial match for image if matchedVariant is undefined
+  let variantImage = matchedVariant?.image;
+  if (!variantImage && Object.keys(selectedVariants).length > 0) {
+    const partialMatch = product?.variants.find(v => {
+      if (!v.active || !v.image) return false;
+      const parts = v.value.split(' - ');
+      return Object.entries(selectedVariants).every(([key, val]) => {
+        const attrIndex = attributeNames.indexOf(key);
+        return attrIndex !== -1 && parts[attrIndex] === val;
+      });
+    });
+    if (partialMatch) {
+      variantImage = partialMatch.image;
+    }
+  }
+
   const displayImages = product ? [...product.images] : [];
-  if (matchedVariant?.image && !displayImages.some((img) => img.url === matchedVariant.image)) {
-    displayImages.unshift({ id: "variant-image", url: matchedVariant.image, isPrimary: false } as any);
+  if (variantImage && !displayImages.some((img) => img.url === variantImage)) {
+    displayImages.unshift({ id: "variant-image", url: variantImage, isPrimary: false } as any);
   }
 
   useEffect(() => {
-    if (matchedVariant?.image) {
-      const index = displayImages.findIndex((img) => img.url === matchedVariant.image);
+    if (variantImage) {
+      const index = displayImages.findIndex((img) => img.url === variantImage);
       if (index !== -1 && index !== selectedImage) {
         setSelectedImage(index);
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [matchedVariant?.image]);
+  }, [variantImage]);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const container = e.currentTarget;

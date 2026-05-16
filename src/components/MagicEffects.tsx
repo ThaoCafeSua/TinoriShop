@@ -45,7 +45,7 @@ const MagicEffects = () => {
   return (
     <>
       {/* Floating Icons - Pure CSS animation with user's transparent image */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
+      <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden" aria-hidden="true">
         {Array.from({ length: FLOATING_ICONS_COUNT }).map((_, i) => (
           <div
             key={i}
@@ -55,7 +55,7 @@ const MagicEffects = () => {
               top: `${10 + (i % 3) * 25}%`,
               width: `${40 + (i % 3) * 20}px`,
               height: `${40 + (i % 3) * 20}px`,
-              opacity: 0.6,
+              opacity: 1,
             }}
           >
             <Image
