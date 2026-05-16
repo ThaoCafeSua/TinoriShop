@@ -6,8 +6,40 @@ import { useWishlist } from "@/hooks/useWishlist";
 import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 
+import { useState, useEffect } from "react";
+
 export default function WishlistPage() {
-  const { items } = useWishlist();
+  const { items, removeItem } = useWishlist();
+  const [validItems, setValidItems] = useState(items);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (items.length === 0) {
+      setValidItems([]);
+      setLoading(false);
+      return;
+    }
+
+    const ids = items.map(i => i.id).join(",");
+    fetch(`/api/products?ids=${ids}`)
+      .then(res => res.json())
+      .then(activeProducts => {
+        const activeIds = activeProducts.map((p: any) => p.id);
+        const invalidItems = items.filter(item => !activeIds.includes(item.id));
+
+        if (invalidItems.length > 0) {
+          // Remove invalid items to sync local storage
+          invalidItems.forEach(item => removeItem(item.id));
+        } else {
+          setValidItems(items);
+          setLoading(false);
+        }
+      })
+      .catch(() => {
+        setValidItems(items);
+        setLoading(false);
+      });
+  }, [items, removeItem]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12 min-h-[60vh]">
@@ -21,7 +53,11 @@ export default function WishlistPage() {
         </div>
       </div>
 
-      {items.length === 0 ? (
+      {loading ? (
+        <div className="text-center py-20 bg-white rounded-3xl shadow-sm">
+          <p className="text-gray-500">Đang tải danh sách...</p>
+        </div>
+      ) : validItems.length === 0 ? (
         <div className="text-center py-20 bg-white rounded-3xl shadow-sm border-2 border-dashed border-pink-100">
           <div className="relative w-24 h-24 mx-auto mb-6">
             <Heart className="w-full h-full text-pink-100" />
@@ -39,7 +75,7 @@ export default function WishlistPage() {
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-          {items.map((product) => (
+          {validItems.map((product) => (
             <ProductCard
               key={product.id}
               id={product.id}
@@ -53,13 +89,13 @@ export default function WishlistPage() {
         </div>
       )}
 
-      {items.length > 0 && (
+      {!loading && validItems.length > 0 && (
         <div className="mt-12 p-6 bg-[#f2d5e0]/30 rounded-3xl border-2 border-white flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm">
               <ShoppingBag className="h-6 w-6 text-[#d53c83]" />
             </div>
-            <p className="font-bold text-[#9a7182]">Cậu có {items.length} món đồ yêu thích</p>
+            <p className="font-bold text-[#9a7182]">Cậu có {validItems.length} món đồ yêu thích</p>
           </div>
           <Link href="/products">
             <Button variant="outline" className="border-[#d53c83] text-[#d53c83] hover:bg-[#f2d5e0] rounded-xl font-bold">

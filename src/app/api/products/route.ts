@@ -12,6 +12,7 @@ export async function GET(req: NextRequest) {
   const featured = searchParams.get("featured");
   const q = searchParams.get("q");
   const active = searchParams.get("active");
+  const ids = searchParams.get("ids");
 
   const products = await prisma.product.findMany({
     where: {
@@ -24,6 +25,7 @@ export async function GET(req: NextRequest) {
           { description: { contains: q } },
         ],
       }),
+      ...(ids && { id: { in: ids.split(",") } }),
     },
     include: {
       images: { orderBy: { order: "asc" } },
