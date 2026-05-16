@@ -552,6 +552,9 @@ export default function ProductForm({ product }: ProductFormProps) {
                     placeholder="Nhập giá..."
                     className="bg-white text-pink-600 font-bold"
                   />
+                  {errors.price && (
+                    <p className="text-red-500 text-xs mt-1">{errors.price.message}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label className="text-sm font-bold text-gray-700">Giá khuyến mãi (VND)</Label>
@@ -561,6 +564,9 @@ export default function ProductForm({ product }: ProductFormProps) {
                     placeholder="Không bắt buộc"
                     className="bg-white"
                   />
+                  {errors.salePrice && (
+                    <p className="text-red-500 text-xs mt-1">{errors.salePrice.message}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label className="text-sm font-bold text-gray-700">Kho hàng</Label>
@@ -570,6 +576,9 @@ export default function ProductForm({ product }: ProductFormProps) {
                     placeholder="0"
                     className="bg-white"
                   />
+                  {errors.stock && (
+                    <p className="text-red-500 text-xs mt-1">{errors.stock.message}</p>
+                  )}
                 </div>
               </div>
             )}

@@ -24,7 +24,7 @@ export type CheckoutFormData = z.infer<typeof checkoutSchema>;
 export const productSchema = z.object({
   name: z.string().trim().min(2, "Tên sản phẩm phải có ít nhất 2 ký tự"),
   description: z.string().optional(),
-  price: z.number().min(1, "Giá phải lớn hơn 0"),
+  price: z.number().min(0, "Giá không được âm"),
   salePrice: z.number().min(0, "Giá sale không được âm").optional().nullable(),
   stock: z.number().int().min(0, "Tồn kho không được âm"),
   categoryId: z.string().optional().nullable(),
