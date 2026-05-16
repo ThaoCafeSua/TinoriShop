@@ -11,10 +11,8 @@ function FacebookIcon({ className }: { className?: string }) {
 
 import { prisma } from "@/lib/prisma";
 import ProductCard from "@/components/ProductCard";
-import LogoImage from "@/components/LogoImage";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/utils";
-import BannerCarousel from "@/components/BannerCarousel";
 import VoucherCard from "@/components/VoucherCard";
 import MagicEffects from "@/components/MagicEffects";
 
@@ -101,15 +99,15 @@ export default async function HomePage() {
       <MagicEffects />
       {/* ── Hero: Logo + tagline + 2 buttons ── */}
       <section className="relative overflow-hidden border-b-2 border-white" style={{ background: "#ffffff" }}>
-        <div className="max-w-5xl mx-auto px-4 flex flex-col items-center text-center" style={{ paddingTop: '20px', paddingBottom: '30px' }}>
+        <div className="max-w-5xl mx-auto flex flex-col items-center text-center">
           <div className="relative w-full animate-fade-in group">
-            {/* Logo */}
+            {/* Banner Image */}
             <div className="w-full">
-              <LogoImage />
+              <img src="/brand/hero-banner.png" alt="Tinori Banner" className="w-full h-auto" />
             </div>
 
-            {/* Buttons Below Logo */}
-            <div className="mt-[-20px] mb-4 flex flex-col sm:flex-row items-center justify-center gap-4 px-4 relative z-10">
+            {/* Buttons */}
+            <div className="mt-[-20px] sm:mt-[-40px] md:mt-[-60px] mb-4 flex flex-col sm:flex-row items-center justify-center gap-4 px-4 relative z-10">
               <Link href="/products">
                 <Button
                   size="lg"
@@ -211,14 +209,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ── Banner Carousel ── */}
-      {banners.length > 0 && (
-        <section className="max-w-5xl mx-auto px-4 py-6">
-          <div className="rounded-3xl overflow-hidden">
-            <BannerCarousel banners={banners} />
-          </div>
-        </section>
-      )}
+
 
       {/* ── Latest Products ── */}
       <section className="max-w-7xl mx-auto px-4 py-8">
