@@ -313,55 +313,7 @@ export default function ProductCard({
               </div>
             </div>
 
-            {/* Quick Variant Selector Overlay */}
-            {showSelector && (
-              <div 
-                className="absolute inset-0 bg-white/95 backdrop-blur-md z-30 p-4 flex flex-col animate-in fade-in zoom-in-95 duration-200"
-                onClick={(e) => e.preventDefault()}
-              >
-                <div className="flex justify-between items-center mb-3">
-                  <span className="text-sm font-bold text-gray-800">Chọn phân loại</span>
-                  <button onClick={() => setShowSelector(false)} className="p-1.5 hover:bg-gray-100 rounded-full transition-colors">
-                    <X className="h-4 w-4 text-gray-400" />
-                  </button>
-                </div>
-                <div className="flex-1 overflow-y-auto space-y-4 custom-scrollbar">
-                  {attributeGroups.map((group: { name: string; values: string[] }) => (
-                    <div key={group.name}>
-                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider mb-2">{group.name}</p>
-                      <div className="flex flex-wrap gap-2">
-                        {group.values.map((value: string) => {
-                          const isSelected = selectedVariants[group.name] === value;
-                          return (
-                            <button
-                              key={value}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                setSelectedVariants(prev => ({ ...prev, [group.name]: value }));
-                              }}
-                              className={`px-3 py-1.5 rounded-xl border text-[11px] font-bold transition-all duration-200 ${
-                                isSelected
-                                  ? "border-[#d53c83] bg-[#f2d5e0] text-[#d53c83] shadow-sm"
-                                  : "border-gray-200 text-gray-600 hover:border-[#f2d5e0] hover:bg-gray-50"
-                              }`}
-                            >
-                              {value}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <button
-                  onClick={handleConfirmSelection}
-                  className="w-full mt-4 py-3 text-white rounded-2xl text-xs font-black shadow-xl shadow-[#d53c83]/30 hover:scale-[1.02] active:scale-95 transition-all"
-                  style={{ backgroundColor: '#d53c83' }}
-                >
-                  XÁC NHẬN & {selectorType === "buy_now" ? "MUA NGAY" : "THÊM VÀO GIỎ"}
-                </button>
-              </div>
-            )}
+
           </div>
 
           <div className="p-4 flex flex-col flex-1">
@@ -400,6 +352,56 @@ export default function ProductCard({
               </div>
             </div>
           </div>
+
+          {/* Quick Variant Selector Overlay */}
+          {showSelector && (
+            <div 
+              className="absolute inset-0 bg-white/95 backdrop-blur-md z-30 p-4 flex flex-col animate-in fade-in zoom-in-95 duration-200"
+              onClick={(e) => e.preventDefault()}
+            >
+              <div className="flex justify-between items-center mb-3">
+                <span className="text-sm font-bold text-gray-800">Chọn phân loại</span>
+                <button onClick={() => setShowSelector(false)} className="p-1.5 hover:bg-gray-100 rounded-full transition-colors">
+                  <X className="h-4 w-4 text-gray-400" />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto space-y-4 custom-scrollbar">
+                {attributeGroups.map((group: { name: string; values: string[] }) => (
+                  <div key={group.name}>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider mb-2">{group.name}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {group.values.map((value: string) => {
+                        const isSelected = selectedVariants[group.name] === value;
+                        return (
+                          <button
+                            key={value}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setSelectedVariants(prev => ({ ...prev, [group.name]: value }));
+                            }}
+                            className={`px-3 py-1.5 rounded-xl border text-[11px] font-bold transition-all duration-200 ${
+                              isSelected
+                                ? "border-[#d53c83] bg-[#f2d5e0] text-[#d53c83] shadow-sm"
+                                : "border-gray-200 text-gray-600 hover:border-[#f2d5e0] hover:bg-gray-50"
+                            }`}
+                          >
+                            {value}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button
+                onClick={handleConfirmSelection}
+                className="w-full mt-4 py-3 text-white rounded-2xl text-xs font-black shadow-xl shadow-[#d53c83]/30 hover:scale-[1.02] active:scale-95 transition-all"
+                style={{ backgroundColor: '#d53c83' }}
+              >
+                XÁC NHẬN & {selectorType === "buy_now" ? "MUA NGAY" : "THÊM VÀO GIỎ"}
+              </button>
+            </div>
+          )}
         </div>
       </Link>
     </div>
