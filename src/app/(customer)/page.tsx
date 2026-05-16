@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/utils";
 import VoucherCard from "@/components/VoucherCard";
 import MagicEffects from "@/components/MagicEffects";
+import GlobalPopup from "@/components/GlobalPopup";
 
 export const dynamic = "force-dynamic";
 
@@ -97,6 +98,7 @@ export default async function HomePage() {
   return (
     <div>
       <MagicEffects />
+      <GlobalPopup />
       {/* ── Hero: Logo + tagline + 2 buttons ── */}
       <section className="relative overflow-hidden border-b-2 border-white" style={{ background: "#fdf2f8" }}>
         <div className="max-w-4xl mx-auto flex flex-col items-center text-center py-[5px] px-4">
