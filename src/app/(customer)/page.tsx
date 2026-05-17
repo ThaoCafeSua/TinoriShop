@@ -128,7 +128,7 @@ export default async function HomePage() {
       {/* ── Premium Hero Section ── */}
       <section className="relative pt-6 pb-20 bg-gradient-to-b from-[#fdf2f8] to-white">
         <div className="max-w-5xl mx-auto px-4">
-          <div className="relative w-full animate-fade-in group rounded-3xl overflow-hidden shadow-2xl ring-1 ring-pink-100">
+          <div className="relative w-full animate-fade-in group rounded-3xl overflow-hidden ring-1 ring-pink-100/60">
             {banners.length > 0 ? (
               <BannerCarousel banners={banners as any} />
             ) : (
@@ -136,9 +136,9 @@ export default async function HomePage() {
             )}
 
             {/* Glassmorphism Buttons Container */}
-            <div className="absolute bottom-[4%] left-1/2 -translate-x-1/2 flex flex-col sm:flex-row items-center justify-center gap-3 w-[90%] sm:w-auto p-3 rounded-2xl bg-white/30 backdrop-blur-md border border-white/40 shadow-lg">
+            <div className="absolute bottom-[4%] left-1/2 -translate-x-1/2 flex flex-col sm:flex-row items-center justify-center gap-3 w-[90%] sm:w-auto p-3 rounded-2xl bg-white/30 backdrop-blur-md border border-white/40">
               <Link href="/products" className="w-full sm:w-auto">
-                <Button size="lg" className="w-full shadow-lg hover:shadow-pink-300/50 hover:scale-105 font-bold transition-all rounded-xl" style={{ backgroundColor: "#d53c83", color: "#ffffff" }}>
+                <Button size="lg" className="w-full hover:scale-105 font-bold transition-all rounded-xl" style={{ backgroundColor: "#d53c83", color: "#ffffff" }}>
                   Mua sắm ngay <ArrowRight className="h-5 w-5 ml-2" />
                 </Button>
               </Link>
@@ -152,7 +152,7 @@ export default async function HomePage() {
 
       {/* ── Elegant Responsive Brand Stats Bar ── */}
       <div className="max-w-md md:max-w-6xl mx-auto px-4 relative z-20 -mt-10 mb-6">
-        <div className="bg-white rounded-3xl md:rounded-full shadow-lg border border-pink-100/40 p-6 md:py-3.5 md:px-4">
+        <div className="bg-white rounded-3xl md:rounded-full border border-pink-100/80 p-6 md:py-3.5 md:px-4">
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4 md:gap-0 items-center">
             {[
               {

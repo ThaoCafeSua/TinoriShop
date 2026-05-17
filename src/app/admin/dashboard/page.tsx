@@ -41,6 +41,11 @@ async function getStats(params: DashboardParams) {
   const startOfWeek = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
+  const visitsWhere = { ...dateWhere };
+  if (!startDate && !endDate) {
+    visitsWhere.createdAt = { gte: startOfToday };
+  }
+
   // Gộp queries để giảm số lần gọi DB: 13 → 6
   const [
     ordersByStatus,
@@ -64,7 +69,7 @@ async function getStats(params: DashboardParams) {
     }),
     // 3-5. Các query nhẹ
     prisma.product.count({ where: { active: true } }),
-    prisma.pageVisit.count({ where: dateWhere }),
+    prisma.pageVisit.count({ where: visitsWhere }),
     prisma.product.findMany({
       where: { stock: { lt: 5 }, active: true },
       select: { id: true, name: true, stock: true },

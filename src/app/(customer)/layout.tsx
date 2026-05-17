@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CartSync from "@/components/CartSync";
 import MagicEffects from "@/components/MagicEffects";
+import HeartLoader from "@/components/HeartLoader";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +13,7 @@ export default function CustomerLayout({
 }) {
   return (
     <>
-
+      <HeartLoader />
       <MagicEffects />
       <CartSync />
       <Navbar />

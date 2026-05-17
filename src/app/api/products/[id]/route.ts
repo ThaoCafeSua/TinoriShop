@@ -53,6 +53,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     if (dup) slug = `${slug}-${Date.now()}`;
   }
 
+  const hasPrimary = images?.some((img: any) => img.isPrimary);
+
   await prisma.productImage.deleteMany({ where: { productId: id } });
   await prisma.productVariant.deleteMany({ where: { productId: id } });
 
@@ -73,7 +75,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
             create: images.map((img: { url: string; alt?: string; isPrimary?: boolean }, i: number) => ({
               url: img.url,
               alt: img.alt || (name || existing.name),
-              isPrimary: i === 0,
+              isPrimary: hasPrimary ? !!img.isPrimary : i === 0,
               order: i,
             })),
           }

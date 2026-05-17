@@ -53,6 +53,8 @@ export async function POST(req: NextRequest) {
   const existing = await prisma.product.findUnique({ where: { slug } });
   if (existing) slug = `${slug}-${Date.now()}`;
 
+  const hasPrimary = images?.some((img: any) => img.isPrimary);
+
   const product = await prisma.product.create({
     data: {
       name,
@@ -69,7 +71,7 @@ export async function POST(req: NextRequest) {
             create: images.map((img: { url: string; alt?: string; isPrimary?: boolean }, i: number) => ({
               url: img.url,
               alt: img.alt || name,
-              isPrimary: i === 0,
+              isPrimary: hasPrimary ? !!img.isPrimary : i === 0,
               order: i,
             })),
           }
