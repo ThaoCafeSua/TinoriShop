@@ -4,16 +4,9 @@ export default function Footer() {
   return (
     <footer className="mt-20 bg-gradient-to-b from-[#ffdbe6] to-white pt-16 pb-12 overflow-hidden border-t border-[#f2d5e0]">
       <div className="max-w-4xl mx-auto px-4 flex flex-col items-center text-center">
-        {/* Decorations */}
-        <div className="flex gap-4 text-3xl mb-6 animate-bounce" style={{ animationDuration: '3s' }}>
-          <span>🎀</span>
-          <span>🐰</span>
-          <span>💗</span>
-        </div>
-
         {/* Main Text */}
         <h2 className="text-2xl md:text-3xl font-black mb-8 text-[#d53c83] tracking-tight leading-relaxed">
-          Cảm ơn cậu đã ghé Tinori 💗
+          Cảm ơn cậu đã ghé thăm ngôi nhà nhỏ của Tinori
         </h2>
 
         {/* Social Icons */}
