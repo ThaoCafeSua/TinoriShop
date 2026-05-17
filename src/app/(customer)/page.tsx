@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Star, Truck, Shield, RefreshCw, ChevronRight } from "lucide-react";
+import { ArrowRight, Star, Truck, Shield, RefreshCw, ChevronRight, Heart, Sparkles, Gift } from "lucide-react";
 
 function FacebookIcon({ className }: { className?: string }) {
   return (
@@ -12,7 +12,7 @@ function FacebookIcon({ className }: { className?: string }) {
 function ShopeeIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M19 7h-3V5.5c0-1.93-1.57-3.5-3.5-3.5S9 3.57 9 5.5V7H6c-1.1 0-2 .9-2 2v9c0 1.66 1.34 3 3 3h10c1.66 0 3-1.34 3-3V9c0-1.1-.9-2-2-2zm-8.5-1.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V7h-3V5.5zm8.5 12.5c0 .55-.45 1-1 1H7c-.55 0-1-.45-1-1V9h12v9z"/>
+      <path d="M19 7h-3V5.5c0-1.93-1.57-3.5-3.5-3.5S9 3.57 9 5.5V7H6c-1.1 0-2 .9-2 2v9c0 1.66 1.34 3 3 3h10c1.66 0 3-1.34 3-3V9c0-1.1-.9-2-2-2zm-8.5-1.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V7h-3V5.5zm8.5 12.5c0 .55-.45 1-1 1H7c-.55 0-1-.45-1-1V9h12v9z" />
     </svg>
   );
 }
@@ -20,7 +20,17 @@ function ShopeeIcon({ className }: { className?: string }) {
 function TikTokIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12.525.02c1.31 0 2.57.34 3.68.95.07.04.14.08.2.13.06.04.13.09.19.14v3.91c-.9-.45-1.9-.71-2.97-.71-1.07 0-2.07.26-2.97.71V17.5c0 2.21-1.79 4-4 4s-4-1.79-4-4 1.79-4 4-4c.48 0 .94.09 1.36.25V9.66c-.44-.1-.9-.16-1.36-.16-3.87 0-7 3.13-7 7s3.13 7 7 7 7-3.13 7-7v-9.35c1.68 1.15 3.7 1.85 5.89 1.85V1c-2.48 0-4.66-1.15-6.09-2.95-.08-.1-.16-.21-.24-.31-.05-.07-.09-.15-.14-.22z"/>
+      <path d="M12.525.02c1.31 0 2.57.34 3.68.95.07.04.14.08.2.13.06.04.13.09.19.14v3.91c-.9-.45-1.9-.71-2.97-.71-1.07 0-2.07.26-2.97.71V17.5c0 2.21-1.79 4-4 4s-4-1.79-4-4 1.79-4 4-4c.48 0 .94.09 1.36.25V9.66c-.44-.1-.9-.16-1.36-.16-3.87 0-7 3.13-7 7s3.13 7 7 7 7-3.13 7-7v-9.35c1.68 1.15 3.7 1.85 5.89 1.85V1c-2.48 0-4.66-1.15-6.09-2.95-.08-.1-.16-.21-.24-.31-.05-.07-.09-.15-.14-.22z" />
+    </svg>
+  );
+}
+
+function InstagramIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
     </svg>
   );
 }
@@ -124,7 +134,7 @@ export default async function HomePage() {
             ) : (
               <img src="/brand/hero-banner.png" alt="Tinori Banner" className="w-full h-auto object-cover transform hover:scale-[1.02] transition-transform duration-1000" />
             )}
-            
+
             {/* Glassmorphism Buttons Container */}
             <div className="absolute bottom-[4%] left-1/2 -translate-x-1/2 flex flex-col sm:flex-row items-center justify-center gap-3 w-[90%] sm:w-auto p-3 rounded-2xl bg-white/30 backdrop-blur-md border border-white/40 shadow-lg">
               <Link href="/products" className="w-full sm:w-auto">
@@ -136,24 +146,12 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {/* Brand Slogan Section */}
-          <div className="mt-12 text-center animate-fade-in px-4">
-            <h1 className="text-3xl md:text-5xl font-black tracking-tight" style={{ color: '#d53c83', fontFamily: '"Sugo Display", sans-serif' }}>
-              TINORI
-            </h1>
-            <p className="mt-3.5 text-lg md:text-2xl font-black text-gray-800 italic relative inline-block">
-              "Nơi những điều xinh đẹp được nâng niu" 🎀
-              <span className="absolute -bottom-1 left-0 w-full h-1 bg-[#f2d5e0] -z-10 rounded-full"></span>
-            </p>
-            <p className="mt-4 text-xs md:text-sm text-gray-500 max-w-2xl mx-auto leading-relaxed font-medium">
-              Chào mừng cậu đến với thế giới phụ kiện, quà tặng Kawaii Nhật Bản ngọt ngào của Tinori! Mỗi món đồ nhỏ bé tại đây đều được chúng tớ lựa chọn với tất cả tình yêu thương, hi vọng sẽ mang lại niềm vui lấp lánh và nụ cười rạng rỡ cho cậu mỗi ngày. 💕
-            </p>
-          </div>
+
         </div>
       </section>
 
       {/* ── Elegant Responsive Brand Stats Bar ── */}
-      <div className="max-w-md md:max-w-6xl mx-auto px-4 relative z-20 -mt-10 mb-16">
+      <div className="max-w-md md:max-w-6xl mx-auto px-4 relative z-20 -mt-10 mb-6">
         <div className="bg-white rounded-3xl md:rounded-full shadow-lg border border-pink-100/40 p-6 md:py-3.5 md:px-4">
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4 md:gap-0 items-center">
             {[
@@ -166,7 +164,7 @@ export default async function HomePage() {
               {
                 icon: ShopeeIcon,
                 title: "1k Follower",
-                desc: "Shopee Store chính hãng",
+                desc: "200+ Đơn giao thành công",
                 color: "text-[#ff5722]"
               },
               {
@@ -190,8 +188,8 @@ export default async function HomePage() {
             ].map((stat, i) => {
               const Icon = stat.icon;
               return (
-                <div 
-                  key={i} 
+                <div
+                  key={i}
                   className="flex items-center gap-3 pb-3.5 border-b border-pink-50/40 last:border-b-0 last:pb-0 md:pb-0 md:border-b-0 md:border-r md:border-pink-50/60 md:px-3 md:last:border-r-0 md:justify-center group"
                 >
                   <div className="w-10 h-10 bg-pink-50/50 rounded-full flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
@@ -211,6 +209,180 @@ export default async function HomePage() {
           </div>
         </div>
       </div>
+
+      {/* ── Brand Trust & About Section ── */}
+      <section className="max-w-7xl mx-auto px-4 pt-4 pb-12 md:pt-6 md:pb-16">
+        <div className="text-center mb-12">
+          <p className="text-[#d53c83] font-bold text-sm tracking-widest uppercase mb-2">TIỆM QUÀ TINORI</p>
+          <h2 className="text-3xl font-black text-gray-900 tracking-tight flex items-center justify-center gap-2">
+            Góc Xinh Xắn & Tràn Đầy Yêu Thương
+          </h2>
+          <div className="w-16 h-1 bg-[#d53c83] mx-auto mt-4 rounded-full opacity-60"></div>
+          <p className="text-xs text-gray-500 mt-3 max-w-md mx-auto leading-relaxed">
+            Nơi nâng niu những điều nhỏ bé lấp lánh để trao tặng niềm vui ngọt ngào nhất tới cậu mỗi ngày!
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+          {/* Cột 1: Ảnh Tiệm Decor Xinh Xắn */}
+          <div className="relative rounded-3xl overflow-hidden shadow-md group min-h-[320px] lg:min-h-auto">
+            <img
+              src="/brand/storefront.png"
+              alt="Cửa hàng Tinori"
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent flex items-end p-6">
+              <div>
+                <span className="bg-[#d53c83] text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider shadow-md">
+                  Vibe Cực Thơ
+                </span>
+                <h3 className="text-white font-black text-lg mt-2 drop-shadow-md">
+                  Góc nhỏ Tinori
+                </h3>
+              </div>
+            </div>
+          </div>
+
+          {/* Cột 2: Cam kết ngọt ngào từ Trái Tim */}
+          <div className="bg-[#fdf2f8]/70 border border-pink-100/50 rounded-3xl p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
+            <div>
+              <h3 className="text-lg font-black text-[#d53c83] flex items-center gap-2 mb-4">
+                Lời Hứa Từ Trái Tim <Heart className="h-5 w-5 fill-current" />
+              </h3>
+              <ul className="space-y-4">
+                <li className="flex gap-3">
+                  <div className="w-8 h-8 bg-pink-100/60 rounded-full flex items-center justify-center shrink-0">
+                    <Gift className="h-4 w-4 text-[#d53c83]" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-black text-gray-800 uppercase tracking-wider">Đóng gói thủ công tỉ mỉ</h4>
+                    <p className="text-[11px] text-gray-500 font-semibold leading-relaxed mt-0.5">
+                      Mỗi đơn hàng đều được đặt trong hộp quà xinh xắn, lót giấy rơm thơm và thắt ruy-băng handmade tinh tế.
+                    </p>
+                  </div>
+                </li>
+                <li className="flex gap-3">
+                  <div className="w-8 h-8 bg-pink-100/60 rounded-full flex items-center justify-center shrink-0">
+                    <Sparkles className="h-4 w-4 text-[#d53c83]" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-black text-gray-800 uppercase tracking-wider">Tuyển chọn cao cấp</h4>
+                    <p className="text-[11px] text-gray-500 font-semibold leading-relaxed mt-0.5">
+                      Tất cả sản phẩm từ gấu bông, kẹp tóc, quà lưu niệm đều được cam kết chất lượng tốt nhất, an toàn nhất.
+                    </p>
+                  </div>
+                </li>
+                <li className="flex gap-3">
+                  <div className="w-8 h-8 bg-pink-100/60 rounded-full flex items-center justify-center shrink-0">
+                    <Truck className="h-4 w-4 text-[#d53c83]" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-black text-gray-800 uppercase tracking-wider">Ship nhanh & Chu đáo</h4>
+                    <p className="text-[11px] text-gray-500 font-semibold leading-relaxed mt-0.5">
+                      Hỗ trợ giao hàng hỏa tốc Hà Nội, đóng gói kỹ càng chống va đập tuyệt đối để món quà trọn vẹn nhất.
+                    </p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div className="mt-6 border-t border-pink-100/50 pt-4 text-center">
+              <span className="text-[10px] font-black text-[#d53c83]/80 uppercase tracking-wider bg-white px-4 py-1.5 rounded-full border border-pink-100/40 shadow-sm">
+                ĐẶT CẢ TÌNH YÊU TRONG MỖI HỘP QUÀ
+              </span>
+            </div>
+          </div>
+
+          {/* Cột 3: Liên kết Mạng Xã Hội */}
+          <div className="bg-gradient-to-tr from-white to-[#fff1f2] border border-pink-100/50 rounded-3xl p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
+            <div>
+              <h3 className="text-lg font-black text-[#d53c83] mb-4">
+                Kết Nối Cộng Đồng
+              </h3>
+              <p className="text-[11px] text-gray-500 font-semibold leading-relaxed mb-6">
+                Theo dõi và săn ngay những voucher ưu đãi độc quyền lên tới 50% chỉ dành riêng cho bạn bè trên các kênh mạng xã hội của Tinori nhé!
+              </p>
+
+              <div className="space-y-2">
+                <a
+                  href="https://www.facebook.com/tinori.official"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-3 bg-white hover:bg-pink-50/50 rounded-2xl border border-pink-100/30 transition-all group shadow-sm hover:-translate-y-0.5"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 bg-[#1877f2]/10 rounded-full flex items-center justify-center shrink-0">
+                      <FacebookIcon className="h-5 w-5 text-[#1877f2]" />
+                    </div>
+                    <div className="text-left">
+                      <h4 className="text-xs font-black text-gray-800">Facebook Page</h4>
+                      <p className="text-[10px] text-gray-400 font-bold">3k+ Follower • Ghé trang của shop</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-pink-300 group-hover:text-[#d53c83] transition-colors" />
+                </a>
+
+                <a
+                  href="https://shopee.vn/tinori?entryPoint=ShopBySearch&searchKeyword=tinori"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-3 bg-white hover:bg-pink-50/50 rounded-2xl border border-pink-100/30 transition-all group shadow-sm hover:-translate-y-0.5"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 bg-[#ff5722]/10 rounded-full flex items-center justify-center shrink-0">
+                      <ShopeeIcon className="h-5 w-5 text-[#ff5722]" />
+                    </div>
+                    <div className="text-left">
+                      <h4 className="text-xs font-black text-gray-800">Shopee Store</h4>
+                      <p className="text-[10px] text-gray-400 font-bold">1k Follower • 200+ Đơn thành công</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-pink-300 group-hover:text-[#d53c83] transition-colors" />
+                </a>
+
+                <a
+                  href="https://www.instagram.com/tinori.shop/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-3 bg-white hover:bg-pink-50/50 rounded-2xl border border-pink-100/30 transition-all group shadow-sm hover:-translate-y-0.5"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 bg-[#e1306c]/10 rounded-full flex items-center justify-center shrink-0">
+                      <InstagramIcon className="h-5 w-5 text-[#e1306c]" />
+                    </div>
+                    <div className="text-left">
+                      <h4 className="text-xs font-black text-gray-800">Instagram Shop</h4>
+                      <p className="text-[10px] text-gray-400 font-bold">Hình ảnh & Vibe ngọt ngào</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-pink-300 group-hover:text-[#d53c83] transition-colors" />
+                </a>
+
+                <a
+                  href="https://www.tiktok.com/@tinori.shop"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-3 bg-white hover:bg-pink-50/50 rounded-2xl border border-pink-100/30 transition-all group shadow-sm hover:-translate-y-0.5"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 bg-black/5 rounded-full flex items-center justify-center shrink-0">
+                      <TikTokIcon className="h-5 w-5 text-gray-900" />
+                    </div>
+                    <div className="text-left">
+                      <h4 className="text-xs font-black text-gray-800">TikTok Shop</h4>
+                      <p className="text-[10px] text-gray-400 font-bold">Video phụ kiện dễ thương</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-pink-300 group-hover:text-[#d53c83] transition-colors" />
+                </a>
+              </div>
+            </div>
+
+            <div className="mt-6 text-center text-[10px] text-pink-400 font-bold tracking-widest">
+              @TINORISHOP_2026
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* ── Voucher Section ── */}
       {vouchers.length > 0 && (
@@ -260,18 +432,18 @@ export default async function HomePage() {
 
       {/* ── Latest Products ── */}
       <section className="max-w-7xl mx-auto px-4 py-8">
-          <div className="text-center mb-10 relative">
-            <p className="text-[#d53c83] font-bold text-sm tracking-widest uppercase mb-2">NEW ARRIVALS</p>
-            <h2 className="text-3xl font-black text-gray-900 tracking-tight">Sản Phẩm Mới Nhất</h2>
-            <div className="w-12 h-1 bg-[#d53c83] mx-auto mt-4 rounded-full opacity-60"></div>
-            <div className="absolute right-0 bottom-0 hidden md:block">
-              <Link href="/products">
-                <Button variant="ghost" className="text-pink-500 hover:text-pink-600 hover:bg-pink-50 font-medium">
-                  Tất cả sản phẩm <ArrowRight className="h-4 w-4 ml-1" />
-                </Button>
-              </Link>
-            </div>
+        <div className="text-center mb-10 relative">
+          <p className="text-[#d53c83] font-bold text-sm tracking-widest uppercase mb-2">NEW ARRIVALS</p>
+          <h2 className="text-3xl font-black text-gray-900 tracking-tight">Sản Phẩm Mới Nhất</h2>
+          <div className="w-12 h-1 bg-[#d53c83] mx-auto mt-4 rounded-full opacity-60"></div>
+          <div className="absolute right-0 bottom-0 hidden md:block">
+            <Link href="/products">
+              <Button variant="ghost" className="text-pink-500 hover:text-pink-600 hover:bg-pink-50 font-medium">
+                Tất cả sản phẩm <ArrowRight className="h-4 w-4 ml-1" />
+              </Button>
+            </Link>
           </div>
+        </div>
         {latestProducts.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {latestProducts.map((product) => (
