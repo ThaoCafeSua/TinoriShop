@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ShoppingCart, Zap, Check, X } from "lucide-react";
+import { ShoppingCart, Zap, Check, X, Star } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { useCart } from "@/hooks/useCart";
 
@@ -39,6 +39,27 @@ export default function ProductCard({
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  // Simple helper to get stable pseudo-random numbers based on string id
+  const getSeedRandom = (str: string) => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return Math.abs(hash);
+  };
+
+  const seed = getSeedRandom(id);
+  const fakeSold = (seed % 1800) + 120; // 120 to 1919
+  const fakeRating = (4.9 + (seed % 2) * 0.1).toFixed(1); // 4.9 or 5.0
+  const fakeReviews = (seed % 150) + 15; // 15 to 164
+
+  const formatSold = (num: number) => {
+    if (num >= 1000) {
+      return (num / 1000).toFixed(1) + "k";
+    }
+    return num.toString();
+  };
 
   const isFavorite = false;
   const [animateHeart, setAnimateHeart] = useState(false);
@@ -292,9 +313,21 @@ export default function ProductCard({
           </div>
 
           <div className="p-4 flex flex-col flex-1">
-            <h3 className="text-sm font-bold text-gray-800 line-clamp-2 mb-2 leading-snug group-hover:text-[#d53c83] transition-colors">
+            <h3 className="text-sm font-bold text-gray-800 line-clamp-2 mb-1.5 leading-snug group-hover:text-[#d53c83] transition-colors">
               {name}
             </h3>
+            
+            {/* Stars and Sold count */}
+            <div className="flex items-center gap-1 text-[11px] text-gray-400 mb-2 font-medium">
+              <div className="flex items-center text-amber-400">
+                <Star className="h-3 w-3 fill-current" />
+                <span className="ml-0.5 font-bold text-gray-700">{fakeRating}</span>
+              </div>
+              <span>({fakeReviews})</span>
+              <span className="text-gray-200">|</span>
+              <span>Đã bán {formatSold(fakeSold)}</span>
+            </div>
+
             <div className="mt-auto">
               <div className="flex flex-wrap items-baseline gap-2">
                 <span className="text-lg font-black text-[#d53c83]">
