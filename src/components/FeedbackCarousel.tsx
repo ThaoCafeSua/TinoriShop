@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { X, ZoomIn } from "lucide-react";
 
 export default function FeedbackCarousel() {
@@ -36,8 +37,8 @@ export default function FeedbackCarousel() {
               <div className="relative overflow-hidden rounded-xl bg-gray-50 flex-1 flex items-center justify-center h-[340px]">
                 <img 
                   src={item.img} 
-                  alt={item.text} 
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  alt={item.text}
+                  className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"
                 />
                 {/* Hover overlay with zoom icon */}
