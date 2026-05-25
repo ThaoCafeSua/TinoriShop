@@ -54,5 +54,5 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET || "tinori-secret-key-2024",
+  secret: process.env.NEXTAUTH_SECRET,
 };

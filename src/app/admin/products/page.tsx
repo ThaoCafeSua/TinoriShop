@@ -9,25 +9,40 @@ import { formatPrice } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import DeleteProductButton from "./DeleteProductButton";
 import ProductStatusToggle from "./ProductStatusToggle";
+import Pagination from "@/components/admin/Pagination";
 
 interface SearchParams {
   search?: string;
+  page?: string;
 }
 
-async function getProducts(search?: string) {
-  return prisma.product.findMany({
-    where: search ? {
-      OR: [
-        { name: { contains: search } },
-        { slug: { contains: search } },
-      ]
-    } : undefined,
-    include: {
-      images: { where: { isPrimary: true }, take: 1 },
-      _count: { select: { orderItems: true } },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+async function getProducts(search?: string, page?: string) {
+  const currentPage = Number(page) || 1;
+  const limit = 20;
+  const skip = (currentPage - 1) * limit;
+
+  const where = search ? {
+    OR: [
+      { name: { contains: search } },
+      { slug: { contains: search } },
+    ]
+  } : undefined;
+
+  const [products, total] = await Promise.all([
+    prisma.product.findMany({
+      where,
+      include: {
+        images: { where: { isPrimary: true }, take: 1 },
+        _count: { select: { orderItems: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: limit,
+    }),
+    prisma.product.count({ where })
+  ]);
+
+  return { products, totalPages: Math.ceil(total / limit), total };
 }
 
 export default async function AdminProductsPage({
@@ -39,7 +54,7 @@ export default async function AdminProductsPage({
   if (!session) redirect("/admin/login");
 
   const params = await searchParams;
-  const products = await getProducts(params.search);
+  const { products, totalPages, total } = await getProducts(params.search, params.page);
 
   return (
     <div className="lg:pl-64">
@@ -48,7 +63,7 @@ export default async function AdminProductsPage({
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
           <div>
             <h1 className="text-2xl font-black text-gray-900">Sản phẩm</h1>
-            <p className="text-gray-500 text-sm">{products.length} sản phẩm</p>
+            <p className="text-gray-500 text-sm">{total} sản phẩm</p>
           </div>
           <Link href="/admin/products/new">
             <Button>
@@ -67,16 +82,16 @@ export default async function AdminProductsPage({
               name="search"
               defaultValue={params.search}
               placeholder="Tìm tên sản phẩm..."
-              className="w-full pl-10 pr-4 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 bg-gray-50/50 hover:bg-gray-50 transition-colors"
             />
             <button type="submit" className="hidden">Tìm</button>
           </form>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50">
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+          <div className="overflow-x-auto max-h-[calc(100vh-280px)] custom-scrollbar">
+            <table className="w-full text-sm relative">
+              <thead className="bg-gray-50/90 backdrop-blur-sm sticky top-0 z-10 shadow-sm">
                 <tr>
                   <th className="text-left px-4 py-3 font-semibold text-gray-600">Sản phẩm</th>
                   <th className="text-right px-4 py-3 font-semibold text-gray-600">Giá</th>
@@ -108,7 +123,12 @@ export default async function AdminProductsPage({
                           )}
                         </div>
                         <div>
-                          <p className="font-semibold text-gray-800 line-clamp-1">{product.name}</p>
+                          <div className="flex items-center gap-1.5">
+                            <p className="font-semibold text-gray-800 line-clamp-1">{product.name}</p>
+                            {product.productType === "GIFT_BOX" && (
+                              <span className="text-[10px] font-bold bg-pink-100 text-[#d53c83] px-1.5 py-0.5 rounded-md whitespace-nowrap">Gift Box</span>
+                            )}
+                          </div>
                           <p className="text-xs text-gray-400">{product._count.orderItems} đơn</p>
                         </div>
                       </div>
@@ -165,6 +185,7 @@ export default async function AdminProductsPage({
               </tbody>
             </table>
           </div>
+          <Pagination totalPages={totalPages} />
         </div>
       </div>
     </div>

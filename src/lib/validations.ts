@@ -30,6 +30,7 @@ export const productSchema = z.object({
   categoryId: z.string().optional().nullable(),
   featured: z.boolean().optional(),
   active: z.boolean().optional(),
+  fulfillmentType: z.enum(["in_stock", "preorder"]).optional(),
 }).refine((data) => {
   if (data.price > 0 && data.salePrice !== null && data.salePrice !== undefined && data.salePrice >= data.price) {
     return false;

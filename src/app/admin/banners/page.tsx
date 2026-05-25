@@ -5,6 +5,9 @@ import AdminNav from "@/components/AdminNav";
 import { Button } from "@/components/ui/button";
 import { Loader2, Plus, Trash2, ExternalLink, ImageIcon, X, Check, Upload } from "lucide-react";
 import { toast } from "@/hooks/useToast";
+import { useSearchParams } from "next/navigation";
+import Pagination from "@/components/admin/Pagination";
+import { Suspense } from "react";
 
 interface Banner {
   id: string;
@@ -15,6 +18,14 @@ interface Banner {
 }
 
 export default function AdminBannersPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center p-8"><Loader2 className="h-8 w-8 animate-spin text-pink-500" /></div>}>
+      <AdminBannersContent />
+    </Suspense>
+  );
+}
+
+function AdminBannersContent() {
   const [banners, setBanners] = useState<Banner[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -22,6 +33,10 @@ export default function AdminBannersPage() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const searchParams = useSearchParams();
+  const page = Number(searchParams.get("page")) || 1;
+  const limit = 20;
 
   const fetchBanners = async () => {
     try {
@@ -113,6 +128,9 @@ export default function AdminBannersPage() {
     fetchBanners();
   };
 
+  const totalPages = Math.ceil(banners.length / limit);
+  const paginatedBanners = banners.slice((page - 1) * limit, page * limit);
+
   return (
     <div className="lg:pl-64">
       <AdminNav />
@@ -196,14 +214,15 @@ export default function AdminBannersPage() {
         {loading ? (
           <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-pink-600" /></div>
         ) : banners.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-2xl shadow-sm">
+          <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-100">
             <ImageIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-500 font-medium">Chưa có banner nào</p>
             <p className="text-gray-400 text-sm mt-1">Bấm "Thêm banner" để tải ảnh lên</p>
           </div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {banners.map((banner) => (
+          <div className="space-y-4">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {paginatedBanners.map((banner) => (
               <div key={banner.id} className={`bg-white rounded-2xl shadow-sm overflow-hidden border-2 transition-all ${banner.active ? "border-pink-200" : "border-gray-200 opacity-60"}`}>
                 <div className="relative aspect-video bg-gray-100">
                   <img src={banner.image} alt="Banner" className="w-full h-full object-cover" />
@@ -230,6 +249,8 @@ export default function AdminBannersPage() {
                 </div>
               </div>
             ))}
+            </div>
+            <Pagination totalPages={totalPages} />
           </div>
         )}
       </div>

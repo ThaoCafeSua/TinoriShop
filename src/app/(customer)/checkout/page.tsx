@@ -22,10 +22,28 @@ export default function CheckoutPage() {
   const { items, getTotalPrice, clearCart } = useCart();
   const [mounted, setMounted] = useState(false);
   const { savedVouchers } = useSavedVouchers();
+  const [validVouchers, setValidVouchers] = useState<string[]>([]);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (savedVouchers.length > 0) {
+      fetch("/api/vouchers?active=true")
+        .then(res => res.json())
+        .then((data: any[]) => {
+           if (Array.isArray(data)) {
+             const activeCodes = data.map(v => v.code);
+             const filtered = savedVouchers.filter(c => activeCodes.includes(c));
+             setValidVouchers(filtered);
+           }
+        })
+        .catch(console.error);
+    } else {
+      setValidVouchers([]);
+    }
+  }, [savedVouchers]);
 
   const totalPrice = getTotalPrice();
   const displayItems = mounted ? items : [];
@@ -256,7 +274,7 @@ export default function CheckoutPage() {
                 Phương thức đặt cọc
               </h2>
               <p className="text-sm text-gray-500 mb-5">
-                Cần đặt cọc <strong className="text-pink-600">25.000đ</strong> để xác nhận đơn hàng
+                Cần đặt cọc <strong className="text-pink-600">{formatPrice(Math.min(25000, totalPrice + calculateShippingFee(totalPrice) - (appliedVoucher?.discount || 0)))}</strong> để xác nhận đơn hàng
               </p>
               <div className="space-y-3">
                 <label className="flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-colors has-[:checked]:border-pink-500 has-[:checked]:bg-pink-50">
@@ -336,7 +354,7 @@ export default function CheckoutPage() {
                 )}
                 <div className="flex justify-between text-sm text-amber-700">
                   <span className="font-semibold">Tiền cọc</span>
-                  <span className="font-bold">25.000đ</span>
+                  <span className="font-bold">{formatPrice(Math.min(25000, totalPrice + calculateShippingFee(totalPrice) - (appliedVoucher?.discount || 0)))}</span>
                 </div>
                 <div className="flex justify-between font-black text-lg border-t pt-2">
                   <span>Tổng thanh toán</span>
@@ -353,9 +371,9 @@ export default function CheckoutPage() {
                     </Label>
                     
                     {/* Saved Vouchers List */}
-                    {savedVouchers.length > 0 && (
+                    {validVouchers.length > 0 && (
                       <div className="mb-4 flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
-                        {savedVouchers.map(code => (
+                        {validVouchers.map(code => (
                           <button
                             key={code}
                             type="button"
@@ -373,7 +391,7 @@ export default function CheckoutPage() {
                       <Input
                         value={voucherCodeInput}
                         onChange={(e) => setVoucherCodeInput(e.target.value.toUpperCase())}
-                        placeholder={savedVouchers.length > 0 ? "Hoặc nhập mã khác..." : "Nhập mã voucher..."}
+                        placeholder={validVouchers.length > 0 ? "Hoặc nhập mã khác..." : "Nhập mã voucher..."}
                         className="font-mono uppercase placeholder:normal-case placeholder:font-sans"
                       />
                       <Button

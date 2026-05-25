@@ -20,10 +20,14 @@ export async function GET(req: NextRequest) {
     where.startDate = { lte: new Date() };
   }
 
-  const vouchers = await prisma.voucher.findMany({
+  let vouchers = await prisma.voucher.findMany({
     where,
     orderBy: { createdAt: "desc" },
   });
+
+  if (activeOnly === "true") {
+    vouchers = vouchers.filter(v => v.usageLimit === 0 || v.usedCount < v.usageLimit);
+  }
 
   return NextResponse.json(vouchers);
 }
@@ -31,7 +35,7 @@ export async function GET(req: NextRequest) {
 // POST: Admin tạo voucher mới
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session || (session.user as any).role !== "admin") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
   const { code, description, discountType, discountValue, minOrderValue, maxDiscount, usageLimit, active, startDate, endDate } = body;

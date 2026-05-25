@@ -7,6 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/useToast";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
+import Pagination from "@/components/admin/Pagination";
+import { Suspense } from "react";
 
 interface Category {
   id: string;
@@ -19,11 +22,23 @@ interface Category {
 }
 
 export default function CategoriesPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center p-8"><Loader2 className="h-8 w-8 animate-spin text-pink-500" /></div>}>
+      <CategoriesContent />
+    </Suspense>
+  );
+}
+
+function CategoriesContent() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState({ name: "", image: "" });
+  
+  const searchParams = useSearchParams();
+  const page = Number(searchParams.get("page")) || 1;
+  const limit = 20;
 
   const fetchCategories = async () => {
     try {
@@ -111,6 +126,9 @@ export default function CategoriesPage() {
     );
   }
 
+  const totalPages = Math.ceil(categories.length / limit);
+  const paginatedCategories = categories.slice((page - 1) * limit, page * limit);
+
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
@@ -186,19 +204,19 @@ export default function CategoriesPage() {
           </div>
         </div>
 
-        {/* List */}
         <div className="md:col-span-2">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-gray-50 text-gray-600 font-semibold border-b">
-                <tr>
+            <div className="overflow-x-auto max-h-[calc(100vh-200px)] custom-scrollbar">
+              <table className="w-full text-left text-sm relative">
+                <thead className="bg-gray-50/90 backdrop-blur-sm text-gray-600 font-semibold border-b sticky top-0 z-10 shadow-sm">
+                  <tr>
                   <th className="px-4 py-3">Danh mục</th>
                   <th className="px-4 py-3">Sản phẩm</th>
                   <th className="px-4 py-3 text-right">Thao tác</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {categories.map((cat) => (
+                {paginatedCategories.map((cat) => (
                   <tr key={cat.id} className="hover:bg-pink-50/50 transition-colors">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
@@ -249,6 +267,8 @@ export default function CategoriesPage() {
                 )}
               </tbody>
             </table>
+            </div>
+            <Pagination totalPages={totalPages} />
           </div>
         </div>
       </div>

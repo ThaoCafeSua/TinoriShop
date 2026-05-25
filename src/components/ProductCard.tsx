@@ -20,6 +20,7 @@ interface ProductCardProps {
   hasVariants?: boolean;
   variants?: any[];
   stock?: number;
+  fulfillmentType?: string;
 }
 
 export default function ProductCard({
@@ -32,6 +33,7 @@ export default function ProductCard({
   hasVariants = false,
   variants = [],
   stock,
+  fulfillmentType,
 }: ProductCardProps) {
 
   const [isMounted, setIsMounted] = useState(false);
@@ -277,6 +279,13 @@ export default function ProductCard({
             {hasDiscount && (
               <div className="absolute top-3 left-3 bg-[#d53c83] text-white text-[11px] font-black px-2 py-1 rounded-full shadow-lg z-10 animate-pulse">
                 -{discountPercent}%
+              </div>
+            )}
+
+            {/* Preorder Badge */}
+            {fulfillmentType === "preorder" && (
+              <div className="absolute bottom-3 right-3 bg-[#d53c83] text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-md z-10 flex items-center gap-1">
+                Hàng đặt trước
               </div>
             )}
 

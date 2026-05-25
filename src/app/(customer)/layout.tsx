@@ -4,7 +4,6 @@ import CartSync from "@/components/CartSync";
 import MagicEffects from "@/components/MagicEffects";
 import HeartLoader from "@/components/HeartLoader";
 
-export const dynamic = "force-dynamic";
 
 export default function CustomerLayout({
   children,

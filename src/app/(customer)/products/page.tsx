@@ -10,6 +10,7 @@ interface SearchParams {
   q?: string;
   sort?: string;
   featured?: string;
+  type?: string;
 }
 
 async function getProducts(searchParams: SearchParams) {
@@ -21,6 +22,11 @@ async function getProducts(searchParams: SearchParams) {
     }
     if (searchParams.featured === "true") {
       where.featured = true;
+    }
+    if (searchParams.type === "gift-box") {
+      where.productType = "GIFT_BOX";
+    } else if (!searchParams.type || searchParams.type === "san-pham") {
+      where.productType = "STANDARD";
     }
     if (searchParams.q) {
       where.name = { contains: searchParams.q };
@@ -76,12 +82,40 @@ export default async function ProductsPage({
             ? `Kết quả tìm kiếm: "${params.q}"`
             : params.featured
             ? "Sản phẩm nổi bật"
+            : params.type === "gift-box"
+            ? "Hộp Quà Tặng"
             : "Tất cả sản phẩm"}
         </h1>
         <p className="text-gray-500 text-sm mt-1">
           {products.length} sản phẩm
         </p>
       </div>
+
+      {/* Product Type Tabs */}
+      {!params.q && !params.featured && (
+        <div className="flex gap-2 mb-6">
+          <Link
+            href={{ query: { type: "san-pham" } }}
+            className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all ${
+              !params.type || params.type === "san-pham"
+                ? "bg-[#d53c83] text-white shadow-md shadow-pink-200"
+                : "bg-white text-gray-500 border border-gray-200 hover:border-pink-200 hover:text-[#d53c83]"
+            }`}
+          >
+            Sản phẩm
+          </Link>
+          <Link
+            href={{ query: { type: "gift-box" } }}
+            className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all ${
+              params.type === "gift-box"
+                ? "bg-[#d53c83] text-white shadow-md shadow-pink-200"
+                : "bg-white text-gray-500 border border-gray-200 hover:border-pink-200 hover:text-[#d53c83]"
+            }`}
+          >
+            Hộp Quà Tặng
+          </Link>
+        </div>
+      )}
 
       <div className="flex gap-6">
 
@@ -150,6 +184,7 @@ export default async function ProductsPage({
                   hasVariants={product._count?.variants > 0}
                   variants={product.variants}
                   stock={product.stock}
+                  fulfillmentType={product.fulfillmentType}
                 />
               ))}
             </div>

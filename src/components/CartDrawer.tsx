@@ -134,8 +134,25 @@ export default function CartDrawer() {
               <span className="font-semibold text-gray-700">Tổng cộng:</span>
               <span className="text-xl font-bold text-pink-600">{formatPrice(totalPrice)}</span>
             </div>
-            <p className="text-xs text-gray-500 mb-3 text-center">
-              * Cần đặt cọc 25.000đ khi đặt hàng
+            
+            {/* Thanh tiến trình miễn phí ship */}
+            {totalPrice > 0 && (
+              <div className="mb-4">
+                {totalPrice >= 250000 ? (
+                  <div className="bg-green-50 text-green-700 text-xs font-bold py-2 px-3 rounded-lg text-center flex items-center justify-center gap-1.5 border border-green-200">
+                    <span className="text-sm">🎉</span> Chúc mừng! Đơn của bạn được FREESHIP
+                  </div>
+                ) : (
+                  <div className="bg-orange-50 text-orange-700 text-xs py-2 px-3 rounded-lg text-center border border-orange-200">
+                    Mua thêm <span className="font-bold">{formatPrice(250000 - totalPrice)}</span> để được <span className="font-bold uppercase">Miễn phí giao hàng</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <p className="text-[11px] text-gray-500 mb-3 text-center flex items-center justify-center gap-1">
+              <span className="inline-block w-1.5 h-1.5 bg-yellow-400 rounded-full"></span>
+              Cần đặt cọc 25.000đ để xác nhận đơn hàng
             </p>
             <Link href="/checkout" onClick={() => setIsOpen(false)}>
               <Button className="w-full" size="lg">

@@ -8,6 +8,9 @@ import {
 } from "lucide-react";
 import { toast } from "@/hooks/useToast";
 import { formatPrice } from "@/lib/utils";
+import { useSearchParams } from "next/navigation";
+import Pagination from "@/components/admin/Pagination";
+import { Suspense } from "react";
 
 interface Voucher {
   id: string;
@@ -39,12 +42,24 @@ const emptyForm = {
 };
 
 export default function AdminVouchersPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center p-8"><Loader2 className="h-8 w-8 animate-spin text-pink-500" /></div>}>
+      <AdminVouchersContent />
+    </Suspense>
+  );
+}
+
+function AdminVouchersContent() {
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+
+  const searchParams = useSearchParams();
+  const page = Number(searchParams.get("page")) || 1;
+  const limit = 20;
 
   const fetchVouchers = async () => {
     try {
@@ -180,6 +195,9 @@ export default function AdminVouchersPage() {
     navigator.clipboard.writeText(code);
     toast({ title: `Đã sao chép mã ${code}` });
   };
+
+  const totalPages = Math.ceil(vouchers.length / limit);
+  const paginatedVouchers = vouchers.slice((page - 1) * limit, page * limit);
 
   return (
     <div className="lg:pl-64">
@@ -325,14 +343,14 @@ export default function AdminVouchersPage() {
         {loading ? (
           <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-pink-600" /></div>
         ) : vouchers.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-2xl shadow-sm">
+          <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-100">
             <Ticket className="h-12 w-12 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-500 font-medium">Chưa có voucher nào</p>
             <p className="text-gray-400 text-sm mt-1">Bấm &quot;Tạo voucher&quot; để bắt đầu</p>
           </div>
         ) : (
           <div className="space-y-3">
-            {vouchers.map((v) => {
+            {paginatedVouchers.map((v) => {
               const isExpired = v.endDate && new Date(v.endDate) < new Date();
               const isFull = v.usedCount >= v.usageLimit;
               return (
@@ -390,6 +408,9 @@ export default function AdminVouchersPage() {
                 </div>
               );
             })}
+            <div className="pt-4">
+              <Pagination totalPages={totalPages} />
+            </div>
           </div>
         )}
       </div>

@@ -13,6 +13,7 @@ export async function GET(req: NextRequest) {
   const q = searchParams.get("q");
   const active = searchParams.get("active");
   const ids = searchParams.get("ids");
+  const productType = searchParams.get("productType");
 
   const products = await prisma.product.findMany({
     where: {
@@ -26,6 +27,7 @@ export async function GET(req: NextRequest) {
         ],
       }),
       ...(ids && { id: { in: ids.split(",") } }),
+      ...(productType && { productType }),
     },
     include: {
       images: { orderBy: { order: "asc" } },
@@ -40,10 +42,10 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session || (session.user as any).role !== "admin") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
-  const { name, description, price, salePrice, stock, categoryId, featured, active, images, variants } = body;
+  const { name, description, price, salePrice, stock, categoryId, featured, active, images, variants, productType, fulfillmentType } = body;
 
   if (!name || price === undefined) {
     return NextResponse.json({ error: "Thiếu thông tin bắt buộc" }, { status: 400 });
@@ -66,6 +68,8 @@ export async function POST(req: NextRequest) {
       categoryId: categoryId || null,
       featured: featured ?? false,
       active: active ?? true,
+      productType: productType || "STANDARD",
+      fulfillmentType: fulfillmentType || "in_stock",
       images: images?.length
         ? {
             create: images.map((img: { url: string; alt?: string; isPrimary?: boolean }, i: number) => ({

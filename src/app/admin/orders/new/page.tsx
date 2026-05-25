@@ -6,7 +6,8 @@ import AdminNav from "@/components/AdminNav";
 import { Button } from "@/components/ui/button";
 import { Loader2, Plus, Minus, Trash2, Search, CheckCircle } from "lucide-react";
 import { toast } from "@/hooks/useToast";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, calculateShippingFee } from "@/lib/utils";
+import AddressForm from "@/components/AddressForm";
 
 interface ProductVariant {
   id: string;
@@ -23,7 +24,7 @@ interface Product {
   price: number;
   salePrice: number | null;
   stock: number;
-  image: string;
+  images: { url: string; isPrimary: boolean }[];
   variants: ProductVariant[];
 }
 
@@ -51,9 +52,12 @@ export default function AdminCreateOrderPage() {
     customerPhone: "",
     customerEmail: "",
     detailedAddress: "",
-    province: "N/A",
-    district: "N/A",
-    ward: "N/A",
+    provinceName: "",
+    provinceCode: "",
+    districtName: "",
+    districtCode: "",
+    wardName: "",
+    wardCode: "",
     note: "Đơn tạo bởi Admin",
   });
   const [shippingFee, setShippingFee] = useState(30000);
@@ -101,7 +105,7 @@ export default function AdminCreateOrderPage() {
         variantName,
         price,
         quantity: 1,
-        image: product.image,
+        image: product.images?.find(i => i.isPrimary)?.url || product.images?.[0]?.url || "",
         stock
       }];
     });
@@ -127,7 +131,25 @@ export default function AdminCreateOrderPage() {
   };
 
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  // Auto-update shipping fee when cart changes
+  useEffect(() => {
+    setShippingFee(calculateShippingFee(subtotal));
+  }, [subtotal]);
+
   const total = subtotal + shippingFee;
+
+  const handleAddressChange = (addr: any) => {
+    setCustomerInfo(prev => ({
+      ...prev,
+      provinceName: addr.provinceName,
+      provinceCode: addr.provinceCode,
+      districtName: addr.districtName,
+      districtCode: addr.districtCode,
+      wardName: addr.wardName,
+      wardCode: addr.wardCode,
+    }));
+  };
 
   const handleSubmit = async () => {
     if (cart.length === 0) {
@@ -139,10 +161,24 @@ export default function AdminCreateOrderPage() {
       return;
     }
 
+    const phoneRegex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/;
+    if (!phoneRegex.test(customerInfo.customerPhone)) {
+      toast({ title: "Số điện thoại không hợp lệ", variant: "destructive" });
+      return;
+    }
+
+    if (!customerInfo.provinceName || !customerInfo.districtName || !customerInfo.wardName || !customerInfo.detailedAddress) {
+      toast({ title: "Vui lòng nhập đầy đủ địa chỉ giao hàng", variant: "destructive" });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const payload = {
         ...customerInfo,
+        province: customerInfo.provinceName,
+        district: customerInfo.districtName,
+        ward: customerInfo.wardName,
         items: cart.map(item => ({
           productId: item.productId,
           variantId: item.variantId,
@@ -201,11 +237,13 @@ export default function AdminCreateOrderPage() {
               <div className="flex justify-center py-10"><Loader2 className="h-6 w-6 animate-spin text-pink-500" /></div>
             ) : (
               <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                {filteredProducts.map(product => (
+                {filteredProducts.map(product => {
+                  const imgUrl = product.images?.find(i => i.isPrimary)?.url || product.images?.[0]?.url;
+                  return (
                   <div key={product.id} className="border rounded-xl p-3 hover:border-pink-300 transition-colors flex flex-col">
                     <div className="aspect-square bg-gray-100 rounded-lg mb-2 overflow-hidden">
-                      {product.image ? (
-                        <img src={product.image} className="w-full h-full object-cover" alt="" />
+                      {imgUrl ? (
+                        <img src={imgUrl} className="w-full h-full object-cover" alt="" />
                       ) : (
                         <div className="w-full h-full bg-pink-50" />
                       )}
@@ -232,7 +270,7 @@ export default function AdminCreateOrderPage() {
                       </div>
                     )}
                   </div>
-                ))}
+                )})}
               </div>
             )}
           </div>
@@ -297,8 +335,13 @@ export default function AdminCreateOrderPage() {
                   className="w-full border px-3 py-2 rounded-lg text-sm"
                 />
               </div>
+
+              <div className="pt-2">
+                <AddressForm onAddressChange={handleAddressChange} />
+              </div>
+
               <textarea
-                placeholder="Địa chỉ giao hàng đầy đủ..."
+                placeholder="Địa chỉ chi tiết (Số nhà, tên đường)..."
                 value={customerInfo.detailedAddress}
                 onChange={e => setCustomerInfo(f => ({ ...f, detailedAddress: e.target.value }))}
                 className="w-full border px-3 py-2 rounded-lg text-sm min-h-[60px]"

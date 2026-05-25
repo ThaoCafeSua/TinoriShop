@@ -16,6 +16,7 @@ import {
   Plus,
   Minus,
   Check,
+  Package,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -43,6 +44,7 @@ interface Product {
   price: number;
   salePrice?: number;
   stock: number;
+  fulfillmentType?: string;
   images: { id: string; url: string; isPrimary: boolean }[];
   variants: ProductVariant[];
   slug: string;
@@ -54,6 +56,7 @@ interface Product {
     slug: string;
     images: { url: string; isPrimary: boolean }[];
     variants?: any[];
+    fulfillmentType?: string;
   }[];
 }
 
@@ -99,28 +102,7 @@ export default function ProductDetailPage() {
   const [addedToCart, setAddedToCart] = useState(false);
   const { addItem, clearCart } = useCart();
   const router = useRouter();
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const isProgrammaticScroll = useRef(false);
-  const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  // Sync scroll position with selected image
-  useEffect(() => {
-    if (scrollRef.current) {
-      const container = scrollRef.current;
-      const width = container.clientWidth;
-      isProgrammaticScroll.current = true;
-      if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
-      
-      container.scrollTo({
-        left: selectedImage * width,
-        behavior: 'smooth'
-      });
-      
-      scrollTimeout.current = setTimeout(() => {
-        isProgrammaticScroll.current = false;
-      }, 600);
-    }
-  }, [selectedImage]);
 
   const attributeNames = product?.variants[0]?.type?.split(' - ') || [];
   const selectedValuesString = attributeNames.map((name: string) => selectedVariants[name] || "").join(' - ');
@@ -157,21 +139,17 @@ export default function ProductDetailPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [variantImage]);
 
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    if (isProgrammaticScroll.current) return;
-    const container = e.currentTarget;
-    const width = container.clientWidth;
-    const index = Math.round(container.scrollLeft / width);
-    if (index !== selectedImage && index >= 0 && index < displayImages.length) {
-      setSelectedImage(index);
-    }
-  };
+
 
   useEffect(() => {
     fetch(`/api/products/${id}`)
       .then((res) => res.json())
       .then((data) => {
         setProduct(data);
+        const primaryIndex = data.images?.findIndex((img: any) => img.isPrimary);
+        if (primaryIndex > 0) {
+          setSelectedImage(primaryIndex);
+        }
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -368,28 +346,23 @@ export default function ProductDetailPage() {
       <div className="grid md:grid-cols-2 gap-8">
         {/* Images */}
         <div className="min-w-0">
-          <div 
-            ref={scrollRef}
-            onScroll={handleScroll}
-            className="relative flex w-full overflow-x-auto snap-x snap-mandatory custom-scrollbar rounded-2xl bg-gray-50 mb-3"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
+          <div className="relative w-full aspect-square rounded-2xl bg-gray-50 mb-3 overflow-hidden">
             {displayImages.length > 0 ? (
-              displayImages.map((img, idx) => (
-                <div key={img.id} className="relative min-w-full aspect-square snap-center flex-shrink-0">
-                  <Image
-                    src={img.url}
-                    alt={`${product.name} - ${idx + 1}`}
-                    fill
-                    className="object-cover"
-                  />
-                  {hasDiscount && (
-                    <div className="absolute top-4 left-4 bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-xl z-10">
-                      -{discountPercent}%
-                    </div>
-                  )}
-                </div>
-              ))
+              <>
+                <Image
+                  src={displayImages[selectedImage]?.url || displayImages[0].url}
+                  alt={`${product.name} - ${selectedImage + 1}`}
+                  fill
+                  priority
+                  className="object-cover transition-opacity duration-300"
+                  key={displayImages[selectedImage]?.url || displayImages[0].url}
+                />
+                {hasDiscount && (
+                  <div className="absolute top-4 left-4 bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-xl z-10">
+                    -{discountPercent}%
+                  </div>
+                )}
+              </>
             ) : (
               <div className="relative min-w-full aspect-square flex items-center justify-center bg-gradient-to-br from-rose-50 to-pink-50 text-gray-400">
                 <ShoppingCart className="h-20 w-20 opacity-20" />
@@ -484,6 +457,23 @@ export default function ProductDetailPage() {
               </div>
             </div>
           ))}
+
+          {/* Pre-order notice */}
+          {product.fulfillmentType === "preorder" && (
+            <div className="bg-pink-50/80 border border-pink-200/50 rounded-2xl p-4 mb-5 flex items-start gap-3 shadow-sm">
+              <div className="bg-pink-100 text-pink-600 p-2 rounded-xl">
+                <Package className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm font-black text-pink-700">
+                  Hàng đặt trước
+                </p>
+                <p className="text-xs text-pink-600/90 mt-1 font-medium leading-relaxed">
+                  Sản phẩm này cần khoảng 14 ngày chuẩn bị trước khi gửi.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Quantity */}
           <div className="mb-5">
@@ -688,9 +678,10 @@ export default function ProductDetailPage() {
                 price={p.price}
                 salePrice={p.salePrice}
                 slug={p.slug}
-                image={p.images[0]?.url}
+                image={p.images?.find((img: any) => img.isPrimary)?.url || p.images[0]?.url}
                 hasVariants={p.variants && p.variants.length > 0}
                 variants={p.variants}
+                fulfillmentType={p.fulfillmentType}
               />
             ))}
           </div>

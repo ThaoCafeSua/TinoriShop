@@ -3,21 +3,25 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import AdminNav from "@/components/AdminNav";
-import AutoRefresh from "@/components/AutoRefresh";
 import TestSePayButton from "@/components/admin/TestSePayButton";
 import Link from "next/link";
 import { formatPrice, ORDER_STATUS_MAP } from "@/lib/utils";
 import { Eye, Search, Calendar } from "lucide-react";
+import Pagination from "@/components/admin/Pagination";
 
 interface SearchParams {
   status?: string;
   search?: string;
   startDate?: string;
   endDate?: string;
+  page?: string;
 }
 
 async function getOrders(params: SearchParams) {
-  const { status, search, startDate, endDate } = params;
+  const { status, search, startDate, endDate, page } = params;
+  const currentPage = Number(page) || 1;
+  const limit = 20;
+  const skip = (currentPage - 1) * limit;
   
   const where: any = {};
   
@@ -35,23 +39,39 @@ async function getOrders(params: SearchParams) {
   
   if (startDate || endDate) {
     where.createdAt = {};
-    if (startDate) {
-      where.createdAt.gte = new Date(startDate);
+    let start = startDate ? new Date(startDate) : null;
+    let end = endDate ? new Date(endDate) : null;
+    
+    // Swap if start > end
+    if (start && end && start > end) {
+      const temp = start;
+      start = end;
+      end = temp;
     }
-    if (endDate) {
-      const end = new Date(endDate);
+    
+    if (start) {
+      where.createdAt.gte = start;
+    }
+    if (end) {
       end.setHours(23, 59, 59, 999);
       where.createdAt.lte = end;
     }
   }
 
-  return prisma.order.findMany({
-    where,
-    include: {
-      items: { include: { product: true } },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const [orders, total] = await Promise.all([
+    prisma.order.findMany({
+      where,
+      include: {
+        items: { include: { product: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: limit,
+    }),
+    prisma.order.count({ where })
+  ]);
+
+  return { orders, totalPages: Math.ceil(total / limit), total };
 }
 
 export default async function AdminOrdersPage({
@@ -63,7 +83,7 @@ export default async function AdminOrdersPage({
   if (!session) redirect("/admin/login");
 
   const params = await searchParams;
-  const orders = await getOrders(params);
+  const { orders, totalPages, total } = await getOrders(params);
 
   const tabs = [
     { status: "", label: "Tất cả" },
@@ -75,15 +95,16 @@ export default async function AdminOrdersPage({
     { status: "CANCELLED", label: "Đã hủy" },
   ];
 
+  const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Ho_Chi_Minh" });
+
   return (
     <div className="lg:pl-64">
-      <AutoRefresh interval={15000} />
       <AdminNav />
       <div className="p-4 sm:p-6 lg:p-8 pt-16 lg:pt-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
           <div>
             <h1 className="text-2xl font-black text-gray-900">Đơn hàng</h1>
-            <p className="text-gray-500 text-sm">{orders.length} đơn hàng được tìm thấy</p>
+            <p className="text-gray-500 text-sm">{total} đơn hàng được tìm thấy</p>
           </div>
           <div>
             <Link href="/admin/orders/new" className="inline-flex items-center justify-center gap-2 bg-pink-600 text-white font-bold px-4 py-2 rounded-xl shadow-md shadow-pink-200 hover:bg-pink-700 transition-colors">
@@ -102,7 +123,7 @@ export default async function AdminOrdersPage({
                 name="search"
                 defaultValue={params.search}
                 placeholder="Tìm mã đơn, tên, sđt..."
-                className="w-full pl-10 pr-4 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 bg-gray-50/50 hover:bg-gray-50 transition-colors"
               />
             </div>
             <div className="relative">
@@ -111,6 +132,7 @@ export default async function AdminOrdersPage({
                 type="date"
                 name="startDate"
                 defaultValue={params.startDate}
+                max={params.endDate || today}
                 className="w-full pl-10 pr-4 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-500"
               />
             </div>
@@ -120,6 +142,8 @@ export default async function AdminOrdersPage({
                 type="date"
                 name="endDate"
                 defaultValue={params.endDate}
+                max={today}
+                min={params.startDate}
                 className="w-full pl-10 pr-4 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-500"
               />
             </div>
@@ -156,10 +180,10 @@ export default async function AdminOrdersPage({
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50">
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+          <div className="overflow-x-auto max-h-[calc(100vh-280px)] custom-scrollbar">
+            <table className="w-full text-sm relative">
+              <thead className="bg-gray-50/90 backdrop-blur-sm sticky top-0 z-10 shadow-sm">
                 <tr>
                   <th className="text-left px-4 py-3 font-semibold text-gray-600">Mã đơn</th>
                   <th className="text-left px-4 py-3 font-semibold text-gray-600">Khách hàng</th>
@@ -195,13 +219,19 @@ export default async function AdminOrdersPage({
                         <p className="text-gray-400 text-xs">{order.customerPhone}</p>
                       </td>
                       <td className="px-4 py-3 hidden lg:table-cell">
-                        <p className="text-gray-600 text-xs">
-                          {order.items
-                            .slice(0, 2)
-                            .map((i) => i.product.name)
-                            .join(", ")}
-                          {order.items.length > 2 && ` +${order.items.length - 2}`}
-                        </p>
+                        <div className="text-gray-600 text-xs leading-relaxed max-w-[250px]">
+                          <p className="line-clamp-2">
+                            {order.items
+                              .slice(0, 2)
+                              .map((i) => i.product.name)
+                              .join(", ")}
+                          </p>
+                          {order.items.length > 2 && (
+                            <span className="text-pink-600 font-semibold block mt-0.5">
+                              +{order.items.length - 2} sản phẩm khác...
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-4 py-3 text-right hidden sm:table-cell">
                         <span className="font-bold text-gray-800">
@@ -262,6 +292,7 @@ export default async function AdminOrdersPage({
               </tbody>
             </table>
           </div>
+          <Pagination totalPages={totalPages} />
         </div>
       </div>
     </div>

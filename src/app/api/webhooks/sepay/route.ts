@@ -4,6 +4,12 @@ import { sendDepositConfirmedEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
+    const authHeader = req.headers.get("authorization");
+    // Require Authorization: Bearer <token> or Apikey <token>
+    if (process.env.SEPAY_WEBHOOK_SECRET && authHeader !== `Bearer ${process.env.SEPAY_WEBHOOK_SECRET}` && authHeader !== `Apikey ${process.env.SEPAY_WEBHOOK_SECRET}`) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const data = await req.json();
     
     // Payload mẫu của SePay:

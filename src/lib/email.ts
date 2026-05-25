@@ -48,6 +48,7 @@ function wrapEmailHtml(content: string): string {
         <div class="footer">
           <p>💕 Cảm ơn cậu đã ủng hộ Tinori!</p>
           <p>© Tinori Shop - Phụ kiện dễ thương</p>
+          <p style="font-style: italic; color: #b3b3b3; margin-top: 12px; font-size: 11px;">* Vui lòng không phản hồi lại email này vì đây là email tự động.</p>
         </div>
       </div>
     </body>

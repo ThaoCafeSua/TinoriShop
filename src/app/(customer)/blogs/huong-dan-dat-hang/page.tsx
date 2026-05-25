@@ -1,4 +1,3 @@
-import { CheckCircle, ShieldCheck, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -18,81 +17,97 @@ export default function GuideBlogPage() {
         {/* Content */}
         <div className="bg-white rounded-3xl shadow-sm p-6 md:p-10 space-y-10">
           
-          {/* Section 1: Hướng dẫn */}
+          {/* Section 1: Cách đặt hàng */}
           <section>
             <h2 className="text-2xl font-bold text-pink-600 mb-6 flex items-center gap-2">
-              <span className="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center text-pink-600 text-sm">1</span>
-              Cách đặt hàng cực dễ
+              <span className="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center text-pink-600 text-sm font-black">1</span>
+              Cách đặt hàng
             </h2>
             <div className="space-y-4 text-gray-600">
-              <div className="flex gap-4">
+              <div className="flex gap-4 items-start">
                 <div className="w-1.5 h-1.5 bg-pink-400 rounded-full mt-2 shrink-0"></div>
-                <p><strong>Bước 1:</strong> Dạo quanh shop, chọn những món đồ bạn yêu thích và thêm vào giỏ hàng.</p>
+                <p>Chọn sản phẩm bạn yêu thích và thêm vào giỏ hàng.</p>
               </div>
-              <div className="flex gap-4">
+              <div className="flex gap-4 items-start">
                 <div className="w-1.5 h-1.5 bg-pink-400 rounded-full mt-2 shrink-0"></div>
-                <p><strong>Bước 2:</strong> Điền đầy đủ thông tin nhận hàng (Nhớ kiểm tra kỹ số điện thoại để shipper gọi nha).</p>
+                <p>Điền đầy đủ thông tin nhận hàng.</p>
               </div>
-              <div className="flex gap-4">
+              <div className="flex gap-4 items-start">
                 <div className="w-1.5 h-1.5 bg-pink-400 rounded-full mt-2 shrink-0"></div>
-                <p><strong>Bước 3:</strong> Hoàn tất đặt hàng và tiến hành <strong>chuyển khoản cọc 25.000đ</strong>. (Shop có hỗ trợ mã QR siêu tiện lợi!)</p>
+                <p>Hoàn tất đặt hàng và chuyển khoản cọc <strong>25.000đ</strong>.</p>
               </div>
-              <div className="flex gap-4">
+              <div className="flex gap-4 items-start">
                 <div className="w-1.5 h-1.5 bg-pink-400 rounded-full mt-2 shrink-0"></div>
-                <p><strong>Bước 4:</strong> Upload ảnh chụp màn hình chuyển khoản thành công và chờ nhận hàng thôi!</p>
+                <p>Tinori xác nhận đơn và chuẩn bị gửi hàng cho bạn ♡</p>
               </div>
             </div>
           </section>
 
-          {/* Section 2: Tại sao phải cọc */}
+          {/* Section 2: Về khoản cọc */}
           <section>
             <h2 className="text-2xl font-bold text-pink-600 mb-6 flex items-center gap-2">
-              <span className="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center text-pink-600 text-sm">2</span>
-              Tại sao lại cần cọc 25.000đ nhỉ?
+              <span className="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center text-pink-600 text-sm font-black">2</span>
+              Về khoản cọc 25.000đ
             </h2>
-            <div className="bg-pink-50 rounded-2xl p-6 border border-pink-100">
-              <p className="text-gray-700 mb-4 leading-relaxed">
-                Tinori rất buồn khi thỉnh thoảng lại gặp những đơn hàng "ảo", shipper giao đến nơi thì không liên lạc được, hàng hoàn về vừa hỏng form vừa tốn kém phí vận chuyển của cả hai chiều (hơn 50k lận đó 😢).
-              </p>
-              <p className="text-gray-700 mb-6 leading-relaxed">
-                Do đó, mức cọc nhỏ xíu <strong>25.000đ</strong> như một lời hứa hẹn xinh xắn giữa chúng mình, giúp Tinori yên tâm đóng gói thật đẹp và gửi đi nhanh nhất cho bạn.
+            <div className="bg-pink-50 rounded-2xl p-6 border border-pink-100 space-y-5">
+              <p className="text-gray-700 leading-relaxed">
+                Khoản cọc <strong>25.000đ</strong> được áp dụng để hạn chế tình trạng đặt đơn ảo hoặc đặt hàng nhưng không nhận hàng.
               </p>
 
               <div className="grid sm:grid-cols-2 gap-4">
-                <div className="bg-white p-4 rounded-xl flex items-start gap-3">
-                  <ShieldCheck className="h-6 w-6 text-green-500 shrink-0" />
-                  <div>
-                    <p className="font-bold text-gray-800 text-sm">Chắc chắn nhận hàng</p>
-                    <p className="text-xs text-gray-500 mt-1">Hàng hot thường hết rất nhanh, cọc giúp bạn giữ được món đồ yêu thích.</p>
-                  </div>
+                <div className="bg-white p-5 rounded-xl">
+                  <p className="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2">
+                    <span className="text-green-500 text-lg">✓</span>
+                    Đơn giao thành công
+                  </p>
+                  <p className="text-xs text-gray-500 leading-relaxed">
+                    25.000đ sẽ được <strong>trừ trực tiếp</strong> vào tổng thanh toán khi nhận hàng nha ♡
+                  </p>
                 </div>
-                <div className="bg-white p-4 rounded-xl flex items-start gap-3">
-                  <CheckCircle className="h-6 w-6 text-pink-500 shrink-0" />
-                  <div>
-                    <p className="font-bold text-gray-800 text-sm">Trừ thẳng vào tiền COD</p>
-                    <p className="text-xs text-gray-500 mt-1">25k này sẽ được trừ thẳng vào tổng tiền khi bạn nhận hàng nhé!</p>
-                  </div>
+                <div className="bg-white p-5 rounded-xl">
+                  <p className="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2">
+                    <span className="text-orange-500 text-lg">⚠</span>
+                    Giao hàng không thành công
+                  </p>
+                  <p className="text-xs text-gray-500 leading-relaxed">
+                    Các trường hợp: không nhận hàng, không liên lạc được, đơn bị hoàn về — khoản cọc 25.000đ sẽ được dùng để hỗ trợ <strong>chi phí vận chuyển hoàn hàng</strong> cho Tinori.
+                  </p>
                 </div>
+              </div>
+
+              <p className="text-sm text-[#d53c83] font-semibold text-center pt-2">
+                Vì vậy các cậu hãy chắc chắn trước khi đặt hàng giúp Tinori nha ✨
+              </p>
+            </div>
+          </section>
+
+          {/* Section 3: Lưu ý nhỏ */}
+          <section>
+            <h2 className="text-2xl font-bold text-pink-600 mb-6 flex items-center gap-2">
+              <span className="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center text-pink-600 text-sm font-black">3</span>
+              Lưu ý nhỏ
+            </h2>
+            <div className="space-y-3 text-gray-600">
+              <div className="flex gap-4 items-start">
+                <div className="w-1.5 h-1.5 bg-pink-400 rounded-full mt-2 shrink-0"></div>
+                <p>Đơn hàng sẽ <strong>tự động hủy sau 24 giờ</strong> nếu shop chưa nhận được cọc.</p>
+              </div>
+              <div className="flex gap-4 items-start">
+                <div className="w-1.5 h-1.5 bg-pink-400 rounded-full mt-2 shrink-0"></div>
+                <p>Miễn phí vận chuyển cho đơn từ <strong>250.000đ</strong>.</p>
+              </div>
+              <div className="flex gap-4 items-start">
+                <div className="w-1.5 h-1.5 bg-pink-400 rounded-full mt-2 shrink-0"></div>
+                <p>Nếu cần hỗ trợ, hãy inbox fanpage Tinori nha ♡</p>
               </div>
             </div>
           </section>
 
-          {/* Section 3: Lưu ý */}
-          <section>
-            <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <AlertCircle className="text-orange-500" />
-              Lưu ý quan trọng
-            </h2>
-            <ul className="list-disc list-inside space-y-2 text-gray-600">
-              <li>Đơn hàng sẽ tự động hủy nếu shop <strong>không nhận được cọc trong vòng 24 giờ</strong>.</li>
-              <li>Nhớ ghi đúng nội dung chuyển khoản: <code className="bg-gray-100 px-2 py-0.5 rounded text-pink-600">COC [Mã Đơn Hàng]</code>.</li>
-              <li>Trường hợp bạn lỡ chuyển sai nội dung, hãy liên hệ ngay qua Fanpage Tinori để được hỗ trợ nhé.</li>
-            </ul>
-          </section>
-
-          <div className="text-center pt-6 border-t">
+          {/* Footer CTA */}
+          <div className="text-center pt-6 border-t border-pink-100">
+            <p className="text-sm text-gray-500 mb-5">Cảm ơn bạn đã ghé qua ngôi nhà nhỏ của Tinori 🎀</p>
             <Link href="/products">
-              <Button size="lg" className="bg-pink-600 hover:bg-pink-700 rounded-full px-8">
+              <Button size="lg" className="bg-[#d53c83] hover:opacity-90 rounded-full px-8 font-bold shadow-lg shadow-pink-200">
                 Bắt đầu mua sắm ngay 🛍️
               </Button>
             </Link>

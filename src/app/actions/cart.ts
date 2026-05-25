@@ -7,31 +7,55 @@ export async function validateCartItems(itemIds: { productId: string; variantId?
   if (itemIds.length === 0) return [];
 
   const productIds = Array.from(new Set(itemIds.map(i => i.productId)));
-  const variantIds = Array.from(new Set(itemIds.filter(i => i.variantId).map(i => i.variantId!)));
 
-  const activeProducts = await prisma.product.findMany({
+  const products = await prisma.product.findMany({
     where: {
       id: { in: productIds },
-      active: true,
     },
-    select: { id: true },
+    select: {
+      id: true,
+      active: true,
+      price: true,
+      salePrice: true,
+      stock: true,
+      variants: {
+        select: {
+          id: true,
+          active: true,
+          price: true,
+          salePrice: true,
+          stock: true,
+        }
+      }
+    },
   });
 
-  const activeVariants = await prisma.productVariant.findMany({
-    where: {
-      id: { in: variantIds },
-      active: true,
-    },
-    select: { id: true },
-  });
+  const productMap = new Map(products.map(p => [p.id, p]));
 
-  const activeProductIds = new Set(activeProducts.map(p => p.id));
-  const activeVariantIds = new Set(activeVariants.map(v => v.id));
+  return itemIds.map(item => {
+    const p = productMap.get(item.productId);
+    if (!p || !p.active) {
+      return { ...item, valid: false };
+    }
 
-  // Return items that are NO LONGER valid
-  return itemIds.filter(item => {
-    if (!activeProductIds.has(item.productId)) return true;
-    if (item.variantId && !activeVariantIds.has(item.variantId)) return true;
-    return false;
+    if (item.variantId) {
+      const v = p.variants.find(v => v.id === item.variantId);
+      if (!v || !v.active) {
+        return { ...item, valid: false };
+      }
+      return {
+        ...item,
+        valid: true,
+        price: v.salePrice || v.price || p.salePrice || p.price,
+        maxStock: v.stock,
+      };
+    }
+
+    return {
+      ...item,
+      valid: true,
+      price: p.salePrice || p.price,
+      maxStock: p.stock,
+    };
   });
 }

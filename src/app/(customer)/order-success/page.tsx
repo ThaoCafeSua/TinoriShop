@@ -32,7 +32,7 @@ interface Order {
     id: string;
     quantity: number;
     price: number;
-    product: { name: string };
+    product: { name: string; fulfillmentType?: string };
     variant?: { name: string; value: string } | null;
   }[];
 }
@@ -149,6 +149,17 @@ function OrderSuccessContent() {
     { icon: <Map className="h-4 w-4 text-cyan-600" />, label: "Quận/Huyện", value: order.district, bgColor: "bg-cyan-100" },
     { icon: <MapPin className="h-4 w-4 text-red-600" />, label: "Tỉnh/Thành phố", value: order.province, bgColor: "bg-red-100" },
   ];
+
+  const hasPreorder = order.items.some(item => item.product.fulfillmentType === "preorder");
+  const hasInStock = order.items.some(item => item.product.fulfillmentType !== "preorder");
+  const isMixed = hasPreorder && hasInStock;
+
+  const handleMessengerClick = () => {
+    const msg = `Chào Tinori ♡\nMình vừa đặt đơn #${order.code} nha.`;
+    navigator.clipboard.writeText(msg);
+    toast({ title: "Đã sao chép tin nhắn! Bạn dán (paste) vào Messenger nha ♡" });
+    window.open("https://m.me/tinori.official", "_blank");
+  };
 
   return (
     <div className="relative min-h-screen">
@@ -277,7 +288,7 @@ function OrderSuccessContent() {
             {[
               { step: "1", title: "Chuyển khoản đặt cọc", desc: `Chuyển 25.000đ với nội dung "Đặt cọc mã đơn hàng ${code}"`, color: "bg-pink-100 text-pink-700" },
               { step: "2", title: "Admin xác nhận cọc", desc: "Shop sẽ kiểm tra và xác nhận đơn", color: "bg-blue-100 text-blue-700" },
-              { step: "3", title: "Đóng gói và giao hàng", desc: "Thời gian giao hàng 2-5 ngày", color: "bg-green-100 text-green-700" },
+              { step: "3", title: "Đóng gói và giao hàng", desc: hasPreorder ? "Hàng có sẵn: 2-5 ngày, Hàng đặt trước: 7-14 ngày" : "Hàng có sẵn thời gian giao 2-5 ngày", color: "bg-green-100 text-green-700" },
             ].map((s) => (
               <div key={s.step} className="flex gap-3">
                 <div className={`w-8 h-8 rounded-full ${s.color} flex items-center justify-center font-bold text-sm flex-shrink-0`}>
@@ -374,20 +385,41 @@ function OrderSuccessContent() {
         </div>
       )}
 
+      {/* Messenger Order Button */}
       <div className="bg-pink-50 rounded-2xl p-6 mb-6">
-        <h2 className="text-lg font-bold text-pink-900 mb-2 flex items-center gap-2">
-          <MessageCircle className="h-5 w-5" />
-          Cần hỗ trợ?
-        </h2>
-        <p className="text-sm text-pink-700 mb-4">
-          Nhắn tin trực tiếp cho Tinori qua Facebook để được hỗ trợ nhanh nhất
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center shrink-0">
+            <MessageCircle className="h-5 w-5 text-pink-600" />
+          </div>
+          <h2 className="text-lg font-black text-pink-900">Gửi đơn qua Messenger</h2>
+        </div>
+        
+        {hasPreorder && (
+          <div className="mb-4 bg-white/60 p-3 rounded-xl border border-pink-100 text-sm text-pink-800 flex gap-2">
+            <AlertCircle className="h-5 w-5 shrink-0 text-pink-500" />
+            <p>
+              {isMixed 
+                ? "Đơn hàng có kèm sản phẩm đặt trước nên toàn bộ đơn sẽ cần khoảng 14 ngày xử lý nha ♡" 
+                : "Hàng đặt trước cần khoảng 14 ngày xử lý ♡"}<br />
+              Cậu có thể nhắn Tinori để được cập nhật nhanh hơn.
+            </p>
+          </div>
+        )}
+        {!hasPreorder && (
+          <p className="text-sm text-pink-700 mb-4">
+            Khách yêu có thể nhắn mã đơn cho shop để shop xác nhận và ưu tiên chuẩn bị hàng nhanh hơn nha ♡
+          </p>
+        )}
+
+        <Button 
+          onClick={handleMessengerClick}
+          className="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold h-12 rounded-xl text-base shadow-md shadow-pink-200 transition-all mb-2"
+        >
+          Nhắn Tinori xác nhận đơn ♡
+        </Button>
+        <p className="text-xs text-center text-pink-600 font-medium">
+          *Hệ thống sẽ tự động copy mã đơn. Bạn chỉ cần dán (paste) tin nhắn vào khung chat Messenger nhé ♡
         </p>
-        <a href="https://www.facebook.com/tinori.official" target="_blank" rel="noopener noreferrer">
-          <Button className="w-full">
-            <ExternalLink className="h-4 w-4 mr-2" />
-            Nhắn tin Facebook Tinori
-          </Button>
-        </a>
       </div>
 
       <div className="flex flex-col gap-3">

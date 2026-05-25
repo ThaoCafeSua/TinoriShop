@@ -5,7 +5,7 @@ import { useCart } from "@/hooks/useCart";
 import { validateCartItems } from "@/app/actions/cart";
 
 export default function CartSync() {
-  const { items, removeItem } = useCart();
+  const { items, syncItems } = useCart();
 
   useEffect(() => {
     const syncCart = async () => {
@@ -17,19 +17,40 @@ export default function CartSync() {
       }));
 
       try {
-        const invalidItems = await validateCartItems(itemsToValidate);
+        const validatedItems = await validateCartItems(itemsToValidate);
         
-        if (invalidItems.length > 0) {
-          // Remove invalid items from cart
-          invalidItems.forEach(invalid => {
-            const itemToRemove = items.find(i => 
-              i.productId === invalid.productId && 
-              i.variantId === invalid.variantId
-            );
-            if (itemToRemove) {
-              removeItem(itemToRemove.id);
+        let hasChanges = false;
+        const newItems = [...items];
+
+        for (const validItem of validatedItems) {
+          const index = newItems.findIndex(
+            i => i.productId === validItem.productId && i.variantId === validItem.variantId
+          );
+          
+          if (index !== -1) {
+            if (!validItem.valid) {
+              // Item is no longer active, remove it
+              newItems.splice(index, 1);
+              hasChanges = true;
+            } else if ('price' in validItem) {
+              // Update price and maxStock if they have changed
+              const item = newItems[index];
+              if (item.price !== validItem.price || item.maxStock !== validItem.maxStock) {
+                newItems[index] = {
+                  ...item,
+                  price: validItem.price as number,
+                  maxStock: validItem.maxStock as number,
+                  // Ensure quantity doesn't exceed new maxStock
+                  quantity: Math.min(item.quantity, validItem.maxStock as number)
+                };
+                hasChanges = true;
+              }
             }
-          });
+          }
+        }
+
+        if (hasChanges) {
+          syncItems(newItems);
         }
       } catch (error) {
         console.error("Failed to sync cart:", error);
@@ -37,8 +58,6 @@ export default function CartSync() {
     };
 
     syncCart();
-    // Only run on mount to avoid infinite loops if removeItem triggers re-render 
-    // (though removeItem is stable from zustand)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

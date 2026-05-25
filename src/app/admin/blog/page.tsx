@@ -7,6 +7,9 @@ import {
   Loader2, Plus, Pencil, Trash2, ImageIcon, X, Check, Newspaper, Upload
 } from "lucide-react";
 import { toast } from "@/hooks/useToast";
+import { useSearchParams } from "next/navigation";
+import Pagination from "@/components/admin/Pagination";
+import { Suspense } from "react";
 
 interface BlogPost {
   id: string;
@@ -22,6 +25,14 @@ interface BlogPost {
 const emptyForm = { title: "", content: "", image: "" as string | null, videoUrl: "" as string | null, active: true };
 
 export default function AdminBlogPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center p-8"><Loader2 className="h-8 w-8 animate-spin text-pink-500" /></div>}>
+      <AdminBlogContent />
+    </Suspense>
+  );
+}
+
+function AdminBlogContent() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -30,6 +41,10 @@ export default function AdminBlogPage() {
   const [saving, setSaving] = useState(false);
   const [uploadingImg, setUploadingImg] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const searchParams = useSearchParams();
+  const page = Number(searchParams.get("page")) || 1;
+  const limit = 20;
 
   const fetchPosts = async () => {
     try {
@@ -145,6 +160,9 @@ export default function AdminBlogPage() {
     });
     fetchPosts();
   };
+
+  const totalPages = Math.ceil(posts.length / limit);
+  const paginatedPosts = posts.slice((page - 1) * limit, page * limit);
 
   return (
     <div className="lg:pl-64">
@@ -267,15 +285,15 @@ export default function AdminBlogPage() {
         {loading ? (
           <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-pink-600" /></div>
         ) : posts.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-2xl shadow-sm">
+          <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-100">
             <div className="text-gray-300 mb-4"><Newspaper className="h-12 w-12 mx-auto" /></div>
             <p className="text-gray-500 font-medium">Chưa có tin tức nào</p>
             <p className="text-gray-400 text-sm mt-1">Bấm "Thêm tin tức" để bắt đầu</p>
           </div>
         ) : (
           <div className="space-y-3">
-            {posts.map((post) => (
-              <div key={post.id} className={`bg-white rounded-2xl shadow-sm border-2 p-4 flex gap-4 items-start transition-all ${post.active ? "border-pink-100" : "border-gray-100 opacity-60"}`}>
+            {paginatedPosts.map((post) => (
+              <div key={post.id} className={`bg-white rounded-2xl shadow-sm border p-4 flex gap-4 items-start transition-all ${post.active ? "border-gray-200 hover:border-pink-200" : "border-gray-100 opacity-60"}`}>
                 {post.image ? (
                   <img src={post.image} alt={post.title} className="w-20 h-20 rounded-xl object-cover flex-shrink-0 border border-gray-100" />
                 ) : (
@@ -306,6 +324,9 @@ export default function AdminBlogPage() {
                 </div>
               </div>
             ))}
+            <div className="pt-4">
+              <Pagination totalPages={totalPages} />
+            </div>
           </div>
         )}
       </div>

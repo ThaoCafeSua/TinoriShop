@@ -12,11 +12,12 @@ import {
   DollarSign,
   Users,
   Calendar,
-  MousePointerClick,
+  AlertTriangle,
+  Heart,
 } from "lucide-react";
 import Link from "next/link";
-import AutoRefresh from "@/components/AutoRefresh";
 import SystemMaintenance from "@/components/admin/SystemMaintenance";
+import RevenueChart from "@/components/admin/dashboard/RevenueChart";
 
 interface DashboardParams {
   startDate?: string;
@@ -28,9 +29,20 @@ async function getStats(params: DashboardParams) {
   const dateWhere: any = {};
   if (startDate || endDate) {
     dateWhere.createdAt = {};
-    if (startDate) dateWhere.createdAt.gte = new Date(startDate);
-    if (endDate) {
-      const end = new Date(endDate);
+    let start = startDate ? new Date(startDate) : null;
+    let end = endDate ? new Date(endDate) : null;
+    
+    // Swap if start > end
+    if (start && end && start > end) {
+      const temp = start;
+      start = end;
+      end = temp;
+    }
+    
+    if (start) {
+      dateWhere.createdAt.gte = start;
+    }
+    if (end) {
       end.setHours(23, 59, 59, 999);
       dateWhere.createdAt.lte = end;
     }
@@ -46,69 +58,155 @@ async function getStats(params: DashboardParams) {
     visitsWhere.createdAt = { gte: startOfToday };
   }
 
-  // Gộp queries để giảm số lần gọi DB: 13 → 6
+  // New Queries for Dashboard v2
   const [
     ordersByStatus,
     revenueData,
     totalProducts,
-    totalVisits,
     lowStockProducts,
+    outOfStockProducts,
+    allOrders, // For top products and preorder stats
+    newCustomers,
   ] = await Promise.all([
-    // 1. Đếm đơn hàng theo status (1 query thay vì 4)
     prisma.order.groupBy({
       by: ["status"],
       _count: true,
       where: dateWhere,
     }),
-    // 2. Tính doanh thu các khoảng thời gian (1 raw query thay vì 4 aggregate)
     prisma.order.findMany({
       where: {
         status: { in: ["COMPLETED", "SHIPPING", "CONFIRMED"] },
+        ...dateWhere,
       },
       select: { totalAmount: true, createdAt: true },
     }),
-    // 3-5. Các query nhẹ
     prisma.product.count({ where: { active: true } }),
-    prisma.pageVisit.count({ where: visitsWhere }),
     prisma.product.findMany({
-      where: { stock: { lt: 5 }, active: true },
+      where: { stock: { lt: 5, gt: 0 }, active: true },
       select: { id: true, name: true, stock: true },
-      take: 12,
+      take: 5,
     }),
+    prisma.product.findMany({
+      where: { stock: 0, active: true },
+      select: { id: true, name: true, stock: true },
+      take: 5,
+    }),
+    // Fetch recent valid orders to calculate top products and preorder stats
+    prisma.order.findMany({
+      where: {
+        status: { not: "CANCELLED" },
+        ...dateWhere,
+      },
+      select: {
+        createdAt: true,
+        status: true,
+        customerPhone: true,
+        items: {
+          select: {
+            quantity: true,
+            price: true,
+            product: { select: { id: true, name: true, fulfillmentType: true } }
+          }
+        }
+      }
+    }),
+    // Estimate new customers by unique phones in this period (naive approach for speed)
+    prisma.order.findMany({
+      where: dateWhere,
+      distinct: ['customerPhone'],
+      select: { customerPhone: true }
+    })
   ]);
 
-  // Tính toán từ kết quả groupBy
   const statusCounts = Object.fromEntries(
     ordersByStatus.map((s) => [s.status, s._count])
   );
   const totalOrders = ordersByStatus.reduce((sum, s) => sum + s._count, 0);
 
-  // Tính doanh thu từ 1 kết quả
-  let totalRevenue = 0, todayRevenue = 0, weekRevenue = 0, monthRevenue = 0;
-  let todayOrders = 0;
+  let totalRevenue = 0;
+  // Prepare daily data for the past 365 days (max) or just use revenueData to group by day
+  const revenueMap: Record<string, { revenue: number, orders: number }> = {};
+  
   for (const order of revenueData) {
     totalRevenue += order.totalAmount;
-    const created = new Date(order.createdAt);
-    if (created >= startOfToday) todayRevenue += order.totalAmount;
-    if (created >= startOfWeek) weekRevenue += order.totalAmount;
-    if (created >= startOfMonth) monthRevenue += order.totalAmount;
+    
+    // YYYY-MM-DD
+    const dateKey = new Date(order.createdAt).toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' });
+    if (!revenueMap[dateKey]) {
+      revenueMap[dateKey] = { revenue: 0, orders: 0 };
+    }
+    revenueMap[dateKey].revenue += order.totalAmount;
+    revenueMap[dateKey].orders += 1;
   }
-  // Đếm đơn hôm nay từ groupBy (tất cả status)
-  todayOrders = ordersByStatus.reduce((sum, s) => sum + s._count, 0); // Sẽ lọc riêng nếu cần
+  
+  // Create an array of the last 365 days
+  const chartData = [];
+  for (let i = 364; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    const dateKey = d.toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' });
+    chartData.push({
+      date: dateKey,
+      revenue: revenueMap[dateKey]?.revenue || 0,
+      orders: revenueMap[dateKey]?.orders || 0,
+    });
+  }
+
+  // Calculate top products and preorder stats
+  const productStats: Record<string, { name: string; qty: number; rev: number; isPreorder: boolean }> = {};
+  let totalPreorders = 0;
+  let overduePreorders = 0;
+
+  allOrders.forEach(order => {
+    let hasPreorder = false;
+    order.items.forEach(item => {
+      const pId = item.product.id;
+      if (!productStats[pId]) {
+        productStats[pId] = { name: item.product.name, qty: 0, rev: 0, isPreorder: item.product.fulfillmentType === 'preorder' };
+      }
+      productStats[pId].qty += item.quantity;
+      productStats[pId].rev += item.price * item.quantity;
+      if (item.product.fulfillmentType === 'preorder') hasPreorder = true;
+    });
+
+    if (hasPreorder) {
+      totalPreorders++;
+      // If older than 10 days and not completed
+      const ageInDays = (now.getTime() - new Date(order.createdAt).getTime()) / (1000 * 3600 * 24);
+      if (ageInDays > 10 && order.status !== 'COMPLETED' && order.status !== 'SHIPPING') {
+        overduePreorders++;
+      }
+    }
+  });
+
+  const topProducts = Object.values(productStats)
+    .sort((a, b) => b.qty - a.qty)
+    .slice(0, 5);
+
+  const topPreorderProducts = Object.values(productStats)
+    .filter(p => p.isPreorder)
+    .sort((a, b) => b.qty - a.qty)
+    .slice(0, 5);
 
   return {
     totalOrders,
     pendingConfirmOrders: statusCounts["PENDING_CONFIRM"] || 0,
     confirmedOrders: statusCounts["CONFIRMED"] || 0,
     shippingOrders: statusCounts["SHIPPING"] || 0,
+    completedOrders: statusCounts["COMPLETED"] || 0,
+    cancelledOrders: statusCounts["CANCELLED"] || 0,
     totalRevenue,
-    todayRevenue,
-    weekRevenue,
-    monthRevenue,
+    chartData,
     totalProducts,
-    todayOrders,
-    totalVisits,
     lowStockProducts,
+    outOfStockProducts,
+    newCustomersCount: newCustomers.length,
+    topProducts,
+    preorderStats: {
+      total: totalPreorders,
+      overdue: overduePreorders,
+      topProducts: topPreorderProducts
+    }
   };
 }
 
@@ -139,55 +237,55 @@ export default async function DashboardPage({
   const params = await searchParams;
   const [stats, recentOrders] = await Promise.all([getStats(params), getRecentOrders()]);
 
+  const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Ho_Chi_Minh" });
+
   const statCards = [
-    {
-      title: "Hôm nay",
-      value: formatPrice(stats.todayRevenue),
-      icon: TrendingUp,
-      bg: "bg-green-50",
-      text: "text-green-600",
-    },
-    {
-      title: "7 ngày qua",
-      value: formatPrice(stats.weekRevenue),
-      icon: TrendingUp,
-      bg: "bg-blue-50",
-      text: "text-blue-600",
-    },
-    {
-      title: "Tháng này",
-      value: formatPrice(stats.monthRevenue),
-      icon: TrendingUp,
-      bg: "bg-purple-50",
-      text: "text-purple-600",
-    },
-    {
-      title: "Lượt truy cập",
-      value: stats.totalVisits,
-      icon: MousePointerClick,
-      bg: "bg-orange-50",
-      text: "text-orange-600",
-    },
-    {
-      title: "Chờ xác nhận cọc",
-      value: stats.pendingConfirmOrders,
-      icon: Clock,
-      bg: "bg-yellow-50",
-      text: "text-yellow-600",
-    },
     {
       title: "Tổng doanh thu",
       value: formatPrice(stats.totalRevenue),
       icon: DollarSign,
       bg: "bg-pink-50",
       text: "text-pink-600",
-      isLarge: true,
+    },
+    {
+      title: "Tổng đơn hàng",
+      value: stats.totalOrders,
+      icon: ShoppingBag,
+      bg: "bg-blue-50",
+      text: "text-blue-600",
+    },
+    {
+      title: "Khách hàng mới",
+      value: stats.newCustomersCount,
+      icon: Users,
+      bg: "bg-purple-50",
+      text: "text-purple-600",
+    },
+    {
+      title: "Sản phẩm đã bán",
+      value: stats.topProducts.reduce((sum, p) => sum + p.qty, 0) + "+",
+      icon: TrendingUp,
+      bg: "bg-green-50",
+      text: "text-green-600",
+    },
+    {
+      title: "Đơn chờ xử lý",
+      value: stats.pendingConfirmOrders,
+      icon: Clock,
+      bg: "bg-yellow-50",
+      text: "text-yellow-600",
+    },
+    {
+      title: "Đơn Pre-order",
+      value: stats.preorderStats.total,
+      icon: Package,
+      bg: "bg-indigo-50",
+      text: "text-indigo-600",
     },
   ];
 
   return (
     <div className="lg:pl-64">
-      <AutoRefresh interval={15000} />
       <AdminNav />
       <div className="p-4 sm:p-6 lg:p-8 pt-16 lg:pt-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
@@ -205,6 +303,7 @@ export default async function DashboardPage({
                 type="date"
                 name="startDate"
                 defaultValue={params.startDate}
+                max={params.endDate || today}
                 className="pl-9 pr-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-pink-500 outline-none"
               />
             </div>
@@ -215,6 +314,8 @@ export default async function DashboardPage({
                 type="date"
                 name="endDate"
                 defaultValue={params.endDate}
+                max={today}
+                min={params.startDate}
                 className="pl-9 pr-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-pink-500 outline-none"
               />
             </div>
@@ -224,119 +325,137 @@ export default async function DashboardPage({
         
         <SystemMaintenance />
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        {/* Overview Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
           {statCards.map((card, i) => {
             const Icon = card.icon;
             return (
               <div
                 key={i}
-                className={`bg-white rounded-2xl shadow-sm p-5 border border-transparent hover:border-pink-100 transition-all ${i === 5 ? "col-span-2 lg:col-span-1" : ""}`}
+                className="bg-white rounded-2xl shadow-sm p-4 border border-transparent hover:border-pink-100 transition-all flex flex-col items-center text-center"
               >
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{card.title}</p>
-                  <div className={`w-10 h-10 ${card.bg} rounded-xl flex items-center justify-center`}>
-                    <Icon className={`h-5 w-5 ${card.text}`} />
-                  </div>
+                <div className={`w-10 h-10 ${card.bg} rounded-full flex items-center justify-center mb-2`}>
+                  <Icon className={`h-5 w-5 ${card.text}`} />
                 </div>
-                <p className={`font-black ${card.isLarge ? "text-xl" : "text-2xl"} text-gray-900`}>
+                <p className="font-black text-xl text-gray-900 mb-0.5">
                   {card.value}
                 </p>
+                <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">{card.title}</p>
               </div>
             );
           })}
         </div>
 
-        {/* Low Stock Alerts */}
-        {stats.lowStockProducts.length > 0 && (
-          <div className="mb-8 bg-red-50 border border-red-100 rounded-2xl p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <Package className="h-5 w-5 text-red-600" />
-              <h2 className="text-lg font-black text-red-900">Cảnh báo hết hàng!</h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {stats.lowStockProducts.map((p) => (
-                <Link key={p.id} href={`/admin/products?search=${p.name}`} className="flex items-center justify-between bg-white p-3 rounded-xl border border-red-200 hover:border-red-400 transition-colors">
-                  <span className="text-sm font-bold text-gray-700 truncate mr-2">{p.name}</span>
-                  <span className={`${p.stock === 0 ? "bg-red-600" : "bg-orange-500"} text-white text-[10px] font-black px-2 py-1 rounded-full whitespace-nowrap`}>
-                    {p.stock === 0 ? "Hết hàng" : `Còn ${p.stock}`}
-                  </span>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
 
-        {/* Recent orders */}
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between p-5 border-b">
-            <h2 className="text-lg font-black text-gray-900">Đơn hàng gần đây</h2>
-            <Link
-              href="/admin/orders"
-              className="text-sm font-medium text-pink-600 hover:text-pink-700"
-            >
-              Xem tất cả
-            </Link>
+
+        {/* Charts & Top Products */}
+        <div className="grid lg:grid-cols-3 gap-6 mb-6">
+          <div className="lg:col-span-2">
+            <RevenueChart data={stats.chartData} />
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="text-left px-4 py-3 font-semibold text-gray-600">Mã đơn</th>
-                  <th className="text-left px-4 py-3 font-semibold text-gray-600">Khách hàng</th>
-                  <th className="text-left px-4 py-3 font-semibold text-gray-600 hidden sm:table-cell">Ngày đặt</th>
-                  <th className="text-right px-4 py-3 font-semibold text-gray-600">Giá trị</th>
-                  <th className="text-center px-4 py-3 font-semibold text-gray-600">Trạng thái</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                {recentOrders.map((order) => {
-                  const status = ORDER_STATUS_MAP[order.status] || {
-                    label: order.status,
-                    color: "bg-gray-100 text-gray-800",
-                  };
-                  return (
-                    <tr key={order.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-3">
-                        <Link
-                          href={`/admin/orders/${order.id}`}
-                          className="font-mono text-pink-600 hover:text-pink-700 font-semibold text-xs"
-                        >
-                          {order.code}
-                        </Link>
-                      </td>
-                      <td className="px-4 py-3">
-                        <p className="font-semibold text-gray-800">{order.customerName}</p>
-                        <p className="text-gray-400 text-xs">{order.customerPhone}</p>
-                      </td>
-                      <td className="px-4 py-3 hidden sm:table-cell text-gray-500 text-xs">
-                        {new Date(order.createdAt).toLocaleDateString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })}
-                      </td>
-                      <td className="px-4 py-3 text-right font-bold text-gray-800">
-                        {formatPrice(order.totalAmount)}
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <span
-                          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${status.color}`}
-                        >
-                          {status.label}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-                {recentOrders.length === 0 && (
-                  <tr>
-                    <td
-                      colSpan={5}
-                      className="px-4 py-12 text-center text-gray-400"
-                    >
-                      Chưa có đơn hàng nào
-                    </td>
-                  </tr>
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+            <h2 className="text-lg font-black text-gray-900 mb-4 flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-pink-500" /> Sản phẩm bán chạy
+            </h2>
+            <div className="space-y-4">
+              {stats.topProducts.map((p, idx) => (
+                <div key={idx} className="flex items-center justify-between">
+                  <div className="flex items-center gap-3 overflow-hidden">
+                    <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center font-bold text-gray-400 shrink-0 text-xs">
+                      #{idx + 1}
+                    </div>
+                    <p className="text-sm font-bold text-gray-800 truncate">{p.name}</p>
+                  </div>
+                  <div className="text-right shrink-0 ml-2">
+                    <p className="text-sm font-black text-pink-600">{p.qty} <span className="text-xs text-gray-400 font-medium">đã bán</span></p>
+                  </div>
+                </div>
+              ))}
+              {stats.topProducts.length === 0 && (
+                <p className="text-sm text-gray-400 text-center py-4">Chưa có dữ liệu</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Widgets */}
+        <div className="grid lg:grid-cols-2 gap-6 mb-6">
+          {/* Preorder Tracking */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+            <h2 className="text-lg font-black text-gray-900 mb-4 flex items-center gap-2">
+              <Package className="h-5 w-5 text-indigo-500" /> Thống kê Hàng đặt trước
+            </h2>
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="bg-indigo-50 rounded-xl p-3">
+                <p className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-1">Đơn Preorder</p>
+                <p className="text-2xl font-black text-indigo-700">{stats.preorderStats.total}</p>
+              </div>
+              <div className={`rounded-xl p-3 ${stats.preorderStats.overdue > 0 ? 'bg-red-50' : 'bg-gray-50'}`}>
+                <p className={`text-xs font-bold uppercase tracking-wider mb-1 ${stats.preorderStats.overdue > 0 ? 'text-red-400' : 'text-gray-400'}`}>Sắp quá hạn 14 ngày</p>
+                <p className={`text-2xl font-black ${stats.preorderStats.overdue > 0 ? 'text-red-600 flex items-center gap-2' : 'text-gray-700'}`}>
+                  {stats.preorderStats.overdue}
+                  {stats.preorderStats.overdue > 0 && <AlertTriangle className="h-5 w-5" />}
+                </p>
+              </div>
+            </div>
+            <div className="space-y-3">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Top Preorder</p>
+              {stats.preorderStats.topProducts.map((p, idx) => (
+                <div key={idx} className="flex justify-between items-center bg-gray-50 p-2 rounded-lg text-sm">
+                  <span className="font-semibold text-gray-700 truncate mr-2">{p.name}</span>
+                  <span className="font-bold text-indigo-600 shrink-0">{p.qty} đơn</span>
+                </div>
+              ))}
+              {stats.preorderStats.topProducts.length === 0 && (
+                <p className="text-sm text-gray-400 text-center py-2">Không có đơn đặt trước</p>
+              )}
+            </div>
+          </div>
+
+          {/* Inventory & Customers */}
+          <div className="space-y-6">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+              <h2 className="text-lg font-black text-gray-900 mb-4 flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-orange-500" /> Tồn kho
+              </h2>
+              <div className="space-y-3">
+                {stats.outOfStockProducts.length > 0 && (
+                  <div className="flex items-start gap-2 text-sm bg-red-50 text-red-700 p-3 rounded-xl border border-red-100">
+                    <span className="font-black shrink-0 mt-0.5">HẾT HÀNG:</span>
+                    <span className="leading-relaxed">
+                      {stats.outOfStockProducts.map(p => p.name).join(", ")}
+                    </span>
+                  </div>
                 )}
-              </tbody>
-            </table>
+                {stats.lowStockProducts.length > 0 && (
+                  <div className="flex items-start gap-2 text-sm bg-orange-50 text-orange-700 p-3 rounded-xl border border-orange-100">
+                    <span className="font-black shrink-0 mt-0.5">SẮP HẾT:</span>
+                    <span className="leading-relaxed">
+                      {stats.lowStockProducts.map(p => `${p.name} (${p.stock})`).join(", ")}
+                    </span>
+                  </div>
+                )}
+                {stats.outOfStockProducts.length === 0 && stats.lowStockProducts.length === 0 && (
+                  <div className="text-center text-sm text-gray-400 py-2">Tồn kho ổn định</div>
+                )}
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+               <h2 className="text-lg font-black text-gray-900 mb-4 flex items-center gap-2">
+                <Heart className="h-5 w-5 text-pink-500" /> Khách hàng
+              </h2>
+              <div className="flex gap-4">
+                <div className="flex-1 bg-gray-50 rounded-xl p-4 text-center border border-gray-100">
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Khách tương tác</p>
+                  <p className="text-2xl font-black text-gray-900">{stats.newCustomersCount}</p>
+                </div>
+                 <div className="flex-1 bg-gray-50 rounded-xl p-4 text-center border border-gray-100">
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Đơn gần đây</p>
+                  <p className="text-2xl font-black text-gray-900">{recentOrders.length}</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

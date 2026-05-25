@@ -37,11 +37,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session || (session.user as any).role !== 'admin') return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { id } = await params;
   const body = await req.json();
-  const { name, description, price, salePrice, stock, categoryId, featured, active, images, variants } = body;
+  const { name, description, price, salePrice, stock, categoryId, featured, active, images, variants, productType, fulfillmentType } = body;
 
   const existing = await prisma.product.findUnique({ where: { id } });
   if (!existing) return NextResponse.json({ error: "Không tìm thấy sản phẩm" }, { status: 404 });
@@ -70,6 +70,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       categoryId: categoryId !== undefined ? (categoryId || null) : existing.categoryId,
       featured: featured !== undefined ? featured : existing.featured,
       active: active !== undefined ? active : existing.active,
+      productType: productType !== undefined ? productType : existing.productType,
+      fulfillmentType: fulfillmentType !== undefined ? fulfillmentType : existing.fulfillmentType,
       images: images?.length
         ? {
             create: images.map((img: { url: string; alt?: string; isPrimary?: boolean }, i: number) => ({
@@ -103,7 +105,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session || (session.user as any).role !== 'admin') return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
     const { id } = await params;

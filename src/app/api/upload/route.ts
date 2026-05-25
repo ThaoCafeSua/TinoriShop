@@ -17,8 +17,8 @@ const MAX_SIZE = 10 * 1024 * 1024; // 10MB
  */
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session) {
-    return NextResponse.json({ error: "Chưa đăng nhập" }, { status: 401 });
+  if (!session || (session.user as any).role !== "admin") {
+    return NextResponse.json({ error: "Chưa đăng nhập hoặc không có quyền" }, { status: 401 });
   }
 
   try {

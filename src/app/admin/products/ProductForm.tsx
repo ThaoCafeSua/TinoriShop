@@ -41,6 +41,8 @@ interface ProductFormProps {
     stock: number;
     featured: boolean;
     active: boolean;
+    productType?: string;
+    fulfillmentType?: string;
     images: { id: string; url: string; isPrimary: boolean }[];
     variants: Variant[];
   };
@@ -54,6 +56,8 @@ export default function ProductForm({ product }: ProductFormProps) {
     product?.images || []
   );
   const [uploading, setUploading] = useState(false);
+  const [productType, setProductType] = useState(product?.productType || "STANDARD");
+  const [fulfillmentType, setFulfillmentType] = useState(product?.fulfillmentType || "in_stock");
 
   const {
     register,
@@ -70,6 +74,7 @@ export default function ProductForm({ product }: ProductFormProps) {
       stock: product?.stock || 0,
       featured: product?.featured || false,
       active: product?.active !== false,
+      fulfillmentType: (product?.fulfillmentType as "in_stock" | "preorder") || "in_stock",
     },
   });
 
@@ -277,6 +282,8 @@ export default function ProductForm({ product }: ProductFormProps) {
       salePrice: finalSalePrice,
       stock: finalStock,
       categoryId: null, // Always null as requested
+      productType,
+      fulfillmentType,
       images,
       variants: finalVariants,
     };
@@ -338,6 +345,86 @@ export default function ProductForm({ product }: ProductFormProps) {
               placeholder="Mô tả sản phẩm..."
               className="flex min-h-[120px] w-full rounded-xl border-2 border-gray-200 bg-white px-4 py-2 text-sm transition-colors placeholder:text-gray-400 focus:border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-100"
             />
+          </div>
+
+          <div>
+            <Label className="mb-1.5 block">Loại sản phẩm</Label>
+            <div className="flex gap-3">
+              <label
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 cursor-pointer transition-all ${
+                  productType === "STANDARD"
+                    ? "border-[#d53c83] bg-pink-50/60 text-[#d53c83]"
+                    : "border-gray-200 bg-white text-gray-500 hover:border-pink-200"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="productType"
+                  value="STANDARD"
+                  checked={productType === "STANDARD"}
+                  onChange={() => setProductType("STANDARD")}
+                  className="sr-only"
+                />
+                <span className="text-sm font-bold">Sản phẩm lẻ</span>
+              </label>
+              <label
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 cursor-pointer transition-all ${
+                  productType === "GIFT_BOX"
+                    ? "border-[#d53c83] bg-pink-50/60 text-[#d53c83]"
+                    : "border-gray-200 bg-white text-gray-500 hover:border-pink-200"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="productType"
+                  value="GIFT_BOX"
+                  checked={productType === "GIFT_BOX"}
+                  onChange={() => setProductType("GIFT_BOX")}
+                  className="sr-only"
+                />
+                <span className="text-sm font-bold">Hộp quà (Gift Box)</span>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <Label className="mb-1.5 block">Thời gian chuẩn bị hàng</Label>
+            <div className="flex gap-3">
+              <label
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 cursor-pointer transition-all ${
+                  fulfillmentType === "in_stock"
+                    ? "border-[#d53c83] bg-pink-50/60 text-[#d53c83]"
+                    : "border-gray-200 bg-white text-gray-500 hover:border-pink-200"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="fulfillmentType"
+                  value="in_stock"
+                  checked={fulfillmentType === "in_stock"}
+                  onChange={() => setFulfillmentType("in_stock")}
+                  className="sr-only"
+                />
+                <span className="text-sm font-bold">Hàng có sẵn</span>
+              </label>
+              <label
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 cursor-pointer transition-all ${
+                  fulfillmentType === "preorder"
+                    ? "border-[#d53c83] bg-pink-50/60 text-[#d53c83]"
+                    : "border-gray-200 bg-white text-gray-500 hover:border-pink-200"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="fulfillmentType"
+                  value="preorder"
+                  checked={fulfillmentType === "preorder"}
+                  onChange={() => setFulfillmentType("preorder")}
+                  className="sr-only"
+                />
+                <span className="text-sm font-bold">Hàng đặt trước (14 ngày)</span>
+              </label>
+            </div>
           </div>
 
           <div className="flex items-center gap-6 pt-2">

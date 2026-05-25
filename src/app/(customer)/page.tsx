@@ -49,7 +49,7 @@ export const dynamic = "force-dynamic";
 async function getFeaturedProducts() {
   try {
     return await prisma.product.findMany({
-      where: { featured: true, active: true },
+      where: { featured: true, active: true, productType: "STANDARD" },
       include: {
         images: { where: { isPrimary: true }, take: 1 },
         _count: { select: { variants: true } },
@@ -64,7 +64,22 @@ async function getFeaturedProducts() {
 async function getLatestProducts() {
   try {
     return await prisma.product.findMany({
-      where: { active: true },
+      where: { active: true, productType: "STANDARD" },
+      include: {
+        images: { where: { isPrimary: true }, take: 1 },
+        _count: { select: { variants: true } },
+        variants: { where: { active: true } },
+      },
+      take: 8,
+      orderBy: { createdAt: "desc" },
+    });
+  } catch { return []; }
+}
+
+async function getGiftBoxes() {
+  try {
+    return await prisma.product.findMany({
+      where: { active: true, productType: "GIFT_BOX" },
       include: {
         images: { where: { isPrimary: true }, take: 1 },
         _count: { select: { variants: true } },
@@ -114,9 +129,10 @@ async function getActiveVouchers() {
 }
 
 export default async function HomePage() {
-  const [featuredProducts, latestProducts, banners, posts, vouchers] = await Promise.all([
+  const [featuredProducts, latestProducts, giftBoxes, banners, posts, vouchers] = await Promise.all([
     getFeaturedProducts(),
     getLatestProducts(),
+    getGiftBoxes(),
     getActiveBanners(),
     getLatestPosts(),
     getActiveVouchers(),
@@ -150,8 +166,34 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ── Shopping Journey Split ── */}
+      <section className="max-w-5xl mx-auto px-4 -mt-6 mb-8 relative z-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Sản phẩm lẻ */}
+          <Link href="/products" className="group relative overflow-hidden rounded-2xl h-[180px] sm:h-[200px] block">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#fff1f2] via-[#ffe4e6] to-[#fecdd3] transition-transform duration-700 group-hover:scale-105"></div>
+            <div className="absolute inset-0 bg-[url('/brand/pattern-dots.png')] opacity-[0.04]"></div>
+            <div className="relative h-full flex flex-col items-center justify-center text-center p-6">
+              <h3 className="text-xl sm:text-2xl font-black text-[#9f1239] mb-1">Dành Riêng Cho Cậu</h3>
+              <p className="text-xs sm:text-sm text-[#be123c] font-medium opacity-80">Những món phụ kiện nhỏ xinh xắn đang chờ bạn</p>
+              <span className="mt-4 inline-block px-6 py-2 bg-white/60 backdrop-blur-sm text-[#9f1239] text-xs font-bold rounded-full shadow-sm group-hover:bg-white transition-colors">Ghé xem ngay</span>
+            </div>
+          </Link>
+          {/* Gift Box */}
+          <Link href="/products?type=gift-box" className="group relative overflow-hidden rounded-2xl h-[180px] sm:h-[200px] block">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#fdf2f8] via-[#fce7f3] to-[#fbcfe8] transition-transform duration-700 group-hover:scale-105"></div>
+            <div className="absolute inset-0 bg-[url('/brand/pattern-dots.png')] opacity-[0.04]"></div>
+            <div className="relative h-full flex flex-col items-center justify-center text-center p-6">
+              <h3 className="text-xl sm:text-2xl font-black text-[#be185d] mb-1">Trao Gửi Yêu Thương</h3>
+              <p className="text-xs sm:text-sm text-[#db2777] font-medium opacity-80">Hộp quà ngọt ngào gói ghém trọn vẹn tình cảm</p>
+              <span className="mt-4 inline-block px-6 py-2 bg-white/60 backdrop-blur-sm text-[#be185d] text-xs font-bold rounded-full shadow-sm group-hover:bg-white transition-colors">Chọn quà nha</span>
+            </div>
+          </Link>
+        </div>
+      </section>
+
       {/* ── Elegant Responsive Brand Stats Bar ── */}
-      <div className="max-w-md md:max-w-6xl mx-auto px-4 relative z-20 -mt-10 mb-6">
+      <div className="max-w-md md:max-w-6xl mx-auto px-4 relative z-20 mb-12">
         <div className="bg-white rounded-3xl md:rounded-full border border-pink-100/80 p-6 md:py-3.5 md:px-4">
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4 md:gap-0 items-center">
             {[
@@ -422,8 +464,51 @@ export default async function HomePage() {
                 hasVariants={product._count?.variants > 0}
                 variants={product.variants}
                 stock={product.stock}
+                fulfillmentType={product.fulfillmentType}
               />
             ))}
+          </div>
+        </section>
+      )}
+
+      {/* ── Gift Box Section ── */}
+      {giftBoxes.length > 0 && (
+        <section className="py-14 my-6" style={{ background: 'linear-gradient(180deg, #fff0f5 0%, #fff8f0 50%, #fff0f5 100%)' }}>
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="text-center mb-10">
+              <p className="text-[#d53c83] font-bold text-sm tracking-widest uppercase mb-2">GIFT COLLECTION</p>
+              <h2 className="text-3xl font-black text-gray-900 tracking-tight">
+                Hộp Quà Yêu Thương 🎀
+              </h2>
+              <div className="w-16 h-1 bg-[#d53c83] mx-auto mt-4 rounded-full opacity-60"></div>
+              <p className="text-xs text-gray-500 mt-3 max-w-md mx-auto leading-relaxed">
+                Gói gém trọn vẹn tình cảm vào từng hộp quà được thiết kế riêng. Trao đi yêu thương, nhận lại nụ cười.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {giftBoxes.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  id={product.id}
+                  name={product.name}
+                  price={product.price}
+                  salePrice={product.salePrice}
+                  image={product.images[0]?.url}
+                  slug={product.slug}
+                  hasVariants={product._count?.variants > 0}
+                  variants={product.variants}
+                  stock={product.stock}
+                  fulfillmentType={product.fulfillmentType}
+                />
+              ))}
+            </div>
+            <div className="text-center mt-8">
+              <Link href="/products?type=gift-box">
+                <Button variant="ghost" className="text-[#d53c83] hover:text-pink-600 hover:bg-pink-50/80 font-bold text-sm px-6 py-2.5 rounded-full border border-pink-200/60">
+                  Xem tất cả Gift Box <ArrowRight className="h-4 w-4 ml-1" />
+                </Button>
+              </Link>
+            </div>
           </div>
         </section>
       )}
@@ -458,6 +543,7 @@ export default async function HomePage() {
                 hasVariants={product._count?.variants > 0}
                 variants={product.variants}
                 stock={product.stock}
+                fulfillmentType={product.fulfillmentType}
               />
             ))}
           </div>

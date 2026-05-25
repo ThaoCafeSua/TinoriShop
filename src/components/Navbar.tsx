@@ -31,6 +31,9 @@ export default function Navbar() {
             <Link href="/products" className="transition-colors hover:opacity-70" style={{ color: '#d53c83' }}>
               Sản phẩm
             </Link>
+            <Link href="/products?type=gift-box" className="transition-colors hover:opacity-70" style={{ color: '#d53c83' }}>
+              Gift Box
+            </Link>
             <Link href="/track-order" className="transition-colors hover:opacity-70" style={{ color: '#d53c83' }}>
               Tra cứu đơn
             </Link>
@@ -107,7 +110,7 @@ export default function Navbar() {
             {[
               { href: "/", label: "Trang chủ" },
               { href: "/products", label: "Sản phẩm" },
-
+              { href: "/products?type=gift-box", label: "Gift Box" },
               { href: "/track-order", label: "Tra cứu đơn" },
               { href: "/news", label: "Tin tức" },
               { href: "/blogs/huong-dan-dat-hang", label: "Hướng dẫn đặt hàng" },

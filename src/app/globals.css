@@ -225,6 +225,8 @@ body {
   animation: marquee 35s linear infinite;
 }
 
-.animate-marquee:hover {
-  animation-play-state: paused;
+@media (hover: hover) {
+  .animate-marquee:hover {
+    animation-play-state: paused;
+  }
 }

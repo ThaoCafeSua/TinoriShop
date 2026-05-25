@@ -51,6 +51,14 @@ export async function GET() {
         }
       }
 
+      // Hoàn trả lượt dùng voucher
+      if (order.voucherCode) {
+        await prisma.voucher.updateMany({
+          where: { code: order.voucherCode },
+          data: { usedCount: { decrement: 1 } }
+        });
+      }
+
       // Gửi email hủy đơn
       if (order.customerEmail) {
         sendOrderCancelledEmail(order.customerEmail, order.code).catch(console.error);
