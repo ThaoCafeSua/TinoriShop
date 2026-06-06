@@ -139,6 +139,17 @@ export default function ProductDetailPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [variantImage]);
 
+  // Sync scroll container when selectedImage changes
+  useEffect(() => {
+    const container = document.getElementById('image-container');
+    if (container) {
+      const currentIndex = Math.round(container.scrollLeft / container.clientWidth);
+      if (currentIndex !== selectedImage) {
+        container.scrollTo({ left: selectedImage * container.clientWidth, behavior: 'smooth' });
+      }
+    }
+  }, [selectedImage]);
+
 
 
   useEffect(() => {
@@ -398,13 +409,7 @@ export default function ProductDetailPage() {
               {displayImages.map((img, i) => (
                 <button
                   key={img.id}
-                  onClick={() => {
-                    setSelectedImage(i);
-                    const container = document.getElementById('image-container');
-                    if (container) {
-                      container.scrollTo({ left: i * container.clientWidth, behavior: 'smooth' });
-                    }
-                  }}
+                  onClick={() => setSelectedImage(i)}
                   className={`relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 border-2 transition-colors ${
                     selectedImage === i
                       ? "border-pink-500"
