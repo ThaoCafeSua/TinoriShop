@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -129,6 +129,11 @@ export default function ProductDetailPage() {
     displayImages.unshift({ id: "variant-image", url: variantImage, isPrimary: false } as any);
   }
 
+  const imageContainerRef = useRef<HTMLDivElement>(null);
+  const isUserScrolling = useRef(false);
+  const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  // When variant image changes, find its index and update selectedImage
   useEffect(() => {
     if (variantImage) {
       const index = displayImages.findIndex((img) => img.url === variantImage);
@@ -139,16 +144,18 @@ export default function ProductDetailPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [variantImage]);
 
-  // Sync scroll container when selectedImage changes
-  useEffect(() => {
-    const container = document.getElementById('image-container');
-    if (container) {
-      const currentIndex = Math.round(container.scrollLeft / container.clientWidth);
-      if (currentIndex !== selectedImage) {
-        container.scrollTo({ left: selectedImage * container.clientWidth, behavior: 'smooth' });
-      }
+  // When selectedImage changes (from variant selection or thumbnail click), scroll to it
+  // But NOT when the user is swiping (to avoid fighting the user's scroll)
+  const scrollToImage = useCallback((index: number) => {
+    const container = imageContainerRef.current;
+    if (container && !isUserScrolling.current) {
+      container.scrollTo({ left: index * container.clientWidth, behavior: 'smooth' });
     }
-  }, [selectedImage]);
+  }, []);
+
+  useEffect(() => {
+    scrollToImage(selectedImage);
+  }, [selectedImage, scrollToImage]);
 
 
 
@@ -356,20 +363,33 @@ export default function ProductDetailPage() {
       <div className="grid md:grid-cols-2 gap-8">
         {/* Images */}
         <div className="min-w-0">
-          <div className="relative w-full aspect-square rounded-2xl bg-gray-50 mb-3 overflow-hidden group">
+          <div className="relative w-full aspect-square rounded-2xl bg-gray-50 mb-3 overflow-hidden">
             {displayImages.length > 0 ? (
               <>
                 <div 
-                  id="image-container"
-                  className="flex overflow-x-auto snap-x snap-mandatory h-full w-full scrollbar-hide scroll-smooth"
+                  ref={imageContainerRef}
+                  className="flex overflow-x-auto snap-x snap-mandatory h-full w-full scrollbar-hide"
+                  style={{ scrollBehavior: 'auto' }}
+                  onTouchStart={() => {
+                    isUserScrolling.current = true;
+                  }}
                   onScroll={(e) => {
+                    // Only update selectedImage from user scrolling
+                    if (!isUserScrolling.current) return;
                     const el = e.currentTarget;
                     const index = Math.round(el.scrollLeft / el.clientWidth);
-                    if (index !== selectedImage) setSelectedImage(index);
+                    if (index >= 0 && index < displayImages.length && index !== selectedImage) {
+                      setSelectedImage(index);
+                    }
+                    // Debounce: mark scrolling as done after user stops
+                    if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+                    scrollTimeout.current = setTimeout(() => {
+                      isUserScrolling.current = false;
+                    }, 150);
                   }}
                 >
                   {displayImages.map((img, i) => (
-                    <div key={img.url} className="min-w-full min-h-full snap-center relative flex-shrink-0">
+                    <div key={`${img.url}-${i}`} className="min-w-full min-h-full snap-center relative flex-shrink-0">
                       <Image
                         src={img.url}
                         alt={`${product.name} - ${i + 1}`}
@@ -405,15 +425,18 @@ export default function ProductDetailPage() {
             )}
           </div>
           {displayImages.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto">
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
               {displayImages.map((img, i) => (
                 <button
-                  key={img.id}
-                  onClick={() => setSelectedImage(i)}
+                  key={`thumb-${img.url}-${i}`}
+                  onClick={() => {
+                    isUserScrolling.current = false;
+                    setSelectedImage(i);
+                  }}
                   className={`relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 border-2 transition-colors ${
                     selectedImage === i
                       ? "border-pink-500"
-                      : "border-transparent"
+                      : "border-transparent hover:border-pink-200"
                   }`}
                 >
                   <Image src={img.url} alt="" fill sizes="80px" className="object-cover" />

@@ -186,8 +186,8 @@ export default async function ProductsPage({
                   }}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
                     (params.sort || "") === opt.value
-                      ? "bg-gray-800 text-white"
-                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      ? "bg-[#d53c83] text-white shadow-sm"
+                      : "bg-pink-50 text-pink-600 hover:bg-pink-100"
                   }`}
                 >
                   {opt.label}
