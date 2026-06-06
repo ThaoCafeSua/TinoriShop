@@ -138,7 +138,7 @@ export default async function ProductsPage({
       <div className="flex gap-6">
 
 
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           {/* Sort & Filter bar */}
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 bg-white rounded-xl px-4 py-3 shadow-sm gap-3">
             <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 scrollbar-hide">

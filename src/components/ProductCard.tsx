@@ -256,10 +256,9 @@ export default function ProductCard({
         </div>
       )}
 
-      <Link href={`/products/${id}`} className="block h-full">
-        <div className="relative overflow-hidden rounded-2xl bg-white shadow-sm hover:shadow-2xl transition-all duration-500 group-hover:-translate-y-2 h-full flex flex-col border border-transparent hover:border-pink-100">
-          <div className="relative aspect-square overflow-hidden bg-gray-50">
-            {image ? (
+      <div className="relative overflow-hidden rounded-2xl bg-white shadow-sm hover:shadow-2xl transition-all duration-500 group-hover:-translate-y-2 h-full flex flex-col border border-transparent hover:border-pink-100">
+        <Link href={`/products/${slug || id}`} className="block relative aspect-square overflow-hidden bg-gray-50">
+          {image ? (
               <>
                 <Image
                   src={matchedVariant?.image || image}
@@ -306,14 +305,16 @@ export default function ProductCard({
             {/* Hover Actions Overlay Removed for cleaner UI */}
 
 
-          </div>
+        </Link>
 
-          <div className="p-4 flex flex-col flex-1">
+        <div className="p-4 flex flex-col flex-1">
+          <Link href={`/products/${slug || id}`} className="block">
             <h3 className="text-sm font-bold text-gray-800 line-clamp-2 mb-1.5 leading-snug group-hover:text-[#d53c83] transition-colors">
               {name}
             </h3>
-            
-            {/* Stars and Sold count */}
+          </Link>
+          
+          {/* Stars and Sold count */}
             <div className="flex items-center gap-1 text-[11px] text-gray-400 mb-2 font-medium">
               <div className="flex items-center text-amber-400">
                 <Star className="h-3 w-3 fill-current" />
@@ -399,7 +400,7 @@ export default function ProductCard({
             </div>
           )}
         </div>
-      </Link>
+      </div>
     </div>
 
   );
