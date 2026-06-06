@@ -66,7 +66,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   // Gửi email tracking theo yêu cầu admin
   if (sendTrackingEmail && order.customerEmail) {
     const finalCode = shippingCode || order.shippingCode;
-    const finalLink = shippingLink || order.shippingLink || (finalCode ? `https://spx.vn/tracking?code=${finalCode}` : undefined);
+    const finalLink = shippingLink || order.shippingLink || (finalCode ? `https://spx.vn/vi?referrer_trigger_type=manual` : undefined);
     if (finalCode) {
       sendShippingTrackingEmail(
         order.customerEmail,

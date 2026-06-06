@@ -96,7 +96,7 @@ export default function AdminOrderDetailPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           shippingCode, 
-          shippingLink: shippingLink || `https://spx.vn/tracking?code=${shippingCode}`,
+          shippingLink: shippingLink || `https://spx.vn/vi?referrer_trigger_type=manual`,
           sendTrackingEmail: true 
         }),
       });
@@ -416,7 +416,7 @@ export default function AdminOrderDetailPage() {
                     <input
                       value={shippingLink}
                       onChange={(e) => setShippingLink(e.target.value)}
-                      placeholder="https://spx.vn/tracking?code=..."
+                      placeholder="https://spx.vn/vi?referrer_trigger_type=manual"
                       className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none"
                     />
                   </div>
