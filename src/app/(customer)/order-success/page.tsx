@@ -57,11 +57,15 @@ function OrderSuccessContent() {
     fetch(`/api/orders/by-code/${code}`)
       .then((r) => r.json())
       .then((data) => { 
-        setOrder(data); 
-        setLoading(false);
-        if (data.status === "PENDING_DEPOSIT") {
-          calculateTimeLeft(data.createdAt);
+        if (data.error) {
+          setOrder(null);
+        } else {
+          setOrder(data); 
+          if (data.status === "PENDING_DEPOSIT") {
+            calculateTimeLeft(data.createdAt);
+          }
         }
+        setLoading(false);
       })
       .catch(() => setLoading(false));
   }, [code]);
@@ -150,8 +154,8 @@ function OrderSuccessContent() {
     { icon: <MapPin className="h-4 w-4 text-red-600" />, label: "Tỉnh/Thành phố", value: order.province, bgColor: "bg-red-100" },
   ];
 
-  const hasPreorder = order.items.some(item => item.product.fulfillmentType === "preorder");
-  const hasInStock = order.items.some(item => item.product.fulfillmentType !== "preorder");
+  const hasPreorder = order.items?.some(item => item.product.fulfillmentType === "preorder") || false;
+  const hasInStock = order.items?.some(item => item.product.fulfillmentType !== "preorder") || false;
   const isMixed = hasPreorder && hasInStock;
 
   const handleMessengerClick = () => {
