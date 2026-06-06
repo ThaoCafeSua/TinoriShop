@@ -322,7 +322,6 @@ export default function ProductDetailPage() {
       maxStock: currentStock,
     };
 
-    clearCart(); // Ensure only this product is checked out
     addItem(cartItem);
     router.push("/checkout");
   };

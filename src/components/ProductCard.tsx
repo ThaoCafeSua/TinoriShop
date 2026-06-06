@@ -153,7 +153,6 @@ export default function ProductCard({
     };
 
     if (selectorType === "buy_now") {
-      clearCart();
       addItem(cartItem);
       router.push("/checkout");
     } else {
@@ -207,7 +206,6 @@ export default function ProductCard({
     
     if (hasVariants) {
       if (matchedVariant) {
-        clearCart();
         const cartItem = {
           id: `${id}-${matchedVariant.id}-${Date.now()}`,
           productId: id,
@@ -237,7 +235,6 @@ export default function ProductCard({
       maxStock: stock,
     };
 
-    clearCart();
     addItem(cartItem);
     router.push("/checkout");
   };
