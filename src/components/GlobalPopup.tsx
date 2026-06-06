@@ -40,8 +40,8 @@ export default function GlobalPopup() {
         className="w-full h-auto max-h-[70vh] object-contain bg-transparent"
       />
       {popup.title && (
-        <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent p-4 text-center">
-          <h3 className="text-white font-bold">{popup.title}</h3>
+        <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-pink-200/90 via-pink-100/60 to-transparent pt-12 pb-4 px-4 text-center">
+          <h3 className="text-[#d53c83] font-black tracking-wide drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)] text-lg">{popup.title}</h3>
         </div>
       )}
     </>
