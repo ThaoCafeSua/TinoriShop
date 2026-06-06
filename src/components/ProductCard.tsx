@@ -401,7 +401,5 @@ export default function ProductCard({
           )}
         </div>
       </div>
-    </div>
-
   );
 }
