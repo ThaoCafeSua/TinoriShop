@@ -345,20 +345,45 @@ export default function ProductDetailPage() {
       <div className="grid md:grid-cols-2 gap-8">
         {/* Images */}
         <div className="min-w-0">
-          <div className="relative w-full aspect-square rounded-2xl bg-gray-50 mb-3 overflow-hidden">
+          <div className="relative w-full aspect-square rounded-2xl bg-gray-50 mb-3 overflow-hidden group">
             {displayImages.length > 0 ? (
               <>
-                <Image
-                  src={displayImages[selectedImage]?.url || displayImages[0].url}
-                  alt={`${product.name} - ${selectedImage + 1}`}
-                  fill
-                  priority
-                  className="object-cover transition-opacity duration-300"
-                  key={displayImages[selectedImage]?.url || displayImages[0].url}
-                />
+                <div 
+                  id="image-container"
+                  className="flex overflow-x-auto snap-x snap-mandatory h-full w-full scrollbar-hide scroll-smooth"
+                  onScroll={(e) => {
+                    const el = e.currentTarget;
+                    const index = Math.round(el.scrollLeft / el.clientWidth);
+                    if (index !== selectedImage) setSelectedImage(index);
+                  }}
+                >
+                  {displayImages.map((img, i) => (
+                    <div key={img.url} className="min-w-full min-h-full snap-center relative flex-shrink-0">
+                      <Image
+                        src={img.url}
+                        alt={`${product.name} - ${i + 1}`}
+                        fill
+                        priority={i === 0}
+                        className="object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
                 {hasDiscount && (
-                  <div className="absolute top-4 left-4 bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-xl z-10">
+                  <div className="absolute top-4 left-4 bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-xl z-10 pointer-events-none">
                     -{discountPercent}%
+                  </div>
+                )}
+                {displayImages.length > 1 && (
+                  <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5 pointer-events-none sm:hidden z-10">
+                    {displayImages.map((_, i) => (
+                      <div 
+                        key={i} 
+                        className={`h-1.5 rounded-full transition-all ${
+                          selectedImage === i ? 'w-4 bg-[#d53c83]' : 'w-1.5 bg-gray-300'
+                        }`} 
+                      />
+                    ))}
                   </div>
                 )}
               </>
@@ -373,7 +398,13 @@ export default function ProductDetailPage() {
               {displayImages.map((img, i) => (
                 <button
                   key={img.id}
-                  onClick={() => setSelectedImage(i)}
+                  onClick={() => {
+                    setSelectedImage(i);
+                    const container = document.getElementById('image-container');
+                    if (container) {
+                      container.scrollTo({ left: i * container.clientWidth, behavior: 'smooth' });
+                    }
+                  }}
                   className={`relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 border-2 transition-colors ${
                     selectedImage === i
                       ? "border-pink-500"
@@ -388,7 +419,7 @@ export default function ProductDetailPage() {
         </div>
 
         {/* Product info */}
-        <div>
+        <div className="min-w-0">
 
           <h1 className="text-2xl font-black text-gray-900 mb-3">{product.name}</h1>
 
