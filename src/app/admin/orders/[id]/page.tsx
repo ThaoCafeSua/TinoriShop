@@ -95,6 +95,7 @@ export default function AdminOrderDetailPage() {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
+          status: "SHIPPING",
           shippingCode, 
           shippingLink: shippingLink || `https://spx.vn/vi?referrer_trigger_type=manual`,
           sendTrackingEmail: true 

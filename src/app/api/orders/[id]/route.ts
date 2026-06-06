@@ -77,19 +77,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     }
   }
 
-  // Khi chuyển sang SHIPPING, gửi email cho khách
-  if (status === "SHIPPING" && order.customerEmail) {
-    const finalCode = shippingCode || order.shippingCode;
-    const finalLink = shippingLink || order.shippingLink;
-    if (finalCode) {
-      sendDepositConfirmedEmail(
-        order.customerEmail,
-        order.code,
-        finalCode,
-        finalLink || undefined
-      ).catch(console.error);
-    }
-  }
+
 
   // Khôi phục tồn kho nếu hủy đơn bằng tay
   if (status === "CANCELLED" && order.status !== "CANCELLED") {
