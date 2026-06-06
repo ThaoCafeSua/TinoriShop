@@ -133,19 +133,28 @@ export default function ProductDetailPage() {
   const isUserScrolling = useRef(false);
   const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  // When variant image changes, find its index and update selectedImage
+  // Track variant selections to sync image - use stringified key to detect changes
+  const selectedVariantsKey = JSON.stringify(selectedVariants);
   useEffect(() => {
+    if (Object.keys(selectedVariants).length === 0) return;
+    // Always allow programmatic scroll after user picks a variant
+    isUserScrolling.current = false;
+
     if (variantImage) {
       const index = displayImages.findIndex((img) => img.url === variantImage);
-      if (index !== -1 && index !== selectedImage) {
+      if (index !== -1) {
         setSelectedImage(index);
+      } else {
+        setSelectedImage(0);
       }
+    } else {
+      // No variant-specific image → show primary/first image
+      setSelectedImage(0);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [variantImage]);
+  }, [selectedVariantsKey]);
 
-  // When selectedImage changes (from variant selection or thumbnail click), scroll to it
-  // But NOT when the user is swiping (to avoid fighting the user's scroll)
+  // Scroll the image container when selectedImage changes programmatically
   const scrollToImage = useCallback((index: number) => {
     const container = imageContainerRef.current;
     if (container && !isUserScrolling.current) {
@@ -499,9 +508,10 @@ export default function ProductDetailPage() {
                   return (
                     <button
                       key={value}
-                      onClick={() =>
-                        setSelectedVariants((prev) => ({ ...prev, [group.name]: value }))
-                      }
+                      onClick={() => {
+                        isUserScrolling.current = false;
+                        setSelectedVariants((prev) => ({ ...prev, [group.name]: value }));
+                      }}
                       className={`px-4 py-2 rounded-xl border-2 text-sm font-medium transition-all ${
                         isSelected
                           ? "border-pink-500 bg-pink-50 text-pink-700"
