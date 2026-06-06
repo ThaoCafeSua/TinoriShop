@@ -11,6 +11,8 @@ interface SearchParams {
   sort?: string;
   featured?: string;
   type?: string;
+  page?: string;
+  availability?: string;
 }
 
 async function getProducts(searchParams: SearchParams) {
@@ -32,12 +34,24 @@ async function getProducts(searchParams: SearchParams) {
       where.name = { contains: searchParams.q };
     }
 
+    if (searchParams.availability === "in_stock") {
+      where.fulfillmentType = "in_stock";
+    } else if (searchParams.availability === "preorder") {
+      where.fulfillmentType = "preorder";
+    }
+
     const orderBy: Record<string, string> = {};
     if (searchParams.sort === "price_asc") orderBy.price = "asc";
     else if (searchParams.sort === "price_desc") orderBy.price = "desc";
     else orderBy.createdAt = "desc";
 
-    return await prisma.product.findMany({
+    const page = Number(searchParams.page) || 1;
+    const limit = 16;
+    const skip = (page - 1) * limit;
+
+    const totalCount = await prisma.product.count({ where });
+
+    const products = await prisma.product.findMany({
       where,
       include: {
         images: { orderBy: [{ isPrimary: 'desc' }, { order: 'asc' }], take: 2 },
@@ -48,10 +62,13 @@ async function getProducts(searchParams: SearchParams) {
         },
       },
       orderBy,
-      take: 48,
+      skip,
+      take: limit,
     });
+
+    return { products, totalCount, totalPages: Math.ceil(totalCount / limit) };
   } catch {
-    return [];
+    return { products: [], totalCount: 0, totalPages: 0 };
   }
 }
 
@@ -69,7 +86,8 @@ export default async function ProductsPage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
-  const products = await getProducts(params);
+  const { products, totalCount, totalPages } = await getProducts(params);
+  const currentPage = Number(params.page) || 1;
 
   const activeCategory = params.category;
 
@@ -87,7 +105,7 @@ export default async function ProductsPage({
             : "Tất cả sản phẩm"}
         </h1>
         <p className="text-gray-500 text-sm mt-1">
-          {products.length} sản phẩm
+          {totalCount} sản phẩm
         </p>
       </div>
 
@@ -122,12 +140,37 @@ export default async function ProductsPage({
 
         <div className="flex-1">
           {/* Sort & Filter bar */}
-          <div className="flex items-center justify-between mb-4 bg-white rounded-xl px-4 py-3 shadow-sm">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <SlidersHorizontal className="h-4 w-4" />
-              <span>Sắp xếp theo:</span>
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 bg-white rounded-xl px-4 py-3 shadow-sm gap-3">
+            <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 scrollbar-hide">
+              <span className="text-sm text-gray-600 whitespace-nowrap font-medium mr-1">Tình trạng:</span>
+              {[
+                { value: "", label: "Tất cả" },
+                { value: "in_stock", label: "Hàng sẵn" },
+                { value: "preorder", label: "Đặt trước" },
+              ].map((opt) => (
+                <Link
+                  key={opt.value}
+                  href={{
+                    query: {
+                      ...params,
+                      availability: opt.value,
+                      page: undefined, // reset page
+                    },
+                  }}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
+                    (params.availability || "") === opt.value
+                      ? "bg-[#d53c83] text-white shadow-sm"
+                      : "bg-pink-50 text-pink-600 hover:bg-pink-100"
+                  }`}
+                >
+                  {opt.label}
+                </Link>
+              ))}
             </div>
-            <div className="flex gap-2">
+
+            <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 scrollbar-hide">
+              <SlidersHorizontal className="h-4 w-4 text-gray-500 shrink-0" />
+              <span className="text-sm text-gray-600 whitespace-nowrap hidden md:inline">Sắp xếp:</span>
               {[
                 { value: "", label: "Mới nhất" },
                 { value: "price_asc", label: "Giá tăng dần" },
@@ -137,13 +180,13 @@ export default async function ProductsPage({
                   key={opt.value}
                   href={{
                     query: {
-                      ...(params.q && { q: params.q }),
-                      ...(opt.value && { sort: opt.value }),
+                      ...params,
+                      sort: opt.value,
                     },
                   }}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
                     (params.sort || "") === opt.value
-                      ? "bg-pink-500 text-white"
+                      ? "bg-gray-800 text-white"
                       : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}
                 >
@@ -188,6 +231,30 @@ export default async function ProductsPage({
                   fulfillmentType={product.fulfillmentType}
                 />
               ))}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-8 gap-2">
+              {Array.from({ length: totalPages }).map((_, i) => {
+                const page = i + 1;
+                return (
+                  <Link
+                    key={page}
+                    href={{
+                      query: { ...params, page: page.toString() },
+                    }}
+                    className={`w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold transition-all ${
+                      currentPage === page
+                        ? "bg-[#d53c83] text-white shadow-md shadow-pink-200"
+                        : "bg-white text-gray-600 border border-gray-200 hover:border-pink-200 hover:text-[#d53c83]"
+                    }`}
+                  >
+                    {page}
+                  </Link>
+                );
+              })}
             </div>
           )}
         </div>
