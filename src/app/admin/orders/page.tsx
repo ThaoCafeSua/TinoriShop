@@ -267,9 +267,6 @@ export default async function AdminOrdersPage({
                       </td>
                       <td className="px-4 py-3 text-center">
                         <div className="flex items-center justify-center gap-1">
-                          {order.status === "PENDING_DEPOSIT" && (
-                            <TestSePayButton orderCode={order.code} depositAmount={order.depositAmount} />
-                          )}
                           <Link href={`/admin/orders/${order.id}`}>
                             <button className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors">
                               <Eye className="h-4 w-4" />
