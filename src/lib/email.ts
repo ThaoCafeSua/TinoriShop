@@ -227,3 +227,49 @@ export async function sendNewOrderAdminEmail(orderCode: string, customerName: st
   }
 }
 
+// Email 6: Gửi mã vận đơn SPX cho khách
+export async function sendShippingTrackingEmail(
+  to: string,
+  orderCode: string,
+  trackingCode: string,
+  trackingLink?: string
+) {
+  if (!process.env.SMTP_USER) {
+    console.log("[EMAIL] SMTP not configured, skipping shipping tracking for", orderCode);
+    return;
+  }
+
+  const defaultLink = `https://spx.vn/tracking?code=${trackingCode}`;
+  const finalLink = trackingLink || defaultLink;
+
+  const html = wrapEmailHtml(`
+    <p>Chào cậu 💗</p>
+    <p>Đơn hàng <strong>#${orderCode}</strong> của bạn đã được gửi đi rồi nè! 🚀</p>
+    <p>Đơn hàng đang trên đường đến với bạn qua <strong>SPX Express</strong>:</p>
+    <div class="tracking-box">
+      <p style="margin:0;font-size:13px;color:#666;">📦 Mã vận đơn SPX</p>
+      <p class="tracking-code">${trackingCode}</p>
+      <p style="text-align:center;margin-top:12px;">
+        <a href="${finalLink}" class="btn" style="color:white;">🔎 Tra cứu đơn hàng</a>
+      </p>
+    </div>
+    <div class="highlight">
+      <p>💰 Phần còn lại bạn thanh toán khi nhận hàng nha 💕</p>
+      <p>📞 Nếu có vấn đề gì, liên hệ Tinori qua Facebook nhé!</p>
+    </div>
+    <p>Cảm ơn cậu đã ủng hộ Tinori 🎀</p>
+  `);
+
+  try {
+    await transporter.sendMail({
+      from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
+      to,
+      subject: `🚚 Đơn hàng #${orderCode} đã được gửi đi — Tra cứu SPX`,
+      html,
+    });
+    console.log(`[EMAIL] SUCCESS: Shipping tracking sent to ${to} for #${orderCode}`);
+  } catch (error) {
+    console.error(`[EMAIL] ERROR: Failed to send tracking to ${to}:`, error);
+  }
+}
+

@@ -51,7 +51,7 @@ async function getFeaturedProducts() {
     return await prisma.product.findMany({
       where: { featured: true, active: true, productType: "STANDARD" },
       include: {
-        images: { where: { isPrimary: true }, take: 1 },
+        images: { orderBy: [{ isPrimary: 'desc' }, { order: 'asc' }], take: 2 },
         _count: { select: { variants: true } },
         variants: { where: { active: true } },
       },
@@ -66,7 +66,7 @@ async function getLatestProducts() {
     return await prisma.product.findMany({
       where: { active: true, productType: "STANDARD" },
       include: {
-        images: { where: { isPrimary: true }, take: 1 },
+        images: { orderBy: [{ isPrimary: 'desc' }, { order: 'asc' }], take: 2 },
         _count: { select: { variants: true } },
         variants: { where: { active: true } },
       },
@@ -81,7 +81,7 @@ async function getGiftBoxes() {
     return await prisma.product.findMany({
       where: { active: true, productType: "GIFT_BOX" },
       include: {
-        images: { where: { isPrimary: true }, take: 1 },
+        images: { orderBy: [{ isPrimary: 'desc' }, { order: 'asc' }], take: 2 },
         _count: { select: { variants: true } },
         variants: { where: { active: true } },
       },
@@ -460,6 +460,7 @@ export default async function HomePage() {
                 price={product.price}
                 salePrice={product.salePrice}
                 image={product.images[0]?.url}
+                hoverImage={product.images[1]?.url}
                 slug={product.slug}
                 hasVariants={product._count?.variants > 0}
                 variants={product.variants}
@@ -473,17 +474,14 @@ export default async function HomePage() {
 
       {/* ── Gift Box Section ── */}
       {giftBoxes.length > 0 && (
-        <section className="py-14 my-6" style={{ background: 'linear-gradient(180deg, #fff0f5 0%, #fff8f0 50%, #fff0f5 100%)' }}>
+        <section className="py-8 my-4">
           <div className="max-w-7xl mx-auto px-4">
             <div className="text-center mb-10">
               <p className="text-[#d53c83] font-bold text-sm tracking-widest uppercase mb-2">GIFT COLLECTION</p>
               <h2 className="text-3xl font-black text-gray-900 tracking-tight">
-                Hộp Quà Yêu Thương 🎀
+                Hộp Quà Yêu Thương
               </h2>
               <div className="w-16 h-1 bg-[#d53c83] mx-auto mt-4 rounded-full opacity-60"></div>
-              <p className="text-xs text-gray-500 mt-3 max-w-md mx-auto leading-relaxed">
-                Gói gém trọn vẹn tình cảm vào từng hộp quà được thiết kế riêng. Trao đi yêu thương, nhận lại nụ cười.
-              </p>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
               {giftBoxes.map((product) => (
@@ -494,6 +492,7 @@ export default async function HomePage() {
                   price={product.price}
                   salePrice={product.salePrice}
                   image={product.images[0]?.url}
+                  hoverImage={product.images[1]?.url}
                   slug={product.slug}
                   hasVariants={product._count?.variants > 0}
                   variants={product.variants}
@@ -517,17 +516,10 @@ export default async function HomePage() {
 
       {/* ── Latest Products ── */}
       <section className="max-w-7xl mx-auto px-4 py-8">
-        <div className="text-center mb-10 relative">
+        <div className="text-center mb-10">
           <p className="text-[#d53c83] font-bold text-sm tracking-widest uppercase mb-2">NEW ARRIVALS</p>
           <h2 className="text-3xl font-black text-gray-900 tracking-tight">Sản Phẩm Mới Nhất</h2>
           <div className="w-12 h-1 bg-[#d53c83] mx-auto mt-4 rounded-full opacity-60"></div>
-          <div className="absolute right-0 bottom-0 hidden md:block">
-            <Link href="/products">
-              <Button variant="ghost" className="text-pink-500 hover:text-pink-600 hover:bg-pink-50 font-medium">
-                Tất cả sản phẩm <ArrowRight className="h-4 w-4 ml-1" />
-              </Button>
-            </Link>
-          </div>
         </div>
         {latestProducts.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -539,6 +531,7 @@ export default async function HomePage() {
                 price={product.price}
                 salePrice={product.salePrice}
                 image={product.images[0]?.url}
+                hoverImage={product.images[1]?.url}
                 slug={product.slug}
                 hasVariants={product._count?.variants > 0}
                 variants={product.variants}
@@ -551,6 +544,16 @@ export default async function HomePage() {
           <div className="text-center py-16 bg-white rounded-2xl">
             <div className="text-pink-100 mb-4 font-black text-6xl">SHOP</div>
             <h3 className="text-xl font-bold mb-2" style={{ color: "#9a7182" }}>Sắp có sản phẩm mới!</h3>
+          </div>
+        )}
+
+        {latestProducts.length > 0 && (
+          <div className="text-center mt-8">
+            <Link href="/products">
+              <Button variant="ghost" className="text-[#d53c83] hover:text-pink-600 hover:bg-pink-50/80 font-bold text-sm px-6 py-2.5 rounded-full border border-pink-200/60">
+                Xem tất cả sản phẩm <ArrowRight className="h-4 w-4 ml-1" />
+              </Button>
+            </Link>
           </div>
         )}
       </section>

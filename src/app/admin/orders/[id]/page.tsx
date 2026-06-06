@@ -82,20 +82,36 @@ export default function AdminOrderDetailPage() {
 
   const [confirmingDeposit, setConfirmingDeposit] = useState(false);
   const [confirmingStatus, setConfirmingStatus] = useState<OrderStatus | null>(null);
-  const [pushingGHTK, setPushingGHTK] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
 
-  const handlePushGHTK = async () => {
-    setPushingGHTK(true);
-    // Giả lập API call 1.5s
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    const fakeCode = "GHTK" + Math.floor(Math.random() * 1000000000);
-    setShippingCode(fakeCode);
-    setShippingLink(`https://khachhang.ghtk.vn/tra-cuu/${fakeCode}`);
-    toast({
-      title: "Đẩy đơn thành công",
-      description: `Đã tạo mã vận đơn ảo: ${fakeCode}`,
-    });
-    setPushingGHTK(false);
+  const handleSendTrackingEmail = async () => {
+    if (!shippingCode) {
+      toast({ title: "Vui lòng nhập mã vận đơn", variant: "destructive" });
+      return;
+    }
+    setSendingEmail(true);
+    try {
+      const res = await fetch(`/api/orders/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          shippingCode, 
+          shippingLink: shippingLink || `https://spx.vn/tracking?code=${shippingCode}`,
+          sendTrackingEmail: true 
+        }),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setOrder((prev) => prev ? { ...prev, ...updated } : null);
+        toast({ title: "Đã gửi email cho khách hàng! 📧", description: `Mã vận đơn: ${shippingCode}` });
+      } else {
+        const err = await res.json();
+        toast({ title: err.error || "Gửi email thất bại", variant: "destructive" });
+      }
+    } catch {
+      toast({ title: "Lỗi kết nối", variant: "destructive" });
+    }
+    setSendingEmail(false);
   };
 
   useEffect(() => {
@@ -380,24 +396,9 @@ export default function AdminOrderDetailPage() {
               <div className="mb-6 bg-gray-50 p-4 rounded-xl border">
                 <div className="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-3">
                   <h3 className="font-semibold text-gray-800 flex items-center gap-2">
-                    <Truck className="h-4 w-4 text-green-600" />
-                    Giao Hàng Tiết Kiệm (GHTK)
+                    <Truck className="h-4 w-4 text-orange-600" />
+                    Vận chuyển SPX Express
                   </h3>
-                  <div className="flex gap-2">
-                    <Button 
-                      onClick={handlePushGHTK} 
-                      disabled={pushingGHTK || !!shippingCode} 
-                      className="bg-green-600 hover:bg-green-700 text-white" 
-                      size="sm"
-                    >
-                      {pushingGHTK ? "Đang đẩy..." : "🚀 Đẩy đơn (Test)"}
-                    </Button>
-                    <Link href={`/admin/orders/${order.id}/print`} target="_blank">
-                      <Button variant="outline" size="sm" className="bg-white">
-                        🖨️ In đơn
-                      </Button>
-                    </Link>
-                  </div>
                 </div>
                 
                 <div className="grid sm:grid-cols-2 gap-3 mb-3">
@@ -406,25 +407,36 @@ export default function AdminOrderDetailPage() {
                     <input
                       value={shippingCode}
                       onChange={(e) => setShippingCode(e.target.value)}
-                      placeholder="VD: GHTK123456789"
-                      className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none"
+                      placeholder="VD: SPXVN12345678"
+                      className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 mb-1">Link Tracking (Tùy chọn)</label>
+                    <label className="block text-xs font-semibold text-gray-500 mb-1">Link Tracking SPX</label>
                     <input
                       value={shippingLink}
                       onChange={(e) => setShippingLink(e.target.value)}
-                      placeholder="https://khachhang.ghtk.vn/tra-cuu/..."
-                      className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none"
+                      placeholder="https://spx.vn/tracking?code=..."
+                      className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none"
                     />
                   </div>
                 </div>
-                <div className="flex justify-end">
+                <div className="flex flex-wrap gap-2 justify-end">
                   <Button onClick={saveShippingInfo} disabled={updating || (!shippingCode && !shippingLink)} variant="secondary" size="sm">
                     Lưu thông tin vận chuyển
                   </Button>
+                  <Button 
+                    onClick={handleSendTrackingEmail} 
+                    disabled={sendingEmail || !shippingCode || !order.customerEmail} 
+                    size="sm" 
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    {sendingEmail ? "Đang gửi..." : "📧 Gửi email cho khách"}
+                  </Button>
                 </div>
+                {!order.customerEmail && (
+                  <p className="text-xs text-amber-500 mt-2 italic">⚠️ Khách hàng chưa cung cấp email, không thể gửi thông báo.</p>
+                )}
                 <p className="text-xs text-gray-400 mt-2 italic">* Cần nhập mã vận đơn trước khi chuyển trạng thái sang &quot;Đang giao&quot;.</p>
               </div>
 

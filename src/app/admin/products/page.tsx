@@ -9,6 +9,7 @@ import { formatPrice } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import DeleteProductButton from "./DeleteProductButton";
 import ProductStatusToggle from "./ProductStatusToggle";
+import QuickEditStock from "@/components/admin/QuickEditStock";
 import Pagination from "@/components/admin/Pagination";
 
 interface SearchParams {
@@ -147,17 +148,7 @@ export default async function AdminProductsPage({
                       </div>
                     </td>
                     <td className="px-4 py-3 text-center hidden sm:table-cell">
-                      <span
-                        className={`text-sm font-semibold ${
-                          product.stock > 10
-                            ? "text-green-600"
-                            : product.stock > 0
-                            ? "text-yellow-600"
-                            : "text-red-600"
-                        }`}
-                      >
-                        {product.stock}
-                      </span>
+                      <QuickEditStock id={product.id} initialStock={product.stock} />
                     </td>
                     <td className="px-4 py-3 text-center">
                       <ProductStatusToggle id={product.id} initialStatus={product.active} />

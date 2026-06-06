@@ -23,6 +23,7 @@ export default function CheckoutPage() {
   const [mounted, setMounted] = useState(false);
   const { savedVouchers } = useSavedVouchers();
   const [validVouchers, setValidVouchers] = useState<string[]>([]);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -115,6 +116,16 @@ export default function CheckoutPage() {
   const onSubmit = async (data: CheckoutFormData) => {
     if (displayItems.length === 0) {
       toast({ title: "Giỏ hàng trống", variant: "destructive" });
+      return;
+    }
+
+    if (!termsAccepted) {
+      toast({ title: "Chưa đồng ý điều khoản", description: "Bạn phải đồng ý với Điều khoản và Điều kiện mua hàng để tiếp tục.", variant: "destructive" });
+      return;
+    }
+
+    if (totalPrice < 200000) {
+      toast({ title: "Đơn hàng tối thiểu 200.000đ", description: "Vui lòng thêm sản phẩm để đạt giá trị đơn tối thiểu", variant: "destructive" });
       return;
     }
 
@@ -305,6 +316,25 @@ export default function CheckoutPage() {
                 Đơn hàng của bạn
               </h2>
 
+              {/* Policy Summary Block */}
+              <div className="bg-pink-50 border border-pink-100 rounded-xl p-4 mb-4 text-xs text-gray-700 space-y-1.5 shadow-sm">
+                <p className="font-bold text-pink-700 uppercase mb-2">Chính sách mua hàng</p>
+                <ul className="list-disc pl-4 space-y-1">
+                  <li>Đơn hàng tối thiểu: <span className="font-bold">200.000đ</span>.</li>
+                  <li>Khách hàng cần đặt cọc trước <span className="font-bold">25.000đ</span> để xác nhận đơn hàng.</li>
+                  <li>Khoản cọc sẽ được trừ vào tổng giá trị đơn hàng khi giao thành công.</li>
+                  <li>Một số sản phẩm là hàng đặt trước, thời gian chuẩn bị khoảng 14 ngày.</li>
+                  <li>Vui lòng đọc Điều khoản và Điều kiện mua hàng trước khi đặt hàng.</li>
+                </ul>
+              </div>
+
+              {totalPrice < 200000 && (
+                <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 mb-4 text-center">
+                  <p className="text-xs text-orange-700 font-bold">⚠️ Đơn hàng tối thiểu 200.000đ</p>
+                  <p className="text-xs text-orange-600 mt-1">Mua thêm <strong>{formatPrice(200000 - totalPrice)}</strong> để có thể đặt hàng</p>
+                </div>
+              )}
+
               <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
                 {displayItems.map((item) => (
                   <div key={item.id} className="flex gap-3">
@@ -419,11 +449,29 @@ export default function CheckoutPage() {
                 )}
               </div>
 
+              {/* Terms and Conditions Checkbox */}
+              <div className="mt-6 mb-4 flex items-start gap-3 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                <div className="flex items-center h-5 mt-0.5">
+                  <input
+                    id="terms"
+                    type="checkbox"
+                    checked={termsAccepted}
+                    onChange={(e) => setTermsAccepted(e.target.checked)}
+                    className="w-4 h-4 text-pink-600 bg-gray-100 border-gray-300 rounded focus:ring-pink-500 cursor-pointer"
+                  />
+                </div>
+                <div className="text-sm text-gray-600">
+                  <label htmlFor="terms" className="cursor-pointer">
+                    Tôi đã đọc và đồng ý với <Link href="/dieu-khoan-mua-hang" target="_blank" className="text-pink-600 font-bold hover:underline">Điều khoản và Điều kiện mua hàng</Link>. <span className="text-red-500">*</span>
+                  </label>
+                </div>
+              </div>
+
               <Button
                 type="submit"
                 className="w-full mt-5"
                 size="lg"
-                disabled={isSubmitting}
+                disabled={isSubmitting || totalPrice < 200000}
               >
                 {isSubmitting ? (
                   <>

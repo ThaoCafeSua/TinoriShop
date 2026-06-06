@@ -16,6 +16,7 @@ interface ProductCardProps {
   price: number;
   salePrice?: number | null;
   image?: string;
+  hoverImage?: string;
   slug: string;
   hasVariants?: boolean;
   variants?: any[];
@@ -29,6 +30,7 @@ export default function ProductCard({
   price,
   salePrice,
   image,
+  hoverImage,
   slug,
   hasVariants = false,
   variants = [],
@@ -261,13 +263,26 @@ export default function ProductCard({
         <div className="relative overflow-hidden rounded-2xl bg-white shadow-sm hover:shadow-2xl transition-all duration-500 group-hover:-translate-y-2 h-full flex flex-col border border-transparent hover:border-pink-100">
           <div className="relative aspect-square overflow-hidden bg-gray-50">
             {image ? (
-              <Image
-                src={matchedVariant?.image || image}
-                alt={name}
-                fill
-                sizes="(max-width: 768px) 100vw, 33vw"
-                className="object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
-              />
+              <>
+                <Image
+                  src={matchedVariant?.image || image}
+                  alt={name}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className={`object-cover transition-all duration-500 ease-in-out ${
+                    hoverImage ? 'group-hover:opacity-0' : 'group-hover:scale-110'
+                  }`}
+                />
+                {hoverImage && (
+                  <Image
+                    src={hoverImage}
+                    alt={`${name} - ảnh 2`}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-in-out"
+                  />
+                )}
+              </>
             ) : (
               <div className="flex h-full items-center justify-center bg-gradient-to-br from-rose-50 to-pink-50 text-gray-400">
                 <ShoppingCart className="mx-auto h-12 w-12 mb-2 opacity-30" />
@@ -291,32 +306,7 @@ export default function ProductCard({
 
 
 
-            {/* Hover Actions Overlay */}
-            <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-10 hidden sm:block">
-              <div className="bg-white/90 backdrop-blur-md p-2 rounded-2xl shadow-2xl flex flex-col gap-2">
-                <button
-                  onClick={handleAddToCart}
-                  className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 ${
-                    addedToCart
-                      ? "bg-green-500 text-white"
-                      : "bg-[#f2d5e0] text-[#d53c83] hover:bg-[#d53c83] hover:text-white"
-                  }`}
-                >
-                  {addedToCart ? (
-                    <><Check className="h-4 w-4" /> Đã thêm</>
-                  ) : (
-                    <><ShoppingCart className="h-4 w-4" /> {hasVariants ? "Tùy chọn" : "Giỏ hàng"}</>
-                  )}
-                </button>
-                <button
-                  onClick={handleBuyNow}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 shadow-lg shadow-[#d53c83]/20"
-                  style={{ backgroundColor: '#d53c83', color: '#ffffff' }}
-                >
-                  <Zap className="h-4 w-4 fill-current" /> Mua ngay
-                </button>
-              </div>
-            </div>
+            {/* Hover Actions Overlay Removed for cleaner UI */}
 
 
           </div>
@@ -348,21 +338,30 @@ export default function ProductCard({
                   </span>
                 )}
               </div>
-              
-              {/* Mobile Only Buttons (Visible when hover overlay is hidden) */}
-              <div className="flex sm:hidden gap-2 mt-3">
+
+              {/* Action buttons - always visible */}
+              <div className="mt-3 flex gap-2">
                 <button
                   onClick={handleAddToCart}
-                  className={`flex-1 flex items-center justify-center py-2 rounded-xl text-[10px] font-bold ${
-                    addedToCart ? "bg-green-500 text-white" : "bg-[#f2d5e0] text-[#d53c83]"
+                  className={`flex items-center justify-center h-8 sm:h-9 rounded-xl text-[11px] font-bold transition-all active:scale-95 ${
+                    addedToCart
+                      ? "bg-green-500 text-white w-full sm:flex-1"
+                      : "bg-[#fdf2f8] text-[#d53c83] border border-[#fce7f3] hover:bg-[#fce7f3] w-10 sm:w-auto sm:flex-1 sm:px-2 shrink-0"
                   }`}
+                  title="Thêm vào giỏ hàng"
                 >
-                  {addedToCart ? <Check className="h-3 w-3" /> : <ShoppingCart className="h-3 w-3" />}
+                  {addedToCart ? (
+                    <Check className="h-4 w-4" />
+                  ) : (
+                    <>
+                      <ShoppingCart className="h-4 w-4 sm:hidden" />
+                      <span className="hidden sm:inline">Giỏ hàng</span>
+                    </>
+                  )}
                 </button>
                 <button
                   onClick={handleBuyNow}
-                  className="flex-[2] py-2 rounded-xl text-[10px] font-bold text-white shadow-md shadow-[#d53c83]/20"
-                  style={{ backgroundColor: '#d53c83' }}
+                  className="flex-1 flex items-center justify-center h-8 sm:h-9 rounded-xl text-[11px] sm:text-xs font-bold transition-all active:scale-95 bg-[#d53c83] text-white hover:bg-[#b83170]"
                 >
                   Mua ngay
                 </button>

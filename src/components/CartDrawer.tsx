@@ -135,16 +135,16 @@ export default function CartDrawer() {
               <span className="text-xl font-bold text-pink-600">{formatPrice(totalPrice)}</span>
             </div>
             
-            {/* Thanh tiến trình miễn phí ship */}
+            {/* Yêu cầu đơn tối thiểu 200k */}
             {totalPrice > 0 && (
               <div className="mb-4">
-                {totalPrice >= 250000 ? (
-                  <div className="bg-green-50 text-green-700 text-xs font-bold py-2 px-3 rounded-lg text-center flex items-center justify-center gap-1.5 border border-green-200">
-                    <span className="text-sm">🎉</span> Chúc mừng! Đơn của bạn được FREESHIP
+                {totalPrice >= 200000 ? (
+                  <div className="bg-green-50 text-green-700 text-xs py-2 px-3 rounded-lg text-center border border-green-200">
+                    Đơn hàng của bạn đủ điều kiện đặt hàng và được <strong>miễn phí vận chuyển</strong>.
                   </div>
                 ) : (
                   <div className="bg-orange-50 text-orange-700 text-xs py-2 px-3 rounded-lg text-center border border-orange-200">
-                    Mua thêm <span className="font-bold">{formatPrice(250000 - totalPrice)}</span> để được <span className="font-bold uppercase">Miễn phí giao hàng</span>
+                    Đơn hàng tối thiểu <strong>200.000đ</strong> để được xử lý.
                   </div>
                 )}
               </div>
@@ -154,16 +154,24 @@ export default function CartDrawer() {
               <span className="inline-block w-1.5 h-1.5 bg-yellow-400 rounded-full"></span>
               Cần đặt cọc 25.000đ để xác nhận đơn hàng
             </p>
-            <Link href="/checkout" onClick={() => setIsOpen(false)}>
-              <Button className="w-full" size="lg">
-                Tiến hành đặt hàng
-              </Button>
-            </Link>
-            <Link href="/cart" onClick={() => setIsOpen(false)}>
-              <Button variant="outline" className="w-full mt-2" size="sm">
-                Xem giỏ hàng
-              </Button>
-            </Link>
+            {totalPrice >= 200000 ? (
+              <Link href="/checkout" onClick={() => setIsOpen(false)}>
+                <Button className="w-full" size="lg">
+                  Tiến hành đặt hàng
+                </Button>
+              </Link>
+            ) : (
+              <div>
+                <Button className="w-full opacity-50 cursor-not-allowed" size="lg" disabled>
+                  Đơn hàng tối thiểu 200.000đ
+                </Button>
+                <Link href="/products" onClick={() => setIsOpen(false)}>
+                  <Button variant="outline" className="w-full mt-2 text-[#d53c83] border-[#d53c83] hover:bg-pink-50" size="sm">
+                    🛍️ Mua thêm sản phẩm
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -40,7 +40,7 @@ async function getProducts(searchParams: SearchParams) {
     return await prisma.product.findMany({
       where,
       include: {
-        images: { where: { isPrimary: true }, take: 1 },
+        images: { orderBy: [{ isPrimary: 'desc' }, { order: 'asc' }], take: 2 },
         category: true,
         _count: { select: { variants: true } },
         variants: {
@@ -180,6 +180,7 @@ export default async function ProductsPage({
                   price={product.price}
                   salePrice={product.salePrice}
                   image={product.images[0]?.url}
+                  hoverImage={product.images[1]?.url}
                   slug={product.slug}
                   hasVariants={product._count?.variants > 0}
                   variants={product.variants}

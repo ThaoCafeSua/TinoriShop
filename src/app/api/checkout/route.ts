@@ -41,6 +41,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Giỏ hàng trống" }, { status: 400 });
   }
 
+  // Validate đơn tối thiểu 200k
+  const MIN_ORDER_AMOUNT = 200000;
+
   // 1. Tính toán lại subtotal dựa trên giá gốc từ DB (Bảo mật giá)
   let calculatedSubtotal = 0;
   const verifiedItems = [];
@@ -82,6 +85,10 @@ export async function POST(req: NextRequest) {
       quantity: Number(item.quantity),
       price: unitPrice, // Dùng giá đã xác minh
     });
+  }
+
+  if (calculatedSubtotal < MIN_ORDER_AMOUNT) {
+    return NextResponse.json({ error: `Đơn hàng tối thiểu ${MIN_ORDER_AMOUNT.toLocaleString('vi-VN')}đ. Vui lòng thêm sản phẩm.` }, { status: 400 });
   }
 
   // 2. Xử lý voucher

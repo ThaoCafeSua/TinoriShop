@@ -253,12 +253,46 @@ export default function ProductForm({ product }: ProductFormProps) {
   };
 
   const onSubmit = async (data: ProductFormData) => {
+    // 1. Validate images
+    const validImages = images.filter(img => img.url.trim() !== "");
+    if (validImages.length === 0) {
+      toast({ title: "Thiếu hình ảnh", description: "Vui lòng tải lên ít nhất 1 hình ảnh sản phẩm hợp lệ.", variant: "destructive" });
+      return;
+    }
+
+    // 2. Validate variants
+    const finalVariants = attributeGroups.length > 0 ? variants : [];
+    if (finalVariants.length > 0) {
+      const activeVariants = finalVariants.filter(v => v.active !== false);
+      if (activeVariants.length === 0) {
+        toast({ title: "Lỗi phân loại", description: "Phải có ít nhất 1 phân loại đang hoạt động.", variant: "destructive" });
+        return;
+      }
+      for (const variant of activeVariants) {
+        if ((variant.price || 0) <= 0) {
+          toast({ title: "Lỗi giá", description: `Giá của phân loại "${variant.name}" phải lớn hơn 0.`, variant: "destructive" });
+          return;
+        }
+        if (variant.salePrice && variant.salePrice >= (variant.price || 0)) {
+          toast({ title: "Lỗi giá khuyến mãi", description: `Giá khuyến mãi của "${variant.name}" phải nhỏ hơn giá gốc.`, variant: "destructive" });
+          return;
+        }
+        if ((variant.stock || 0) < 0) {
+          toast({ title: "Lỗi tồn kho", description: `Kho hàng của "${variant.name}" không được âm.`, variant: "destructive" });
+          return;
+        }
+      }
+    } else {
+      if ((data.price || 0) <= 0) {
+        toast({ title: "Lỗi giá", description: "Giá sản phẩm phải lớn hơn 0.", variant: "destructive" });
+        return;
+      }
+    }
+
     // Calculate aggregate values from variants
     let finalPrice = data.price;
     let finalSalePrice = data.salePrice || null;
     let finalStock = data.stock || 0;
-
-    const finalVariants = attributeGroups.length > 0 ? variants : [];
 
     if (finalVariants.length > 0) {
       // For price, we take the minimum price of all active variants

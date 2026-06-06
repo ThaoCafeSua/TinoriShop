@@ -52,8 +52,7 @@ export const PAYMENT_METHOD_MAP: Record<string, string> = {
   MOMO: "Ví MoMo",
 };
 
-// Tính phí vận chuyển
+// Tính phí vận chuyển - Miễn phí ship cho đơn từ 200k (đơn dưới 200k sẽ bị chặn ở checkout)
 export function calculateShippingFee(subtotal: number, isInnerCity: boolean = false): number {
-  if (subtotal >= 250000) return 0; // Miễn phí ship từ 250k
-  return isInnerCity ? 20000 : 30000;
+  return 0; // Luôn miễn phí ship - yêu cầu đơn tối thiểu 200k
 }

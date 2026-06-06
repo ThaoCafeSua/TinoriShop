@@ -229,4 +229,10 @@ body {
   .animate-marquee:hover {
     animation-play-state: paused;
   }
+}
+
+/* NProgress Cursor Override */
+html.nprogress-busy, 
+html.nprogress-busy * {
+  cursor: wait !important;
 }

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { sendDepositConfirmedEmail } from "@/lib/email";
+import { sendDepositConfirmedEmail, sendShippingTrackingEmail } from "@/lib/email";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -36,7 +36,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
   const { id } = await params;
   const body = await req.json();
-  const { status, shippingCode, shippingLink, depositNote } = body;
+  const { status, shippingCode, shippingLink, depositNote, sendTrackingEmail } = body;
 
   const order = await prisma.order.findUnique({ 
     where: { id },
@@ -62,6 +62,20 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   if (shippingCode !== undefined) updateData.shippingCode = shippingCode;
   if (shippingLink !== undefined) updateData.shippingLink = shippingLink;
   if (depositNote !== undefined) updateData.depositNote = depositNote;
+
+  // Gửi email tracking theo yêu cầu admin
+  if (sendTrackingEmail && order.customerEmail) {
+    const finalCode = shippingCode || order.shippingCode;
+    const finalLink = shippingLink || order.shippingLink || (finalCode ? `https://spx.vn/tracking?code=${finalCode}` : undefined);
+    if (finalCode) {
+      sendShippingTrackingEmail(
+        order.customerEmail,
+        order.code,
+        finalCode,
+        finalLink || undefined
+      ).catch(console.error);
+    }
+  }
 
   // Khi chuyển sang SHIPPING, gửi email cho khách
   if (status === "SHIPPING" && order.customerEmail) {

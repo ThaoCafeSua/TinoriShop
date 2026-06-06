@@ -423,21 +423,6 @@ function OrderSuccessContent() {
       </div>
 
       <div className="flex flex-col gap-3">
-        <Button 
-          onClick={() => {
-            const text = `Mình vừa tậu được đơn hàng siêu xinh tại Tinori Shop! 🎀 Mã đơn: ${code}. Ghé shop xem đồ xinh nhé: ${window.location.origin}`;
-            if (navigator.share) {
-              navigator.share({ title: 'Khoe đơn hàng Tinori', text, url: window.location.href });
-            } else {
-              copyText(text, "link khoe đơn");
-            }
-          }}
-          className="w-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold"
-        >
-          <div className="flex items-center gap-2">
-            <span className="text-lg">✨</span> Khoe đơn hàng ngay
-          </div>
-        </Button>
         <Link href="/products" className="w-full">
           <Button variant="outline" className="w-full">Tiếp tục mua sắm</Button>
         </Link>
