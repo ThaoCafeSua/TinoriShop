@@ -16,7 +16,6 @@ import {
   Heart,
 } from "lucide-react";
 import Link from "next/link";
-import SystemMaintenance from "@/components/admin/SystemMaintenance";
 import RevenueChart from "@/components/admin/dashboard/RevenueChart";
 
 interface DashboardParams {
@@ -323,8 +322,6 @@ export default async function DashboardPage({
           </form>
         </div>
         
-        <SystemMaintenance />
-
         {/* Overview Cards */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
           {statCards.map((card, i) => {
