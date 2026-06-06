@@ -340,27 +340,10 @@ export default function ProductCard({
               <div className="mt-3 flex gap-2">
                 <button
                   onClick={handleAddToCart}
-                  className={`flex items-center justify-center h-8 sm:h-9 rounded-xl text-[11px] font-bold transition-all active:scale-95 ${
-                    addedToCart
-                      ? "bg-green-500 text-white w-full sm:flex-1"
-                      : "bg-[#fdf2f8] text-[#d53c83] border border-[#fce7f3] hover:bg-[#fce7f3] w-10 sm:w-auto sm:flex-1 sm:px-2 shrink-0"
-                  }`}
-                  title="Thêm vào giỏ hàng"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all bg-pink-50 text-pink-600 hover:bg-pink-100"
                 >
-                  {addedToCart ? (
-                    <Check className="h-4 w-4" />
-                  ) : (
-                    <>
-                      <ShoppingCart className="h-4 w-4 sm:hidden" />
-                      <span className="hidden sm:inline">Giỏ hàng</span>
-                    </>
-                  )}
-                </button>
-                <button
-                  onClick={handleBuyNow}
-                  className="flex-1 flex items-center justify-center h-8 sm:h-9 rounded-xl text-[11px] sm:text-xs font-bold transition-all active:scale-95 bg-[#d53c83] text-white hover:bg-[#b83170]"
-                >
-                  Mua ngay
+                  <ShoppingCart className="h-4 w-4" />
+                  Thêm vào giỏ
                 </button>
               </div>
             </div>
