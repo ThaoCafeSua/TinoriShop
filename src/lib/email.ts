@@ -40,7 +40,7 @@ function wrapEmailHtml(content: string): string {
     <body>
       <div class="container">
         <div class="header">
-          <h1>🎀 Tinori Shop</h1>
+          <h1>Tinori Shop</h1>
         </div>
         <div class="body">
           ${content}
@@ -74,7 +74,7 @@ export async function sendDepositReminderEmail(to: string, orderCode: string) {
     <p style="text-align:center;margin-top:12px;">
       <a href="${BASE_URL}/order-success?code=${orderCode}" class="btn" style="color:white;">Xem QR & Đặt cọc ngay</a>
     </p>
-    <p>Tinori đợi cậu 🎀</p>
+    <p>Tinori đợi cậu</p>
   `);
 
   await transporter.sendMail({
@@ -100,7 +100,7 @@ export async function sendOrderCancelledEmail(to: string, orderCode: string) {
       <p>Đơn hàng <strong>#${orderCode}</strong> đã bị hủy do quá 24 giờ chưa đặt cọc.</p>
     </div>
     <p>Nếu vẫn muốn mua, bạn có thể đặt lại bất cứ lúc nào nha.</p>
-    <p>Tinori luôn chờ cậu 🎀</p>
+    <p>Tinori luôn chờ cậu</p>
   `);
 
   await transporter.sendMail({
@@ -140,7 +140,7 @@ export async function sendDepositConfirmedEmail(
     <div class="highlight">
       <p>Phần còn lại bạn thanh toán khi nhận hàng nha.</p>
     </div>
-    <p>Cảm ơn cậu đã ủng hộ Tinori 🎀</p>
+    <p>Cảm ơn cậu đã ủng hộ Tinori</p>
   `);
 
   await transporter.sendMail({
@@ -175,7 +175,7 @@ export async function sendOrderConfirmationEmail(
       <p>Nội dung chuyển khoản: <strong>COC ${orderCode}</strong></p>
       <p>Đơn sẽ tự động hủy nếu chưa nhận được cọc sau 24 giờ</p>
     </div>
-    <p>Tinori đợi cậu nha 🎀</p>
+    <p>Tinori đợi cậu nha</p>
     <p style="text-align:center;margin-top:12px;">
       <a href="${BASE_URL}/order-success?code=${orderCode}" class="btn" style="color:white;">Xem QR & Đặt cọc ngay</a>
     </p>
@@ -196,7 +196,7 @@ export async function sendOrderConfirmationEmail(
 
 // Email 5: Thông báo cho Admin có đơn mới
 export async function sendNewOrderAdminEmail(orderCode: string, customerName: string, totalAmount: number) {
-  const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_USER;
+  const adminEmail = process.env.ADMIN_EMAIL || "thuthusach@gmail.com";
   if (!adminEmail) {
     console.log("[EMAIL] ADMIN_EMAIL not configured, skipping admin notification");
     return;
@@ -257,7 +257,7 @@ export async function sendShippingTrackingEmail(
       <p>Phần còn lại bạn thanh toán khi nhận hàng nha.</p>
       <p>Nếu có vấn đề gì, liên hệ Tinori qua Facebook nhé!</p>
     </div>
-    <p>Cảm ơn cậu đã ủng hộ Tinori 🎀</p>
+    <p>Cảm ơn cậu đã ủng hộ Tinori</p>
   `);
 
   try {
