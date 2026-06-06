@@ -49,7 +49,7 @@ export default function WishlistPage() {
         </Link>
         <div>
           <h1 className="text-3xl font-black text-gray-900">Danh sách yêu thích</h1>
-          <p className="text-gray-500">Những món đồ cậu đang "thầm thương trộm nhớ" ✨</p>
+          <p className="text-gray-500">Những món đồ cậu đang "thầm thương trộm nhớ" </p>
         </div>
       </div>
 

@@ -103,7 +103,7 @@ export default function AdminOrderDetailPage() {
       if (res.ok) {
         const updated = await res.json();
         setOrder((prev) => prev ? { ...prev, ...updated } : null);
-        toast({ title: "Đã gửi email cho khách hàng! 📧", description: `Mã vận đơn: ${shippingCode}` });
+        toast({ title: "Đã gửi email cho khách hàng! ", description: `Mã vận đơn: ${shippingCode}` });
       } else {
         const err = await res.json();
         toast({ title: err.error || "Gửi email thất bại", variant: "destructive" });
@@ -431,11 +431,11 @@ export default function AdminOrderDetailPage() {
                     size="sm" 
                     className="bg-blue-600 hover:bg-blue-700 text-white"
                   >
-                    {sendingEmail ? "Đang gửi..." : "📧 Gửi email cho khách"}
+                    {sendingEmail ? "Đang gửi..." : " Gửi email cho khách"}
                   </Button>
                 </div>
                 {!order.customerEmail && (
-                  <p className="text-xs text-amber-500 mt-2 italic">⚠️ Khách hàng chưa cung cấp email, không thể gửi thông báo.</p>
+                  <p className="text-xs text-amber-500 mt-2 italic">️ Khách hàng chưa cung cấp email, không thể gửi thông báo.</p>
                 )}
                 <p className="text-xs text-gray-400 mt-2 italic">* Cần nhập mã vận đơn trước khi chuyển trạng thái sang &quot;Đang giao&quot;.</p>
               </div>

@@ -166,7 +166,7 @@ export default function CartPage() {
 
             <div className="mt-4 p-3 bg-amber-50 rounded-xl">
               <p className="text-xs text-amber-700 font-medium">
-                ⚡ Đặt cọc 25.000đ qua chuyển khoản hoặc MoMo để xác nhận đơn hàng
+                 Đặt cọc 25.000đ qua chuyển khoản hoặc MoMo để xác nhận đơn hàng
               </p>
             </div>
           </div>

@@ -61,13 +61,13 @@ interface Product {
 }
 
 const reviewTemplates = [
-  { name: "n*****1", comment: "Sản phẩm siêu dễ thương luôn ạ! Đóng gói cực kỳ cẩn thận, shop còn tặng thêm quà siêu xinh nữa. Sẽ tiếp tục ủng hộ shop lâu dài ạaa~ 💕", date: "12-05-2026" },
-  { name: "t*****h", comment: "Đồ đẹp và giao hàng nhanh lắm mọi người ơi, đóng gói siêu cẩn thận luôn, 10 điểm không có nhưng luôn nheee 😍", date: "10-05-2026" },
+  { name: "n*****1", comment: "Sản phẩm siêu dễ thương luôn ạ! Đóng gói cực kỳ cẩn thận, shop còn tặng thêm quà siêu xinh nữa. Sẽ tiếp tục ủng hộ shop lâu dài ạaa~ ", date: "12-05-2026" },
+  { name: "t*****h", comment: "Đồ đẹp và giao hàng nhanh lắm mọi người ơi, đóng gói siêu cẩn thận luôn, 10 điểm không có nhưng luôn nheee ", date: "10-05-2026" },
   { name: "m*****a", comment: "Hàng giao siêu tốc, phụ kiện xinh xỉu luôn á, đóng gói chắc chắn lắm nha. Iu shop quá đi à 🎀", date: "09-05-2026" },
   { name: "h*****n", comment: "Chất lượng sản phẩm tuyệt vời lắm ạ, xinh hơn cả trong ảnh luôn. Shop tư vấn siêu dễ thương nữa!", date: "08-05-2026" },
-  { name: "k*****y", comment: "Giao đúng mẫu, đúng số lượng, đóng gói siêu cute. Giá cả lại rất học sinh sinh viên nữa ạ 💗", date: "07-05-2026" },
-  { name: "p*****o", comment: "Đồ siêu xinh xắn, shop đóng gói cẩn thận có bọc bong bóng khí đầy đủ luôn. Sẽ mua lại lần sau nhaaa 🧸", date: "05-05-2026" },
-  { name: "a*****e", comment: "Nhận hàng mà ưng quá chừng luôn á! Giao hàng siêu nhanh, mới đặt hôm qua hôm nay đã có rùi ✨", date: "02-05-2026" },
+  { name: "k*****y", comment: "Giao đúng mẫu, đúng số lượng, đóng gói siêu cute. Giá cả lại rất học sinh sinh viên nữa ạ ", date: "07-05-2026" },
+  { name: "p*****o", comment: "Đồ siêu xinh xắn, shop đóng gói cẩn thận có bọc bong bóng khí đầy đủ luôn. Sẽ mua lại lần sau nhaaa ", date: "05-05-2026" },
+  { name: "a*****e", comment: "Nhận hàng mà ưng quá chừng luôn á! Giao hàng siêu nhanh, mới đặt hôm qua hôm nay đã có rùi ", date: "02-05-2026" },
 ];
 
 export default function ProductDetailPage() {
@@ -214,7 +214,7 @@ export default function ProductDetailPage() {
   if (!product) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-        <div className="text-6xl mb-4">😢</div>
+        <div className="text-6xl mb-4"></div>
         <h2 className="text-2xl font-bold text-gray-700 mb-4">
           Không tìm thấy sản phẩm
         </h2>
@@ -506,7 +506,7 @@ export default function ProductDetailPage() {
           {/* Deposit notice */}
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-5">
             <p className="text-sm font-semibold text-amber-800">
-              💳 Cần đặt cọc 25.000đ khi đặt hàng
+               Cần đặt cọc 25.000đ khi đặt hàng
             </p>
             <p className="text-xs text-amber-600 mt-1">
               Sau khi xác nhận cọc, đơn hàng sẽ được xử lý ngay
@@ -656,7 +656,7 @@ export default function ProductDetailPage() {
                     <span>🎀 Phản Hồi Của Người Bán</span>
                   </p>
                   <p className="mt-1 leading-relaxed text-[11px]">
-                    Tinori cảm ơn cậu iu rất nhiều vì đã tin tưởng lựa chọn và dành tặng đánh giá siêu ngọt ngào này cho tụi tớ ạ! Chúc cậu luôn rạng rỡ và tràn ngập niềm vui bên món quà nhỏ này nhaaa. Mãi iu cậu! 💕
+                    Tinori cảm ơn cậu iu rất nhiều vì đã tin tưởng lựa chọn và dành tặng đánh giá siêu ngọt ngào này cho tụi tớ ạ! Chúc cậu luôn rạng rỡ và tràn ngập niềm vui bên món quà nhỏ này nhaaa. Mãi iu cậu! 
                   </p>
                 </div>
               </div>

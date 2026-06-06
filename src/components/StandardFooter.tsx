@@ -23,8 +23,7 @@ export default function StandardFooter() {
               <span className="text-2xl font-black">TINORI</span>
             </div>
             <p className="text-gray-600 text-sm leading-relaxed">
-              Sản phẩm rất xinh và dễ thương. Giá hợp lý,
-              giao hàng toàn quốc.
+              Mang đến những điều dễ thương mỗi ngày.
             </p>
             <div className="flex gap-3 mt-4">
               <a
@@ -105,7 +104,7 @@ export default function StandardFooter() {
             </ul>
             <div className="mt-4 p-3 bg-yellow-100 border border-yellow-400 rounded-xl shadow-sm">
               <p className="text-xs text-yellow-800 font-semibold">
-                💡 Đặt cọc 25.000đ để giữ đơn nha
+                 Đặt cọc 25.000đ để giữ đơn nha
               </p>
             </div>
           </div>

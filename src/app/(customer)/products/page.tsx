@@ -157,7 +157,7 @@ export default async function ProductsPage({
 
           {products.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-2xl">
-              <div className="text-6xl mb-4">🔍</div>
+              <div className="text-6xl mb-4"></div>
               <h3 className="text-xl font-bold text-gray-700 mb-2">
                 Không tìm thấy sản phẩm
               </h3>

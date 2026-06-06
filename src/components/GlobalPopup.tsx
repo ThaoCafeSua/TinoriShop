@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import Link from "next/link";
+import { createPortal } from "react-dom";
 
 export default function GlobalPopup() {
   const [popup, setPopup] = useState<any>(null);
@@ -46,7 +47,9 @@ export default function GlobalPopup() {
     </>
   );
 
-  return (
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/40 animate-in fade-in duration-300">
       <div className="relative w-full max-w-sm sm:max-w-md mx-auto animate-in zoom-in-95 duration-500">
         <button 
@@ -68,6 +71,7 @@ export default function GlobalPopup() {
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

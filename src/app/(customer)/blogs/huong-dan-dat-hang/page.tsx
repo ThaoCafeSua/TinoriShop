@@ -38,7 +38,7 @@ export default function GuideBlogPage() {
               </div>
               <div className="flex gap-4 items-start">
                 <div className="w-1.5 h-1.5 bg-pink-400 rounded-full mt-2 shrink-0"></div>
-                <p>Tinori xác nhận đơn và chuẩn bị gửi hàng cho bạn ♡</p>
+                <p>Tinori xác nhận đơn và chuẩn bị gửi hàng cho bạn </p>
               </div>
             </div>
           </section>
@@ -57,16 +57,16 @@ export default function GuideBlogPage() {
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="bg-white p-5 rounded-xl">
                   <p className="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2">
-                    <span className="text-green-500 text-lg">✓</span>
+                    <span className="text-green-500 text-lg"></span>
                     Đơn giao thành công
                   </p>
                   <p className="text-xs text-gray-500 leading-relaxed">
-                    25.000đ sẽ được <strong>trừ trực tiếp</strong> vào tổng thanh toán khi nhận hàng nha ♡
+                    25.000đ sẽ được <strong>trừ trực tiếp</strong> vào tổng thanh toán khi nhận hàng nha 
                   </p>
                 </div>
                 <div className="bg-white p-5 rounded-xl">
                   <p className="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2">
-                    <span className="text-orange-500 text-lg">⚠</span>
+                    <span className="text-orange-500 text-lg"></span>
                     Giao hàng không thành công
                   </p>
                   <p className="text-xs text-gray-500 leading-relaxed">
@@ -76,7 +76,7 @@ export default function GuideBlogPage() {
               </div>
 
               <p className="text-sm text-[#d53c83] font-semibold text-center pt-2">
-                Vì vậy các cậu hãy chắc chắn trước khi đặt hàng giúp Tinori nha ✨
+                Vì vậy các cậu hãy chắc chắn trước khi đặt hàng giúp Tinori nha 
               </p>
             </div>
           </section>
@@ -98,7 +98,7 @@ export default function GuideBlogPage() {
               </div>
               <div className="flex gap-4 items-start">
                 <div className="w-1.5 h-1.5 bg-pink-400 rounded-full mt-2 shrink-0"></div>
-                <p>Nếu cần hỗ trợ, hãy inbox fanpage Tinori nha ♡</p>
+                <p>Nếu cần hỗ trợ, hãy inbox fanpage Tinori nha </p>
               </div>
             </div>
           </section>
@@ -108,7 +108,7 @@ export default function GuideBlogPage() {
             <p className="text-sm text-gray-500 mb-5">Cảm ơn bạn đã ghé qua ngôi nhà nhỏ của Tinori 🎀</p>
             <Link href="/products">
               <Button size="lg" className="bg-[#d53c83] hover:opacity-90 rounded-full px-8 font-bold shadow-lg shadow-pink-200">
-                Bắt đầu mua sắm ngay 🛍️
+                Bắt đầu mua sắm ngay ️
               </Button>
             </Link>
           </div>

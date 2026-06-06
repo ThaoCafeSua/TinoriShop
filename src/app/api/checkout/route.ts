@@ -96,35 +96,42 @@ export async function POST(req: NextRequest) {
   let appliedVoucherCode: string | null = null;
 
   if (voucherCode) {
-    const voucher = await prisma.voucher.findUnique({
-      where: { code: voucherCode.toUpperCase() },
-    });
+    if (voucherCode.toUpperCase() === "FREESHIP") {
+      if (calculatedSubtotal >= 200000) {
+        voucherDiscount = 30000;
+        appliedVoucherCode = "FREESHIP";
+      }
+    } else {
+      const voucher = await prisma.voucher.findUnique({
+        where: { code: voucherCode.toUpperCase() },
+      });
 
-    if (voucher && voucher.active) {
-      const now = new Date();
-      const isValid =
-        (!voucher.startDate || now >= voucher.startDate) &&
-        (!voucher.endDate || now <= voucher.endDate) &&
-        voucher.usedCount < voucher.usageLimit &&
-        calculatedSubtotal >= voucher.minOrderValue;
+      if (voucher && voucher.active) {
+        const now = new Date();
+        const isValid =
+          (!voucher.startDate || now >= voucher.startDate) &&
+          (!voucher.endDate || now <= voucher.endDate) &&
+          voucher.usedCount < voucher.usageLimit &&
+          calculatedSubtotal >= voucher.minOrderValue;
 
-      if (isValid) {
-        if (voucher.discountType === "PERCENT") {
-          voucherDiscount = Math.round(calculatedSubtotal * voucher.discountValue / 100);
-          if (voucher.maxDiscount && voucherDiscount > voucher.maxDiscount) {
-            voucherDiscount = voucher.maxDiscount;
+        if (isValid) {
+          if (voucher.discountType === "PERCENT") {
+            voucherDiscount = Math.round(calculatedSubtotal * voucher.discountValue / 100);
+            if (voucher.maxDiscount && voucherDiscount > voucher.maxDiscount) {
+              voucherDiscount = voucher.maxDiscount;
+            }
+          } else {
+            voucherDiscount = voucher.discountValue;
           }
-        } else {
-          voucherDiscount = voucher.discountValue;
+
+          appliedVoucherCode = voucher.code;
+
+          // Tăng usedCount
+          await prisma.voucher.update({
+            where: { id: voucher.id },
+            data: { usedCount: { increment: 1 } },
+          });
         }
-
-        appliedVoucherCode = voucher.code;
-
-        // Tăng usedCount
-        await prisma.voucher.update({
-          where: { id: voucher.id },
-          data: { usedCount: { increment: 1 } },
-        });
       }
     }
   }

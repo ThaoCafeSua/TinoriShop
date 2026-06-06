@@ -330,7 +330,7 @@ export default function CheckoutPage() {
 
               {totalPrice < 200000 && (
                 <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 mb-4 text-center">
-                  <p className="text-xs text-orange-700 font-bold">⚠️ Đơn hàng tối thiểu 200.000đ</p>
+                  <p className="text-xs text-orange-700 font-bold">️ Đơn hàng tối thiểu 200.000đ</p>
                   <p className="text-xs text-orange-600 mt-1">Mua thêm <strong>{formatPrice(200000 - totalPrice)}</strong> để có thể đặt hàng</p>
                 </div>
               )}

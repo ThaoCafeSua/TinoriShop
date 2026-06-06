@@ -10,7 +10,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const FROM_NAME = "Tinori Shop 🎀";
+const FROM_NAME = "Tinori Shop";
 const FROM_EMAIL = process.env.SMTP_USER || "tinori@shop.com";
 const BASE_URL = process.env.NEXTAUTH_URL || "https://tinori.vercel.app";
 
@@ -46,7 +46,7 @@ function wrapEmailHtml(content: string): string {
           ${content}
         </div>
         <div class="footer">
-          <p>💕 Cảm ơn cậu đã ủng hộ Tinori!</p>
+          <p>Cảm ơn cậu đã ủng hộ Tinori!</p>
           <p>© Tinori Shop - Phụ kiện dễ thương</p>
           <p style="font-style: italic; color: #b3b3b3; margin-top: 12px; font-size: 11px;">* Vui lòng không phản hồi lại email này vì đây là email tự động.</p>
         </div>
@@ -64,23 +64,23 @@ export async function sendDepositReminderEmail(to: string, orderCode: string) {
   }
 
   const html = wrapEmailHtml(`
-    <p>Chào cậu 💗</p>
-    <p>Đơn hàng <strong>#${orderCode}</strong> của bạn đang chờ đặt cọc <strong style="color:#d53c83">25.000đ</strong> để tụi mình giữ hàng nè ~</p>
+    <p>Chào cậu,</p>
+    <p>Đơn hàng <strong>#${orderCode}</strong> của bạn đang chờ đặt cọc <strong style="color:#d53c83">25.000đ</strong> để tụi mình giữ hàng.</p>
     <div class="highlight">
-      <p>⏰ Đơn hàng sẽ tự động hủy nếu không nhận được cọc trong <strong>24 giờ</strong></p>
-      <p>💳 Nội dung chuyển khoản: <strong>COC ${orderCode}</strong></p>
+      <p>Đơn hàng sẽ tự động hủy nếu không nhận được cọc trong <strong>24 giờ</strong></p>
+      <p>Nội dung chuyển khoản: <strong>COC ${orderCode}</strong></p>
     </div>
-    <p>Nếu bạn vẫn muốn mua, hãy chuyển khoản giúp tụi mình nha ✨</p>
+    <p>Nếu bạn vẫn muốn mua, hãy chuyển khoản giúp tụi mình nha.</p>
     <p style="text-align:center;margin-top:12px;">
-      <a href="${BASE_URL}/order-success?code=${orderCode}" class="btn" style="color:white;">💳 Xem QR & Đặt cọc ngay</a>
+      <a href="${BASE_URL}/order-success?code=${orderCode}" class="btn" style="color:white;">Xem QR & Đặt cọc ngay</a>
     </p>
-    <p>Tinori đợi cậu 💕</p>
+    <p>Tinori đợi cậu 🎀</p>
   `);
 
   await transporter.sendMail({
     from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
     to,
-    subject: `⏰ Nhắc đặt cọc - Đơn hàng #${orderCode}`,
+    subject: `Nhắc đặt cọc - Đơn hàng #${orderCode}`,
     html,
   });
   console.log("[EMAIL] Deposit reminder sent to", to, "for order", orderCode);
@@ -94,19 +94,19 @@ export async function sendOrderCancelledEmail(to: string, orderCode: string) {
   }
 
   const html = wrapEmailHtml(`
-    <p>Chào cậu 💗</p>
-    <p>Do quá thời gian giữ đơn mà chưa nhận được cọc, đơn hàng <strong>#${orderCode}</strong> của bạn đã được huỷ rồi nè 😢</p>
+    <p>Chào cậu,</p>
+    <p>Do quá thời gian giữ đơn mà chưa nhận được cọc, đơn hàng <strong>#${orderCode}</strong> của bạn đã được huỷ.</p>
     <div class="highlight">
-      <p>❌ Đơn hàng <strong>#${orderCode}</strong> đã bị hủy do quá 24 giờ chưa đặt cọc</p>
+      <p>Đơn hàng <strong>#${orderCode}</strong> đã bị hủy do quá 24 giờ chưa đặt cọc.</p>
     </div>
-    <p>Nếu vẫn muốn mua, bạn có thể đặt lại bất cứ lúc nào nha ✨</p>
-    <p>Tinori luôn chờ cậu 💕</p>
+    <p>Nếu vẫn muốn mua, bạn có thể đặt lại bất cứ lúc nào nha.</p>
+    <p>Tinori luôn chờ cậu 🎀</p>
   `);
 
   await transporter.sendMail({
     from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
     to,
-    subject: `❌ Đơn hàng #${orderCode} đã bị hủy`,
+    subject: `Đơn hàng #${orderCode} đã bị hủy`,
     html,
   });
   console.log("[EMAIL] Order cancelled email sent to", to, "for order", orderCode);
@@ -125,20 +125,20 @@ export async function sendDepositConfirmedEmail(
   }
 
   const trackingSection = trackingLink
-    ? `<p style="text-align:center;margin-top:12px;"><a href="${trackingLink}" class="btn" style="color:white;">🔎 Theo dõi đơn hàng</a></p>`
+    ? `<p style="text-align:center;margin-top:12px;"><a href="${trackingLink}" class="btn" style="color:white;">Theo dõi đơn hàng</a></p>`
     : "";
 
   const html = wrapEmailHtml(`
-    <p>Chào cậu 💗</p>
-    <p>Tinori đã nhận được tiền đặt cọc <strong style="color:#d53c83">25.000đ</strong> của bạn rồi nè ✨</p>
+    <p>Chào cậu,</p>
+    <p>Tinori đã nhận được tiền đặt cọc <strong style="color:#d53c83">25.000đ</strong> của bạn rồi.</p>
     <p>Đơn hàng của bạn đã được lên đơn vận chuyển:</p>
     <div class="tracking-box">
-      <p style="margin:0;font-size:13px;color:#666;">🚚 Mã vận đơn</p>
+      <p style="margin:0;font-size:13px;color:#666;">Mã vận đơn</p>
       <p class="tracking-code">${trackingCode}</p>
       ${trackingSection}
     </div>
     <div class="highlight">
-      <p>💰 Phần còn lại bạn thanh toán khi nhận hàng nha 💕</p>
+      <p>Phần còn lại bạn thanh toán khi nhận hàng nha.</p>
     </div>
     <p>Cảm ơn cậu đã ủng hộ Tinori 🎀</p>
   `);
@@ -146,7 +146,7 @@ export async function sendDepositConfirmedEmail(
   await transporter.sendMail({
     from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
     to,
-    subject: `✅ Đã nhận cọc - Đơn hàng #${orderCode} đang được giao`,
+    subject: `Đã nhận cọc - Đơn hàng #${orderCode} đang được giao`,
     html,
   });
   console.log("[EMAIL] Deposit confirmed email sent to", to, "for order", orderCode);
@@ -164,20 +164,20 @@ export async function sendOrderConfirmationEmail(
   }
 
   const html = wrapEmailHtml(`
-    <p>Chào ${customerName} 💗</p>
-    <p>Cảm ơn cậu đã đặt hàng tại Tinori! ✨</p>
+    <p>Chào ${customerName},</p>
+    <p>Cảm ơn cậu đã đặt hàng tại Tinori!</p>
     <div class="tracking-box">
       <p style="margin:0;font-size:13px;color:#666;">Mã đơn hàng</p>
       <p class="tracking-code">#${orderCode}</p>
     </div>
     <div class="highlight">
-      <p>💳 Vui lòng đặt cọc <strong style="color:#d53c83">25.000đ</strong> trong vòng 24 giờ</p>
-      <p>📝 Nội dung chuyển khoản: <strong>COC ${orderCode}</strong></p>
-      <p>⏰ Đơn sẽ tự động hủy nếu chưa nhận được cọc sau 24 giờ</p>
+      <p>Vui lòng đặt cọc <strong style="color:#d53c83">25.000đ</strong> trong vòng 24 giờ</p>
+      <p>Nội dung chuyển khoản: <strong>COC ${orderCode}</strong></p>
+      <p>Đơn sẽ tự động hủy nếu chưa nhận được cọc sau 24 giờ</p>
     </div>
-    <p>Tinori đợi cậu nha 💕</p>
+    <p>Tinori đợi cậu nha 🎀</p>
     <p style="text-align:center;margin-top:12px;">
-      <a href="${BASE_URL}/order-success?code=${orderCode}" class="btn" style="color:white;">💳 Xem QR & Đặt cọc ngay</a>
+      <a href="${BASE_URL}/order-success?code=${orderCode}" class="btn" style="color:white;">Xem QR & Đặt cọc ngay</a>
     </p>
   `);
 
@@ -185,7 +185,7 @@ export async function sendOrderConfirmationEmail(
     await transporter.sendMail({
       from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
       to,
-      subject: `🎀 Xác nhận đơn hàng #${orderCode} - Tinori Shop`,
+      subject: `Xác nhận đơn hàng #${orderCode} - Tinori Shop`,
       html,
     });
     console.log(`[EMAIL] SUCCESS: Order confirmation sent to ${to} for #${orderCode}`);
@@ -203,14 +203,14 @@ export async function sendNewOrderAdminEmail(orderCode: string, customerName: st
   }
 
   const html = wrapEmailHtml(`
-    <p>🌟 <strong>Chủ shop ơi, có đơn hàng mới nè!</strong></p>
+    <p><strong>Chủ shop ơi, có đơn hàng mới nè!</strong></p>
     <div class="highlight">
       <p>Mã đơn: <strong>#${orderCode}</strong></p>
       <p>Khách hàng: <strong>${customerName}</strong></p>
       <p>Tổng tiền: <strong>${new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(totalAmount)}</strong></p>
     </div>
     <p style="text-align:center;margin-top:12px;">
-      <a href="${BASE_URL}/admin/orders" class="btn" style="color:white;">🚀 Xem đơn ngay</a>
+      <a href="${BASE_URL}/admin/orders" class="btn" style="color:white;">Xem đơn ngay</a>
     </p>
   `);
 
@@ -218,7 +218,7 @@ export async function sendNewOrderAdminEmail(orderCode: string, customerName: st
     await transporter.sendMail({
       from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
       to: adminEmail,
-      subject: `🔔 CÓ ĐƠN HÀNG MỚI! #${orderCode}`,
+      subject: `CÓ ĐƠN HÀNG MỚI! #${orderCode}`,
       html,
     });
     console.log(`[EMAIL] SUCCESS: Admin notified for #${orderCode}`);
@@ -243,19 +243,19 @@ export async function sendShippingTrackingEmail(
   const finalLink = trackingLink || defaultLink;
 
   const html = wrapEmailHtml(`
-    <p>Chào cậu 💗</p>
-    <p>Đơn hàng <strong>#${orderCode}</strong> của bạn đã được gửi đi rồi nè! 🚀</p>
+    <p>Chào cậu,</p>
+    <p>Đơn hàng <strong>#${orderCode}</strong> của bạn đã được gửi đi rồi!</p>
     <p>Đơn hàng đang trên đường đến với bạn qua <strong>SPX Express</strong>:</p>
     <div class="tracking-box">
-      <p style="margin:0;font-size:13px;color:#666;">📦 Mã vận đơn SPX</p>
+      <p style="margin:0;font-size:13px;color:#666;">Mã vận đơn SPX</p>
       <p class="tracking-code">${trackingCode}</p>
       <p style="text-align:center;margin-top:12px;">
-        <a href="${finalLink}" class="btn" style="color:white;">🔎 Tra cứu đơn hàng</a>
+        <a href="${finalLink}" class="btn" style="color:white;">Tra cứu đơn hàng</a>
       </p>
     </div>
     <div class="highlight">
-      <p>💰 Phần còn lại bạn thanh toán khi nhận hàng nha 💕</p>
-      <p>📞 Nếu có vấn đề gì, liên hệ Tinori qua Facebook nhé!</p>
+      <p>Phần còn lại bạn thanh toán khi nhận hàng nha.</p>
+      <p>Nếu có vấn đề gì, liên hệ Tinori qua Facebook nhé!</p>
     </div>
     <p>Cảm ơn cậu đã ủng hộ Tinori 🎀</p>
   `);
@@ -264,7 +264,7 @@ export async function sendShippingTrackingEmail(
     await transporter.sendMail({
       from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
       to,
-      subject: `🚚 Đơn hàng #${orderCode} đã được gửi đi — Tra cứu SPX`,
+      subject: `Đơn hàng #${orderCode} đã được gửi đi — Tra cứu SPX`,
       html,
     });
     console.log(`[EMAIL] SUCCESS: Shipping tracking sent to ${to} for #${orderCode}`);

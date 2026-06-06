@@ -21,10 +21,18 @@ export default function VoucherCard({ voucher: v }: VoucherProps) {
       <div className="flex h-full">
         {/* Left Part: Discount Value */}
         <div className="w-16 flex-shrink-0 bg-[#fff5f8] flex flex-col items-center justify-center border-r border-dashed border-pink-200 p-2">
-          <div className="text-sm font-black text-[#d53c83]">
-            {v.discountType === "PERCENT" ? `${v.discountValue}%` : (v.discountValue / 1000) + 'k'}
-          </div>
-          <div className="text-[9px] font-bold text-[#9a7182] uppercase">Giảm</div>
+          {v.discountType === "FREESHIP" ? (
+            <>
+              <div className="text-[10px] font-black text-[#d53c83] leading-tight text-center">FREE<br/>SHIP</div>
+            </>
+          ) : (
+            <>
+              <div className="text-sm font-black text-[#d53c83]">
+                {v.discountType === "PERCENT" ? `${v.discountValue}%` : (v.discountValue / 1000) + 'k'}
+              </div>
+              <div className="text-[9px] font-bold text-[#9a7182] uppercase">Giảm</div>
+            </>
+          )}
         </div>
         
         {/* Right Part: Code & Min Order */}

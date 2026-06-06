@@ -129,7 +129,7 @@ async function getActiveVouchers() {
 }
 
 export default async function HomePage() {
-  const [featuredProducts, latestProducts, giftBoxes, banners, posts, vouchers] = await Promise.all([
+  const [featuredProducts, latestProducts, giftBoxes, banners, posts, dbVouchers] = await Promise.all([
     getFeaturedProducts(),
     getLatestProducts(),
     getGiftBoxes(),
@@ -137,6 +137,17 @@ export default async function HomePage() {
     getLatestPosts(),
     getActiveVouchers(),
   ]);
+
+  const vouchers = [
+    {
+      id: "hardcoded-freeship",
+      code: "FREESHIP",
+      discountType: "FREESHIP",
+      discountValue: 30000,
+      minOrderValue: 200000,
+    },
+    ...dbVouchers
+  ];
 
   return (
     <div>
@@ -269,17 +280,17 @@ export default async function HomePage() {
           {/* Cột 1: Ảnh Tiệm Decor Xinh Xắn */}
           <div className="relative rounded-3xl overflow-hidden shadow-md group min-h-[320px] lg:min-h-auto">
             <img
-              src="/brand/storefront.png"
-              alt="Cửa hàng Tinori"
+              src="/brand/birthday.png"
+              alt="Happy Birthday Tinori"
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent flex items-end p-6">
+            <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/10 to-transparent flex items-end p-6">
               <div>
                 <span className="bg-[#d53c83] text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider shadow-md">
-                  Vibe Cực Thơ
+                  Happy Birthday
                 </span>
-                <h3 className="text-white font-black text-lg mt-2 drop-shadow-md">
-                  Góc nhỏ Tinori
+                <h3 className="text-[#d53c83] font-black text-lg mt-2 drop-shadow-sm">
+                  Quà tặng Sinh nhật
                 </h3>
               </div>
             </div>
@@ -563,11 +574,11 @@ export default async function HomePage() {
         <div className="text-center mb-10">
           <p className="text-[#d53c83] font-bold text-sm tracking-widest uppercase mb-2">FEEDBACK & LOVE</p>
           <h2 className="text-3xl font-black text-gray-900 tracking-tight flex items-center justify-center gap-2">
-            Khách Yêu Nói Gì Về Tinori? <span className="animate-bounce">💬</span>
+            Khách Yêu Nói Gì Về Tinori? <span className="animate-bounce"></span>
           </h2>
           <div className="w-16 h-1 bg-[#d53c83] mx-auto mt-4 rounded-full opacity-60"></div>
           <p className="text-xs text-gray-500 mt-3 max-w-md mx-auto leading-relaxed">
-            Những tin nhắn siêu ngọt ngào là động lực to lớn nhất để Tinori hoàn thiện mỗi ngày. Cảm ơn cậu đã tin tưởng! 💕
+            Những tin nhắn siêu ngọt ngào là động lực to lớn nhất để Tinori hoàn thiện mỗi ngày. Cảm ơn cậu đã tin tưởng! 
           </p>
         </div>
 

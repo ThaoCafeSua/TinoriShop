@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
     if (!smtpUser || !smtpPass) {
       return NextResponse.json({
-        error: `SMTP chưa được cấu hình. SMTP_USER: ${smtpUser ? "✅ có" : "❌ thiếu"}, SMTP_PASS: ${smtpPass ? "✅ có" : "❌ thiếu"}. Vào Vercel > Settings > Environment Variables để thêm.`,
+        error: `SMTP chưa được cấu hình. SMTP_USER: ${smtpUser ? " có" : " thiếu"}, SMTP_PASS: ${smtpPass ? " có" : " thiếu"}. Vào Vercel > Settings > Environment Variables để thêm.`,
       }, { status: 400 });
     }
 
@@ -42,12 +42,12 @@ export async function POST(req: NextRequest) {
     await transporter.sendMail({
       from: `"Tinori Test 🎀" <${smtpUser}>`,
       to: email,
-      subject: "✅ Test Email từ Tinori Shop",
-      text: "Chúc mừng! Hệ thống email của bạn đang hoạt động tốt. ✨",
+      subject: " Test Email từ Tinori Shop",
+      text: "Chúc mừng! Hệ thống email của bạn đang hoạt động tốt. ",
       html: `
         <div style="font-family:Arial;max-width:400px;margin:20px auto;padding:24px;background:#fdf2f8;border-radius:16px;text-align:center;">
           <h2 style="color:#d53c83;">🎀 Tinori Shop</h2>
-          <p style="font-size:16px;color:#333;"><b>Chúc mừng!</b> Hệ thống email đang hoạt động tốt. ✨</p>
+          <p style="font-size:16px;color:#333;"><b>Chúc mừng!</b> Hệ thống email đang hoạt động tốt. </p>
           <p style="font-size:12px;color:#999;">Gửi từ: ${smtpUser}</p>
           <p style="font-size:12px;color:#999;">Thời gian: ${new Date().toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })}</p>
         </div>

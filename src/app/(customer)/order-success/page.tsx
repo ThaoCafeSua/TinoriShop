@@ -111,7 +111,7 @@ function OrderSuccessContent() {
 
   const copyText = (text: string, label?: string) => {
     navigator.clipboard.writeText(text);
-    toast({ title: `Đã sao chép ${label || ""}! ✓` });
+    toast({ title: `Đã sao chép ${label || ""}! ` });
   };
 
   if (loading) {
@@ -155,9 +155,9 @@ function OrderSuccessContent() {
   const isMixed = hasPreorder && hasInStock;
 
   const handleMessengerClick = () => {
-    const msg = `Chào Tinori ♡\nMình vừa đặt đơn #${order.code} nha.`;
+    const msg = `Chào Tinori \nMình vừa đặt đơn #${order.code} nha.`;
     navigator.clipboard.writeText(msg);
-    toast({ title: "Đã sao chép tin nhắn! Bạn dán (paste) vào Messenger nha ♡" });
+    toast({ title: "Đã sao chép tin nhắn! Bạn dán (paste) vào Messenger nha " });
     window.open("https://m.me/tinori.official", "_blank");
   };
 
@@ -179,13 +179,13 @@ function OrderSuccessContent() {
             </div>
           )}
           <h1 className="text-2xl font-black text-gray-900 mb-2">
-            {isCancelled ? "Đơn hàng đã bị hủy" : isConfirmed ? "Đơn hàng đã được xác nhận! 🎉" : "Đặt hàng thành công! 🎉"}
+            {isCancelled ? "Đơn hàng đã bị hủy" : isConfirmed ? "Đơn hàng đã được xác nhận! " : "Đặt hàng thành công! "}
           </h1>
           {isPendingDeposit && (
             <p className="text-gray-500">Cảm ơn bạn đã tin tưởng Tinori. Vui lòng hoàn tất đặt cọc để xác nhận đơn hàng.</p>
           )}
           {isConfirmed && (
-            <p className="text-green-600 font-medium">Shop đã xác nhận cọc và đang xử lý đơn hàng! 💕</p>
+            <p className="text-green-600 font-medium">Shop đã xác nhận cọc và đang xử lý đơn hàng! </p>
           )}
         </div>
 
@@ -196,7 +196,7 @@ function OrderSuccessContent() {
               <p className="text-sm font-bold">
                 Thời gian giữ đơn còn lại: <span className="text-lg font-black">{formatTime(timeLeft)}</span>
               </p>
-              <p className="text-xs opacity-80">⏰ Đơn hàng sẽ tự động hủy nếu không nhận được cọc trong <strong>24 giờ</strong></p>
+              <p className="text-xs opacity-80"> Đơn hàng sẽ tự động hủy nếu không nhận được cọc trong <strong>24 giờ</strong></p>
             </div>
           </div>
         )}
@@ -253,7 +253,7 @@ function OrderSuccessContent() {
                 />
                 <p className="text-xs text-gray-500 mt-2">Quét mã QR để chuyển khoản nhanh</p>
                 <p className="text-sm text-pink-600 font-semibold mt-1">
-                  📝 Ghi chú: <span className="font-black">Đặt cọc mã đơn hàng {code}</span>
+                   Ghi chú: <span className="font-black">Đặt cọc mã đơn hàng {code}</span>
                 </p>
               </div>
               <div className="bg-blue-50 rounded-xl p-4 space-y-2 mb-4">
@@ -399,15 +399,15 @@ function OrderSuccessContent() {
             <AlertCircle className="h-5 w-5 shrink-0 text-pink-500" />
             <p>
               {isMixed 
-                ? "Đơn hàng có kèm sản phẩm đặt trước nên toàn bộ đơn sẽ cần khoảng 14 ngày xử lý nha ♡" 
-                : "Hàng đặt trước cần khoảng 14 ngày xử lý ♡"}<br />
+                ? "Đơn hàng có kèm sản phẩm đặt trước nên toàn bộ đơn sẽ cần khoảng 14 ngày xử lý nha " 
+                : "Hàng đặt trước cần khoảng 14 ngày xử lý "}<br />
               Cậu có thể nhắn Tinori để được cập nhật nhanh hơn.
             </p>
           </div>
         )}
         {!hasPreorder && (
           <p className="text-sm text-pink-700 mb-4">
-            Khách yêu có thể nhắn mã đơn cho shop để shop xác nhận và ưu tiên chuẩn bị hàng nhanh hơn nha ♡
+            Khách yêu có thể nhắn mã đơn cho shop để shop xác nhận và ưu tiên chuẩn bị hàng nhanh hơn nha 
           </p>
         )}
 
@@ -415,10 +415,10 @@ function OrderSuccessContent() {
           onClick={handleMessengerClick}
           className="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold h-12 rounded-xl text-base shadow-md shadow-pink-200 transition-all mb-2"
         >
-          Nhắn Tinori xác nhận đơn ♡
+          Nhắn Tinori xác nhận đơn 
         </Button>
         <p className="text-xs text-center text-pink-600 font-medium">
-          *Hệ thống sẽ tự động copy mã đơn. Bạn chỉ cần dán (paste) tin nhắn vào khung chat Messenger nhé ♡
+          *Hệ thống sẽ tự động copy mã đơn. Bạn chỉ cần dán (paste) tin nhắn vào khung chat Messenger nhé 
         </p>
       </div>
 

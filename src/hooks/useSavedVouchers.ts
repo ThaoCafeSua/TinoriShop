@@ -25,7 +25,7 @@ export function useSavedVouchers() {
     const newSaved = [...savedVouchers, code];
     setSavedVouchers(newSaved);
     localStorage.setItem("tinori_saved_vouchers", JSON.stringify(newSaved));
-    toast({ title: "Đã lưu mã giảm giá thành công! 🎉", variant: "success" });
+    toast({ title: "Đã lưu mã giảm giá thành công! ", variant: "success" });
   };
 
   const isSaved = (code: string) => savedVouchers.includes(code);

@@ -10,6 +10,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Vui lòng nhập mã voucher" }, { status: 400 });
   }
 
+  if (code.toUpperCase() === "FREESHIP") {
+    if (subtotal && subtotal < 200000) {
+      return NextResponse.json({ error: "Đơn hàng tối thiểu 200.000đ để sử dụng mã này" }, { status: 400 });
+    }
+    return NextResponse.json({
+      valid: true,
+      code: "FREESHIP",
+      description: "Miễn phí vận chuyển",
+      discountType: "FIXED",
+      discountValue: 30000,
+      discount: 30000,
+      maxDiscount: null,
+      minOrderValue: 200000,
+    });
+  }
+
   const voucher = await prisma.voucher.findUnique({
     where: { code: code.toUpperCase() },
   });

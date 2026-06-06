@@ -167,7 +167,7 @@ export default function CartDrawer() {
                 </Button>
                 <Link href="/products" onClick={() => setIsOpen(false)}>
                   <Button variant="outline" className="w-full mt-2 text-[#d53c83] border-[#d53c83] hover:bg-pink-50" size="sm">
-                    🛍️ Mua thêm sản phẩm
+                    ️ Mua thêm sản phẩm
                   </Button>
                 </Link>
               </div>
