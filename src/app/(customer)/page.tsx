@@ -461,9 +461,11 @@ export default async function HomePage() {
             <h2 className="text-3xl font-black text-gray-900 tracking-tight">Mã Giảm Giá</h2>
             <div className="w-12 h-1 bg-[#d53c83] mx-auto mt-4 rounded-full opacity-60"></div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+          <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 pb-4 md:grid md:grid-cols-3 lg:grid-cols-4 md:overflow-visible md:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {vouchers.map((v) => (
-              <VoucherCard key={v.id} voucher={v as any} />
+              <div key={v.id} className="w-[85vw] max-w-[320px] shrink-0 snap-start md:w-auto md:max-w-none">
+                <VoucherCard voucher={v as any} />
+              </div>
             ))}
           </div>
         </section>

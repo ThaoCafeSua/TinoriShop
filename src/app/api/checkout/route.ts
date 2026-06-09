@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
 
     const MIN_ORDER_AMOUNT = 200000;
     let calculatedSubtotal = 0;
-    const verifiedItems = [];
+    const verifiedItems: any[] = [];
 
     // Pre-check products and calculate subtotal
     for (const item of items) {
