@@ -22,8 +22,8 @@ export async function GET(req: NextRequest) {
       ...(featured === "true" && { featured: true }),
       ...(q && {
         OR: [
-          { name: { contains: q } },
-          { description: { contains: q } },
+          { name: { contains: q, mode: 'insensitive' } },
+          { description: { contains: q, mode: 'insensitive' } },
         ],
       }),
       ...(ids && { id: { in: ids.split(",") } }),

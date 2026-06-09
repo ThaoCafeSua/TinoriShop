@@ -94,7 +94,7 @@ export default function GuideBlogPage() {
               </div>
               <div className="flex gap-4 items-start">
                 <div className="w-1.5 h-1.5 bg-pink-400 rounded-full mt-2 shrink-0"></div>
-                <p>Miễn phí vận chuyển cho đơn từ <strong>250.000đ</strong>.</p>
+                <p>Miễn phí vận chuyển cho đơn từ <strong>200.000đ</strong>.</p>
               </div>
               <div className="flex gap-4 items-start">
                 <div className="w-1.5 h-1.5 bg-pink-400 rounded-full mt-2 shrink-0"></div>

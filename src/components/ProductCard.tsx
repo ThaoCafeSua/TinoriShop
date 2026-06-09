@@ -65,8 +65,7 @@ export default function ProductCard({
     return num.toString();
   };
 
-  const isFavorite = false;
-  const [animateHeart, setAnimateHeart] = useState(false);
+
   const [addedToCart, setAddedToCart] = useState(false);
   const [showSelector, setShowSelector] = useState(false);
   const [selectorType, setSelectorType] = useState<"cart" | "buy_now">("cart");
@@ -92,7 +91,7 @@ export default function ProductCard({
   const selectedValuesString = attributeNames.map((name: string) => selectedVariants[name] || "").join(' - ');
   const matchedVariant = variants.find((v: any) => v.value === selectedValuesString && v.active !== false);
 
-  const displayPrice = matchedVariant?.salePrice || matchedVariant?.price || salePrice || price;
+  const displayPrice = matchedVariant?.salePrice ?? matchedVariant?.price ?? salePrice ?? price;
   const hasDiscount = salePrice && salePrice < price;
   const discountPercent = hasDiscount
     ? Math.round(((price - salePrice!) / price) * 100)

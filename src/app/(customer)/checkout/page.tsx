@@ -154,7 +154,8 @@ export default function CheckoutPage() {
 
       const order = await res.json();
       clearCart();
-      router.push(`/order-success?code=${order.code}`);
+      const last4Phone = data.customerPhone.slice(-4);
+      router.push(`/order-success?code=${order.code}&phone=${last4Phone}`);
     } catch (err) {
       toast({
         title: "Lỗi đặt hàng",

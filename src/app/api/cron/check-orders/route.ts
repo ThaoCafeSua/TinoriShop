@@ -5,7 +5,14 @@ import { sendDepositReminderEmail, sendOrderCancelledEmail } from "@/lib/email";
 // API này được gọi định kỳ (mỗi phút) để:
 // 1. Gửi email nhắc cọc sau 60 phút (1 tiếng)
 // 2. Tự động hủy đơn sau 1440 phút (24 tiếng) nếu chưa có cọc
-export async function GET() {
+export async function GET(req: Request) {
+  const authHeader = req.headers.get('authorization');
+  const cronSecret = process.env.CRON_SECRET;
+
+  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const now = new Date();
 
   // Tìm đơn PENDING_DEPOSIT chưa bị hủy

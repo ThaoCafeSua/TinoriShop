@@ -588,7 +588,7 @@ export default function ProductDetailPage() {
               className="flex-1"
               size="lg"
               variant={addedToCart ? "success" : "default"}
-              disabled={product.stock === 0}
+              disabled={currentStock <= 0}
             >
               {addedToCart ? (
                 <>
@@ -598,7 +598,7 @@ export default function ProductDetailPage() {
               ) : (
                 <>
                   <ShoppingCart className="h-5 w-5" />
-                  {product.stock === 0 ? "Hết hàng" : "Thêm vào giỏ"}
+                  {currentStock <= 0 ? "Hết hàng" : "Thêm vào giỏ"}
                 </>
               )}
             </Button>
@@ -606,8 +606,8 @@ export default function ProductDetailPage() {
               onClick={handleBuyNow}
               className="flex-1 font-bold shadow-lg"
               size="lg"
-              disabled={product.stock === 0}
-              style={{ backgroundColor: '#d53c83', color: '#ffffff' }}
+              disabled={currentStock <= 0}
+              style={{ backgroundColor: currentStock <= 0 ? '#9ca3af' : '#d53c83', color: '#ffffff' }}
             >
               Mua ngay
             </Button>

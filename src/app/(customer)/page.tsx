@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Star, Truck, Shield, RefreshCw, ChevronRight, Heart, Sparkles, Gift } from "lucide-react";
 
 function FacebookIcon({ className }: { className?: string }) {
@@ -19,8 +20,10 @@ function ShopeeIcon({ className }: { className?: string }) {
 
 function TikTokIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12.525.02c1.31 0 2.57.34 3.68.95.07.04.14.08.2.13.06.04.13.09.19.14v3.91c-.9-.45-1.9-.71-2.97-.71-1.07 0-2.07.26-2.97.71V17.5c0 2.21-1.79 4-4 4s-4-1.79-4-4 1.79-4 4-4c.48 0 .94.09 1.36.25V9.66c-.44-.1-.9-.16-1.36-.16-3.87 0-7 3.13-7 7s3.13 7 7 7 7-3.13 7-7v-9.35c1.68 1.15 3.7 1.85 5.89 1.85V1c-2.48 0-4.66-1.15-6.09-2.95-.08-.1-.16-.21-.24-.31-.05-.07-.09-.15-.14-.22z" />
+    <svg className={className} viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M296 88v192c0 22-18 40-40 40s-40-18-40-40 18-40 40-40v-56c-53 0-96 43-96 96s43 96 96 96 96-43 96-96V198c25 15 54 24 85 24v-56c-44 0-82-28-95-68h-46z" fill="#00F2FE" transform="translate(-16, -16)"/>
+      <path d="M296 88v192c0 22-18 40-40 40s-40-18-40-40 18-40 40-40v-56c-53 0-96 43-96 96s43 96 96 96 96-43 96-96V198c25 15 54 24 85 24v-56c-44 0-82-28-95-68h-46z" fill="#FE0050" transform="translate(16, 16)"/>
+      <path d="M296 88v192c0 22-18 40-40 40s-40-18-40-40 18-40 40-40v-56c-53 0-96 43-96 96s43 96 96 96 96-43 96-96V198c25 15 54 24 85 24v-56c-44 0-82-28-95-68h-46z" fill="currentColor"/>
     </svg>
   );
 }
@@ -159,7 +162,7 @@ export default async function HomePage() {
             {banners.length > 0 ? (
               <BannerCarousel banners={banners as any} />
             ) : (
-              <img src="/brand/hero-banner.png" alt="Tinori Banner" className="w-full h-auto object-cover transform hover:scale-[1.02] transition-transform duration-1000" />
+              <Image src="/brand/hero-banner.png" alt="Tinori Banner" width={1200} height={400} className="w-full h-auto object-cover transform hover:scale-[1.02] transition-transform duration-1000" />
             )}
 
             {/* Glassmorphism Buttons Container */}
@@ -279,9 +282,11 @@ export default async function HomePage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
           {/* Cột 1: Ảnh Tiệm Decor Xinh Xắn */}
           <div className="relative rounded-3xl overflow-hidden shadow-md group min-h-[320px] lg:min-h-auto">
-            <img
+            <Image
               src="/brand/birthday.png"
               alt="Happy Birthday Tinori"
+              width={600}
+              height={800}
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/10 to-transparent flex items-end p-6">
@@ -299,8 +304,8 @@ export default async function HomePage() {
           {/* Cột 2: Cam kết ngọt ngào từ Trái Tim */}
           <div className="bg-[#fdf2f8]/70 border border-pink-100/50 rounded-3xl p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
             <div>
-              <h3 className="text-lg font-black text-[#d53c83] flex items-center gap-2 mb-4">
-                Lời Hứa Từ Trái Tim <Heart className="h-5 w-5 fill-current" />
+              <h3 className="text-lg font-black text-[#d53c83] mb-4">
+                Girl Box Tinori
               </h3>
               <ul className="space-y-4">
                 <li className="flex gap-3">
@@ -308,20 +313,31 @@ export default async function HomePage() {
                     <Gift className="h-4 w-4 text-[#d53c83]" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-black text-gray-800 uppercase tracking-wider">Đóng gói thủ công tỉ mỉ</h4>
+                    <h4 className="text-xs font-black text-gray-800 uppercase tracking-wider">Được Chọn Lựa Bằng Yêu Thương</h4>
                     <p className="text-[11px] text-gray-500 font-semibold leading-relaxed mt-0.5">
-                      Mỗi đơn hàng đều được đặt trong hộp quà xinh xắn, lót giấy rơm thơm và thắt ruy-băng handmade tinh tế.
+                      Những món quà nhỏ đều là tâm huyết mà Tinori gửi gắm trong từng hộp quà.
                     </p>
                   </div>
                 </li>
                 <li className="flex gap-3">
                   <div className="w-8 h-8 bg-pink-100/60 rounded-full flex items-center justify-center shrink-0">
-                    <Sparkles className="h-4 w-4 text-[#d53c83]" />
+                    <Star className="h-4 w-4 text-[#d53c83]" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-black text-gray-800 uppercase tracking-wider">Tuyển chọn cao cấp</h4>
+                    <h4 className="text-xs font-black text-gray-800 uppercase tracking-wider">Dành Cho Người Quan Trọng</h4>
                     <p className="text-[11px] text-gray-500 font-semibold leading-relaxed mt-0.5">
-                      Tất cả sản phẩm từ gấu bông, kẹp tóc, quà lưu niệm đều được cam kết chất lượng tốt nhất, an toàn nhất.
+                      Phù hợp cho những dịp đặc biệt và những người mà bạn luôn trân quý.
+                    </p>
+                  </div>
+                </li>
+                <li className="flex gap-3">
+                  <div className="w-8 h-8 bg-pink-100/60 rounded-full flex items-center justify-center shrink-0">
+                    <Heart className="h-4 w-4 text-[#d53c83]" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-black text-gray-800 uppercase tracking-wider">Gửi Đi Một Chút Thân Thương</h4>
+                    <p className="text-[11px] text-gray-500 font-semibold leading-relaxed mt-0.5">
+                      Trao gửi những lời yêu thương, sự quan tâm và niềm vui qua từng món quà nhỏ.
                     </p>
                   </div>
                 </li>
@@ -332,7 +348,7 @@ export default async function HomePage() {
                   <div>
                     <h4 className="text-xs font-black text-gray-800 uppercase tracking-wider">Ship nhanh & Chu đáo</h4>
                     <p className="text-[11px] text-gray-500 font-semibold leading-relaxed mt-0.5">
-                      Hỗ trợ giao hàng hỏa tốc Hà Nội, đóng gói kỹ càng chống va đập tuyệt đối để món quà trọn vẹn nhất.
+                      Hỗ trợ giao hàng hỏa tốc Hà Nội, đóng gói cẩn thận để món quà đến tay người nhận thật trọn vẹn.
                     </p>
                   </div>
                 </li>
@@ -352,7 +368,7 @@ export default async function HomePage() {
                 Kết Nối Cộng Đồng
               </h3>
               <p className="text-[11px] text-gray-500 font-semibold leading-relaxed mb-6">
-                Theo dõi và săn ngay những voucher ưu đãi độc quyền lên tới 50% chỉ dành riêng cho bạn bè trên các kênh mạng xã hội của Tinori nhé!
+                Theo dõi Tinori trên các nền tảng mạng xã hội để cập nhật sản phẩm mới, bộ sưu tập dễ thương và những ưu đãi mới nhất nhé!
               </p>
 
               <div className="space-y-2">
@@ -598,9 +614,11 @@ export default async function HomePage() {
               <Link key={post.id} href={`/news/${post.id}`} className="group bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-pink-50">
                 {post.image ? (
                   <div className="aspect-video overflow-hidden">
-                    <img
+                    <Image
                       src={post.image}
                       alt={post.title}
+                      width={400}
+                      height={300}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>

@@ -201,10 +201,12 @@ body {
 }
 
 /* Hide scrollbars utility */
-.scrollbar-none::-webkit-scrollbar {
+.scrollbar-none::-webkit-scrollbar,
+.scrollbar-hide::-webkit-scrollbar {
   display: none !important;
 }
-.scrollbar-none {
+.scrollbar-none,
+.scrollbar-hide {
   -ms-overflow-style: none !important;
   scrollbar-width: none !important;
 }

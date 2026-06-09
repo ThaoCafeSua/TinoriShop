@@ -7,7 +7,14 @@ import { sendDepositConfirmedEmail, sendShippingTrackingEmail } from "@/lib/emai
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const { searchParams } = new URL(req.url);
-  const phone = searchParams.get("phone");
+  const phone = searchParams.get("phone"); // 4 số cuối
+
+  const session = await getServerSession(authOptions);
+  const isAdmin = session && (session.user as any).role === "admin";
+
+  if (!isAdmin && !phone) {
+    return NextResponse.json({ error: "Không tìm thấy đơn hàng" }, { status: 403 });
+  }
 
   const order = await prisma.order.findUnique({
     where: { id },
@@ -21,10 +28,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     },
   });
 
-  if (!order) return NextResponse.json({ error: "Không tìm thấy đơn hàng" }, { status: 404 });
+  if (!order) return NextResponse.json({ error: "Không tìm thấy đơn hàng" }, { status: 403 });
 
-  if (phone && order.customerPhone !== phone) {
-    return NextResponse.json({ error: "Thông tin không khớp" }, { status: 403 });
+  if (!isAdmin) {
+    if (!order.customerPhone.endsWith(phone as string)) {
+      return NextResponse.json({ error: "Không tìm thấy đơn hàng" }, { status: 403 });
+    }
   }
 
   return NextResponse.json(order);

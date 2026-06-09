@@ -7,23 +7,25 @@ export default withAuth(
     const method = req.method;
 
     // Các routes công khai luôn được phép truy cập
-    const isPublicGet = method === "GET" && [
-      "/api/products", 
-      "/api/categories", 
-      "/api/banners", 
-      "/api/blog-posts", 
-      "/api/vouchers", 
-      "/api/popup",
-      "/api/orders/track"
-    ].some(path => pathname.startsWith(path));
+    const isPublicGet = method === "GET" && (
+      [
+        "/api/products", 
+        "/api/categories", 
+        "/api/banners", 
+        "/api/blog-posts", 
+        "/api/vouchers", 
+        "/api/popup",
+        "/api/orders/track",
+        "/api/orders/by-code"
+      ].some(path => pathname.startsWith(path)) ||
+      /^\/api\/orders\/[a-zA-Z0-9-]+$/.test(pathname)
+    );
 
     const isPublicPost = method === "POST" && [
       "/api/checkout", 
       "/api/track-visit", 
       "/api/webhooks", 
-      "/api/vouchers/check", 
-      "/api/upload-public",
-      "/api/orders/" // Cho phép xác nhận đặt cọc upload deposit
+      "/api/vouchers/check"
     ].some(path => pathname.startsWith(path));
 
     // Đặc biệt kiểm tra upload deposit và webhook (public post)

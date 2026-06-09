@@ -35,11 +35,12 @@ export default function FeedbackCarousel() {
             >
               {/* Image Container with Hover zoom and overlay button */}
               <div className="relative overflow-hidden rounded-xl bg-gray-50 flex-1 flex items-center justify-center h-[340px]">
-                <img 
+                <Image 
                   src={item.img} 
                   alt={item.text}
+                  width={260}
+                  height={340}
                   className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
-                  loading="lazy"
                 />
                 {/* Hover overlay with zoom icon */}
                 <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
@@ -76,9 +77,11 @@ export default function FeedbackCarousel() {
             className="relative max-w-4xl max-h-[90vh] w-full flex items-center justify-center animate-in zoom-in-95 duration-300"
             onClick={(e) => e.stopPropagation()}
           >
-            <img 
+            <Image 
               src={selectedImg} 
               alt="Feedback Details" 
+              width={800}
+              height={800}
               className="max-w-full max-h-[85vh] object-contain rounded-2xl shadow-2xl border-4 border-white/5 bg-white"
             />
           </div>

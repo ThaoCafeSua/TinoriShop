@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Banner {
@@ -35,13 +36,15 @@ export default function BannerCarousel({ banners }: { banners: Banner[] }) {
         const isAdjacent = i === (current + 1) % banners.length || i === (current - 1 + banners.length) % banners.length;
         if (!isVisible && !isAdjacent) return null;
         return (
-          <img
+          <Image
             key={b.id}
             src={b.image}
             alt={`Banner ${i + 1}`}
+            width={1200}
+            height={400}
             className={`w-full h-auto block transition-opacity duration-700 ${isVisible ? "opacity-100 relative" : "opacity-0 absolute inset-0"}`}
             style={{ maxHeight: "none" }}
-            loading={isVisible ? "eager" : "lazy"}
+            priority={isVisible}
           />
         );
       })}

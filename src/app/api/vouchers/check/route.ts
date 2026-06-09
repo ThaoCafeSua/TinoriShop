@@ -69,6 +69,11 @@ export async function POST(req: NextRequest) {
     discount = voucher.discountValue;
   }
 
+  // Giới hạn giảm giá không vượt quá giá trị đơn hàng
+  if (subtotal && discount > subtotal) {
+    discount = subtotal;
+  }
+
   return NextResponse.json({
     valid: true,
     code: voucher.code,

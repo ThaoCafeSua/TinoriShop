@@ -48,13 +48,15 @@ const BANK_INFO = {
 function OrderSuccessContent() {
   const searchParams = useSearchParams();
   const code = searchParams.get("code");
+  const phone = searchParams.get("phone");
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
 
   const fetchOrder = useCallback(() => {
     if (!code) { setLoading(false); return; }
-    fetch(`/api/orders/by-code/${code}`)
+    const url = `/api/orders/by-code/${code}` + (phone ? `?phone=${phone}` : "");
+    fetch(url)
       .then((r) => r.json())
       .then((data) => { 
         if (data.error) {

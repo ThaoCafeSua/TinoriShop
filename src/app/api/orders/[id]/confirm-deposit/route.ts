@@ -18,6 +18,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   if (!order) return NextResponse.json({ error: "Không tìm thấy đơn hàng" }, { status: 404 });
 
+  if (order.status !== "PENDING_DEPOSIT") {
+    return NextResponse.json({ error: "Chỉ có thể xác nhận cọc cho đơn hàng đang chờ cọc" }, { status: 400 });
+  }
+
   if (order.depositStatus === "PAID") {
     return NextResponse.json({ error: "Đơn hàng đã được xác nhận cọc trước đó" }, { status: 400 });
   }
@@ -31,6 +35,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       status: "CONFIRMED",
     },
   });
+
+  if (order.customerEmail) {
+    import("@/lib/email").then(({ sendDepositConfirmedEmail }) => {
+      sendDepositConfirmedEmail(order.customerEmail!, order.code, order.customerName).catch(console.error);
+    }).catch(console.error);
+  }
 
   return NextResponse.json(updated);
 }
