@@ -19,9 +19,11 @@ export const metadata: Metadata = {
     description: "Tinori - Nơi những điều xinh đẹp được nâng niu.",
     type: "website",
   },
+  other: {
+    "p:domain_verify": "e701bcc01f0c254d1dcdc8242b797468",
+  },
 };
 
-import FloatingWidgets from "@/components/FloatingWidgets";
 import VisitTracker from "@/components/VisitTracker";
 import NextTopLoader from "nextjs-toploader";
 
@@ -45,7 +47,6 @@ export default function RootLayout({
           shadow="0 0 10px #d53c83,0 0 5px #d53c83"
         />
         <VisitTracker />
-        <FloatingWidgets />
         {children}
         <Toaster />
       </body>
