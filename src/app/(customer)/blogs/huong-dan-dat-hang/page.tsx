@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 
 export default function GuideBlogPage() {
   return (
-    <div className="min-h-screen bg-rose-50/30 py-12">
+    <div className="flex-1 w-full bg-rose-50/30 py-12">
       <div className="max-w-3xl mx-auto px-4">
         
         {/* Header */}

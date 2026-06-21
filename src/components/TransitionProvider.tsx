@@ -36,7 +36,7 @@ export default function TransitionProvider({
         initial="hidden"
         animate="enter"
         exit="exit"
-        className="min-h-screen"
+        className="flex-1 flex flex-col w-full"
       >
         {children}
       </motion.div>

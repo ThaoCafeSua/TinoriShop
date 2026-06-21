@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import ProductCard from "@/components/ProductCard";
 import Link from "next/link";
 import { Filter, SlidersHorizontal } from "lucide-react";
+import ProductSearch from "@/components/ProductSearch";
 
 export const dynamic = "force-dynamic";
 
@@ -104,9 +105,10 @@ export default async function ProductsPage({
             ? "Hộp Quà Tặng"
             : "Tất cả sản phẩm"}
         </h1>
-        <p className="text-gray-500 text-sm mt-1">
+        <p className="text-gray-500 text-sm mt-1 mb-6">
           {totalCount} sản phẩm
         </p>
+        <ProductSearch />
       </div>
 
       {/* Product Type Tabs */}

@@ -302,7 +302,7 @@ export default function CheckoutPage() {
                     </div>
                     <div>
                       <p className="font-semibold text-gray-800">Chuyển khoản ngân hàng</p>
-                      <p className="text-xs text-gray-500">MB Bank / Vietcombank</p>
+                      <p className="text-xs text-gray-500">Hỗ trợ quét mã QR mọi ngân hàng</p>
                     </div>
                   </div>
                 </label>

@@ -1,14 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { Search, Store, Menu, X } from "lucide-react";
+import { Store, Menu, X } from "lucide-react";
 import { useState } from "react";
 import CartDrawer from "@/components/CartDrawer";
 
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
 
 
   return (
@@ -57,14 +56,6 @@ export default function Navbar() {
 
           {/* Actions */}
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setSearchOpen(!searchOpen)}
-              className="p-2 transition-colors hover:opacity-70"
-              style={{ color: '#d53c83' }}
-            >
-              <Search className="h-6 w-6" />
-            </button>
-
             <CartDrawer />
             <button
               className="md:hidden p-2"
@@ -76,31 +67,6 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Search bar */}
-        {searchOpen && (
-          <div className="pb-3">
-            <form
-              action="/products"
-              className="flex gap-2"
-            >
-              <input
-                name="q"
-                type="text"
-                placeholder="Tìm kiếm sản phẩm..."
-                className="flex-1 h-10 rounded-xl px-4 text-sm text-gray-800 bg-gray-50 border border-gray-100 focus:outline-none focus:ring-2"
-
-                autoFocus
-              />
-              <button
-                type="submit"
-                className="h-10 px-4 rounded-xl font-bold text-sm transition-opacity hover:opacity-90"
-                style={{ backgroundColor: '#f2d5e0', color: '#d53c83' }}
-              >
-                Tìm
-              </button>
-            </form>
-          </div>
-        )}
       </div>
 
       {/* Mobile menu */}

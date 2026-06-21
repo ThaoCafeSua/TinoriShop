@@ -184,23 +184,23 @@ export default async function HomePage() {
       <section className="max-w-5xl mx-auto px-4 -mt-6 mb-8 relative z-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Sản phẩm lẻ */}
-          <Link href="/products" className="group relative overflow-hidden rounded-2xl h-[180px] sm:h-[200px] block">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#fff1f2] via-[#ffe4e6] to-[#fecdd3] transition-transform duration-700 group-hover:scale-105"></div>
+          <Link href="/products" className="group relative overflow-hidden rounded-2xl h-[180px] sm:h-[200px] block border border-pink-50/50">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#FCEEF3] via-[#F9E8F1] to-[#FBEFF4] transition-transform duration-700 group-hover:scale-105"></div>
             <div className="absolute inset-0 bg-[url('/brand/pattern-dots.png')] opacity-[0.04]"></div>
             <div className="relative h-full flex flex-col items-center justify-center text-center p-6">
-              <h3 className="text-xl sm:text-2xl font-black text-[#9f1239] mb-1">Dành Riêng Cho Cậu</h3>
-              <p className="text-xs sm:text-sm text-[#be123c] font-medium opacity-80">Những món phụ kiện nhỏ xinh xắn đang chờ bạn</p>
-              <span className="mt-4 inline-block px-6 py-2 bg-white/60 backdrop-blur-sm text-[#9f1239] text-xs font-bold rounded-full shadow-sm group-hover:bg-white transition-colors">Ghé xem ngay</span>
+              <h3 className="text-xl sm:text-2xl font-black text-[#D85C9A] mb-1">Dành Riêng Cho Cậu</h3>
+              <p className="text-xs sm:text-sm text-[#D85C9A] font-medium opacity-90">Những món phụ kiện nhỏ xinh xắn đang chờ bạn</p>
+              <span className="mt-4 inline-block px-6 py-2 bg-white/70 backdrop-blur-sm text-[#D85C9A] text-xs font-bold rounded-full shadow-sm group-hover:bg-white transition-colors">Ghé xem ngay</span>
             </div>
           </Link>
           {/* Gift Box */}
-          <Link href="/products?type=gift-box" className="group relative overflow-hidden rounded-2xl h-[180px] sm:h-[200px] block">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#fdf2f8] via-[#fce7f3] to-[#fbcfe8] transition-transform duration-700 group-hover:scale-105"></div>
+          <Link href="/products?type=gift-box" className="group relative overflow-hidden rounded-2xl h-[180px] sm:h-[200px] block border border-pink-50/50">
+            <div className="absolute inset-0 bg-gradient-to-bl from-[#FCEEF3] via-[#FBEFF4] to-[#F9E8F1] transition-transform duration-700 group-hover:scale-105"></div>
             <div className="absolute inset-0 bg-[url('/brand/pattern-dots.png')] opacity-[0.04]"></div>
             <div className="relative h-full flex flex-col items-center justify-center text-center p-6">
-              <h3 className="text-xl sm:text-2xl font-black text-[#be185d] mb-1">Trao Gửi Yêu Thương</h3>
-              <p className="text-xs sm:text-sm text-[#db2777] font-medium opacity-80">Hộp quà ngọt ngào gói ghém trọn vẹn tình cảm</p>
-              <span className="mt-4 inline-block px-6 py-2 bg-white/60 backdrop-blur-sm text-[#be185d] text-xs font-bold rounded-full shadow-sm group-hover:bg-white transition-colors">Chọn quà nha</span>
+              <h3 className="text-xl sm:text-2xl font-black text-[#D85C9A] mb-1">Trao Gửi Yêu Thương</h3>
+              <p className="text-xs sm:text-sm text-[#D85C9A] font-medium opacity-90">Hộp quà ngọt ngào gói ghém trọn vẹn tình cảm</p>
+              <span className="mt-4 inline-block px-6 py-2 bg-white/70 backdrop-blur-sm text-[#D85C9A] text-xs font-bold rounded-full shadow-sm group-hover:bg-white transition-colors">Chọn quà nha</span>
             </div>
           </Link>
         </div>
@@ -463,7 +463,7 @@ export default async function HomePage() {
           </div>
           <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 pb-4 md:grid md:grid-cols-3 lg:grid-cols-4 md:overflow-visible md:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {vouchers.map((v) => (
-              <div key={v.id} className="w-[85vw] max-w-[320px] shrink-0 snap-start md:w-auto md:max-w-none">
+              <div key={v.id} className="w-[60vw] max-w-[240px] shrink-0 snap-start md:w-auto md:max-w-none">
                 <VoucherCard voucher={v as any} />
               </div>
             ))}

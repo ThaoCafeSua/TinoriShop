@@ -168,7 +168,7 @@ function OrderSuccessContent() {
   };
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative flex-1 w-full flex flex-col">
       <div className="max-w-2xl mx-auto px-4 py-8 relative z-10">
         <div className="text-center mb-8">
           {isCancelled ? (
